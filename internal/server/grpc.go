@@ -1,7 +1,8 @@
 package server
 
 import (
-	v1 "crow/api/todo/v1"
+	loginv1 "crow/api/login/v1"
+	todov1 "crow/api/todo/v1"
 	"crow/internal/conf"
 	"crow/internal/service"
 
@@ -10,7 +11,7 @@ import (
 )
 
 // NewGRPCServer new a gRPC server.
-func NewGRPCServer(c *conf.Server, todo *service.TodoService) *grpc.Server {
+func NewGRPCServer(c *conf.Server, todo *service.TodoService, login *service.LoginService) *grpc.Server {
 	var opts = []grpc.ServerOption{
 		grpc.Middleware(
 			recovery.Recovery(),
@@ -26,6 +27,7 @@ func NewGRPCServer(c *conf.Server, todo *service.TodoService) *grpc.Server {
 		opts = append(opts, grpc.Timeout(c.Grpc.Timeout.AsDuration()))
 	}
 	srv := grpc.NewServer(opts...)
-	v1.RegisterTodoServiceServer(srv, todo)
+	todov1.RegisterTodoServiceServer(srv, todo)
+	loginv1.RegisterLoginServiceServer(srv, login)
 	return srv
 }

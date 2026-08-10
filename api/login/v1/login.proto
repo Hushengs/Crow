@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+package login.v1;
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+
+option go_package = "crow/api/login/v1;v1";
+option java_multiple_files = true;
+option java_package = "io.grpc.examples.login.v1";
+option java_outer_classname = "LoginProto";
+
+// LoginService provides authentication endpoints for users.
+service LoginService {
+  // Login authenticates a user with account credentials and returns tokens
+  // for subsequent authenticated requests.
+  rpc Login (LoginRequest) returns (LoginReply) {
+    option (google.api.http) = {
+      post: "/v1/login"
+      body: "*"
+    };
+  }
+}
+
+// LoginRequest is the input for LoginService.Login.
+message LoginRequest {
+  // User account identifier, such as username, email, or phone number.
+  string account = 1 [(google.api.field_behavior) = REQUIRED];
+  // Plaintext password submitted by the client for authentication.
+  string password = 2 [(google.api.field_behavior) = REQUIRED];
+}
+
+// LoginReply contains the authentication result for a successful login.
+message LoginReply {
+  // Bearer token used to access protected APIs.
+  string access_token = 1;
+  // Optional refresh token used to obtain a new access token.
+  string refresh_token = 2;
+  // Token type returned to the client. Usually "Bearer".
+  string token_type = 3;
+  // Access token lifetime in seconds.
+  int64 expires_in = 4;
+  // Authenticated user identifier.
+  int64 user_id = 5;
+}

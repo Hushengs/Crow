@@ -1,7 +1,8 @@
 package server
 
 import (
-	v1 "crow/api/todo/v1"
+	loginv1 "crow/api/login/v1"
+	todov1 "crow/api/todo/v1"
 	"crow/internal/conf"
 	"crow/internal/service"
 	"github.com/go-kratos/kratos/v3/middleware/recovery"
@@ -13,7 +14,7 @@ import (
 )
 
 // NewHTTPServer new an HTTP server.
-func NewHTTPServer(c *conf.Server, todo *service.TodoService) *http.Server {
+func NewHTTPServer(c *conf.Server, todo *service.TodoService, login *service.LoginService) *http.Server {
 	var opts = []http.ServerOption{
 		http.Middleware(
 			recovery.Recovery(),
@@ -37,6 +38,7 @@ func NewHTTPServer(c *conf.Server, todo *service.TodoService) *http.Server {
 		opts = append(opts, http.Timeout(c.Http.Timeout.AsDuration()))
 	}
 	srv := http.NewServer(opts...)
-	v1.RegisterTodoServiceHTTPServer(srv, todo)
+	todov1.RegisterTodoServiceHTTPServer(srv, todo)
+	loginv1.RegisterLoginServiceHTTPServer(srv, login)
 	return srv
 }
