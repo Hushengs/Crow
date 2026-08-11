@@ -1,9 +1,12 @@
 package data
 
 import (
+	"context"
+	"database/sql"
 	"crow/internal/conf"
 
 	"github.com/go-kratos/kratos/v3/log"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/google/wire"
 )
 
@@ -12,13 +15,23 @@ var ProviderSet = wire.NewSet(NewData, NewTodoRepo, NewLoginRepo)
 
 // Data .
 type Data struct {
-	// TODO wrapped database client
+	db *sql.DB
 }
 
 // NewData .
 func NewData(c *conf.Data) (*Data, func(), error) {
+	db, err := sql.Open(c.GetDatabase().GetDriver(), c.GetDatabase().GetSource())
+	if err != nil {
+		return nil, nil, err
+	}
+	if err := db.PingContext(context.Background()); err != nil {
+		_ = db.Close()
+		return nil, nil, err
+	}
+
 	cleanup := func() {
 		log.Info("closing the data resources")
+		_ = db.Close()
 	}
-	return &Data{}, cleanup, nil
+	return &Data{db: db}, cleanup, nil
 }
