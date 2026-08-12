@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/go-kratos/kratos/v3/errors"
+	"golang.org/x/crypto/bcrypt"
 )
 
 var (
@@ -48,8 +49,8 @@ type TokenGenerator interface {
 
 // LoginUsecase is the login usecase.
 type LoginUsecase struct {
-	repo   LoginRepo
-	token  TokenGenerator
+	repo  LoginRepo
+	token TokenGenerator
 }
 
 // NewLoginUsecase creates a new LoginUsecase.
@@ -67,8 +68,18 @@ func (uc *LoginUsecase) Login(ctx context.Context, in *LoginInput) (*LoginResult
 	if err != nil {
 		return nil, err
 	}
-	if user == nil || user.PasswordHash != in.Password {
+	if user == nil || !matchPassword(user.PasswordHash, in.Password) {
 		return nil, ErrLoginInvalidCredentials
 	}
 	return uc.token.Generate(ctx, user)
+}
+
+func matchPassword(storedPassword, plainPassword string) bool {
+	if storedPassword == "" || plainPassword == "" {
+		return false
+	}
+	if err := bcrypt.CompareHashAndPassword([]byte(storedPassword), []byte(plainPassword)); err == nil {
+		return true
+	}
+	return storedPassword == plainPassword
 }

@@ -1,0 +1,11 @@
+---
+description: Enforce Go backend and React frontend for this project
+alwaysApply: true
+---
+
+# Project Tech Stack
+
+- Backend implementation must use Go.
+- Do not introduce backend services or business logic in Node.js, Python, Java, or other server runtimes unless the user explicitly requests an exception.
+- Frontend implementation must use React.
+- For UI work, prefer React components, hooks, and React-based app structure; do not introduce Vue, Angular, or other frontend frameworks by default.

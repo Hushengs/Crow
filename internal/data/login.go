@@ -26,7 +26,7 @@ func (r *loginRepo) FindByAccount(ctx context.Context, account string) (*biz.Log
 	row := &loginUser{}
 	err := r.data.db.QueryRowContext(
 		ctx,
-		"SELECT id, account, password_hash FROM users WHERE account = ? LIMIT 1",
+		"SELECT id, username, password FROM admin WHERE username = ? AND status = 1 LIMIT 1",
 		account,
 	).Scan(&row.ID, &row.Account, &row.PasswordHash)
 	if err != nil {
