@@ -156,6 +156,50 @@ button:hover:not(:disabled),
   box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
 }
 
+.checkbox-group {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid #d7deea;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.checkbox-group__empty {
+  margin: 0;
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+.checkbox-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #f8fafc;
+  cursor: pointer;
+}
+
+.checkbox-option input {
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+}
+
+.checkbox-option strong {
+  display: block;
+  color: #0f172a;
+  font-size: 14px;
+}
+
+.checkbox-option small {
+  display: block;
+  margin-top: 4px;
+  color: #64748b;
+  font-size: 12px;
+}
+
 .submit,
 .ghost-button,
 .danger-button {

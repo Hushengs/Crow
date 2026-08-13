@@ -12,11 +12,7 @@ import (
 )
 
 func (s *AdminService) CreatePermission(ctx context.Context, req *pb.CreatePermissionRequest) (*pb.Permission, error) {
-	permission, err := s.permissionUC.CreatePermission(ctx, convertPermission(req.GetPermission()))
-	if err != nil {
-		return nil, err
-	}
-	return convertPermissionReply(permission), nil
+	return nil, biz.ErrPermissionInvalidArgument
 }
 
 func (s *AdminService) GetPermission(ctx context.Context, req *pb.GetPermissionRequest) (*pb.Permission, error) {
@@ -28,6 +24,9 @@ func (s *AdminService) GetPermission(ctx context.Context, req *pb.GetPermissionR
 }
 
 func (s *AdminService) ListPermissions(ctx context.Context, req *pb.ListPermissionsRequest) (*pb.PermissionSet, error) {
+	if err := s.permissionUC.SyncProgramPermissions(ctx); err != nil {
+		return nil, err
+	}
 	pageToken, err := pagination.ParsePageToken(req)
 	if err != nil {
 		return nil, err
@@ -55,32 +54,11 @@ func (s *AdminService) ListPermissions(ctx context.Context, req *pb.ListPermissi
 }
 
 func (s *AdminService) UpdatePermission(ctx context.Context, req *pb.UpdatePermissionRequest) (*pb.Permission, error) {
-	if req.GetPermission().GetId() <= 0 || req.GetUpdateMask() == nil || len(req.GetUpdateMask().GetPaths()) == 0 {
-		return nil, biz.ErrPermissionInvalidArgument
-	}
-	if err := validatePermissionMaskPaths(req.GetUpdateMask().GetPaths()); err != nil {
-		return nil, err
-	}
-	current, err := s.permissionUC.GetPermission(ctx, req.GetPermission().GetId())
-	if err != nil {
-		return nil, err
-	}
-	updated, err := applyPermissionUpdateMask(current, req.GetPermission(), req.GetUpdateMask().GetPaths())
-	if err != nil {
-		return nil, err
-	}
-	permission, err := s.permissionUC.UpdatePermission(ctx, updated)
-	if err != nil {
-		return nil, err
-	}
-	return convertPermissionReply(permission), nil
+	return nil, biz.ErrPermissionInvalidArgument
 }
 
 func (s *AdminService) DeletePermission(ctx context.Context, req *pb.DeletePermissionRequest) (*emptypb.Empty, error) {
-	if err := s.permissionUC.DeletePermission(ctx, req.GetId()); err != nil {
-		return nil, err
-	}
-	return &emptypb.Empty{}, nil
+	return nil, biz.ErrPermissionInvalidArgument
 }
 
 func applyPermissionUpdateMask(current *biz.Permission, patch *pb.Permission, paths []string) (*biz.Permission, error) {

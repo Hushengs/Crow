@@ -395,62 +395,62 @@ func TestAdminRoleServiceCRUD(t *testing.T) {
 	}
 }
 
-func TestPermissionServiceCRUD(t *testing.T) {
+func TestPermissionServiceManagedByRoutes(t *testing.T) {
 	ctx := context.Background()
 	svc := newTestRBACService()
 
-	created, err := svc.CreatePermission(ctx, &v1.CreatePermissionRequest{
+	if _, err := svc.CreatePermission(ctx, &v1.CreatePermissionRequest{
 		Permission: &v1.Permission{
 			ParentId: 0,
 			Title:    "用户列表",
 			Handle:   "/users",
 			Weight:   10,
 		},
-	})
-	if err != nil {
-		t.Fatalf("CreatePermission() error = %v", err)
-	}
-	if created.GetId() != 1 {
-		t.Fatalf("CreatePermission() id = %d, want 1", created.GetId())
+	}); !kratoserrors.IsBadRequest(err) {
+		t.Fatalf("CreatePermission() error = %v, want bad request", err)
 	}
 
-	got, err := svc.GetPermission(ctx, &v1.GetPermissionRequest{Id: created.GetId()})
-	if err != nil {
-		t.Fatalf("GetPermission() error = %v", err)
-	}
-	if got.GetHandle() != "/users" || got.GetTitle() != "用户列表" {
-		t.Fatalf("GetPermission() = %+v, want created permission", got)
-	}
-
-	list, err := svc.ListPermissions(ctx, &v1.ListPermissionsRequest{PageSize: 10})
+	list, err := svc.ListPermissions(ctx, &v1.ListPermissionsRequest{PageSize: 100})
 	if err != nil {
 		t.Fatalf("ListPermissions() error = %v", err)
 	}
-	if len(list.GetPermissions()) != 1 {
-		t.Fatalf("ListPermissions() len = %d, want 1", len(list.GetPermissions()))
+	if len(list.GetPermissions()) == 0 {
+		t.Fatalf("ListPermissions() len = 0, want synced route permissions")
 	}
 
-	updated, err := svc.UpdatePermission(ctx, &v1.UpdatePermissionRequest{
+	var adminCreate *v1.Permission
+	for _, permission := range list.GetPermissions() {
+		if permission.GetHandle() == "/v1/admins/create" {
+			adminCreate = permission
+			break
+		}
+	}
+	if adminCreate == nil {
+		t.Fatalf("ListPermissions() missing synced permission /v1/admins/create")
+	}
+
+	got, err := svc.GetPermission(ctx, &v1.GetPermissionRequest{Id: adminCreate.GetId()})
+	if err != nil {
+		t.Fatalf("GetPermission() error = %v", err)
+	}
+	if got.GetTitle() != "管理员新增" || got.GetHandle() != "/v1/admins/create" {
+		t.Fatalf("GetPermission() = %+v, want synced route permission", got)
+	}
+
+	if _, err := svc.UpdatePermission(ctx, &v1.UpdatePermissionRequest{
 		Permission: &v1.Permission{
-			Id:     created.GetId(),
+			Id:     adminCreate.GetId(),
 			Title:  "用户管理",
 			Handle: "/admins/users",
 			Weight: 20,
 		},
 		UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"title", "handle", "weight"}},
-	})
-	if err != nil {
-		t.Fatalf("UpdatePermission() error = %v", err)
-	}
-	if updated.GetTitle() != "用户管理" || updated.GetHandle() != "/admins/users" || updated.GetWeight() != 20 {
-		t.Fatalf("UpdatePermission() = %+v, want updated fields", updated)
+	}); !kratoserrors.IsBadRequest(err) {
+		t.Fatalf("UpdatePermission() error = %v, want bad request", err)
 	}
 
-	if _, err := svc.DeletePermission(ctx, &v1.DeletePermissionRequest{Id: created.GetId()}); err != nil {
-		t.Fatalf("DeletePermission() error = %v", err)
-	}
-	if _, err := svc.GetPermission(ctx, &v1.GetPermissionRequest{Id: created.GetId()}); !kratoserrors.IsNotFound(err) {
-		t.Fatalf("GetPermission() after delete error = %v, want not found", err)
+	if _, err := svc.DeletePermission(ctx, &v1.DeletePermissionRequest{Id: adminCreate.GetId()}); !kratoserrors.IsBadRequest(err) {
+		t.Fatalf("DeletePermission() error = %v, want bad request", err)
 	}
 }
 

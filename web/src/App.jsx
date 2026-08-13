@@ -33,7 +33,7 @@ function createAdminForm() {
     username: '',
     password: '',
     realName: '',
-    roleId: '0',
+    roleIds: [],
     status: '1',
     remark: '',
   }
@@ -43,6 +43,7 @@ function createRoleForm() {
   return {
     id: '',
     roleName: '',
+    permissionIds: [],
   }
 }
 
@@ -150,6 +151,16 @@ function formatDateTime(value) {
   return date.toLocaleString('zh-CN', { hour12: false })
 }
 
+function normalizeIdList(values) {
+  return Array.from(
+    new Set(
+      (Array.isArray(values) ? values : [])
+        .map((value) => String(value).trim())
+        .filter((value) => value !== '' && value !== '0'),
+    ),
+  )
+}
+
 function maskToken(value) {
   if (!value) {
     return '-'
@@ -209,19 +220,20 @@ function normalizeAdminForm(admin) {
     username: normalized.username,
     password: '',
     realName: normalized.realName,
-    roleId: String(normalized.roleId ?? 0),
+    roleIds: normalized.roleId ? [String(normalized.roleId)] : [],
     status: String(normalized.status ?? 1),
     remark: normalized.remark,
   }
 }
 
 function buildAdminPayload(form) {
+  const roleIds = normalizeIdList(form.roleIds)
   return {
     id: Number(form.id) || 0,
     username: form.username.trim(),
     password: form.password.trim(),
     real_name: form.realName.trim(),
-    role_id: Number(form.roleId) || 0,
+    role_id: Number(roleIds[0]) || 0,
     status: Number(form.status) || 0,
     remark: form.remark.trim(),
   }
@@ -247,6 +259,7 @@ function normalizeRoleForm(role) {
   return {
     id: String(normalized.id || ''),
     roleName: normalized.roleName,
+    permissionIds: [],
   }
 }
 
@@ -401,7 +414,7 @@ const resourceCatalog = [
         placeholder: (isEditing) => (isEditing ? '不修改密码可留空' : '请输入至少 6 位密码'),
       },
       { name: 'realName', label: '真实姓名', type: 'text', placeholder: '请输入真实姓名' },
-      { name: 'roleId', label: '角色 ID', type: 'number', placeholder: '请输入角色 ID' },
+      { name: 'roleIds', label: '绑定角色', type: 'checkbox-group', optionsSource: 'roles' },
       {
         name: 'status',
         label: '状态',
@@ -485,7 +498,10 @@ const resourceCatalog = [
     buildUpdateMaskPaths: () => ['role_name'],
     canSubmit: (form) => form.roleName.trim() !== '',
     describe: (payload) => payload.role_name || '角色',
-    fields: [{ name: 'roleName', label: '角色名称', type: 'text', placeholder: '请输入角色名称' }],
+    fields: [
+      { name: 'roleName', label: '角色名称', type: 'text', placeholder: '请输入角色名称' },
+      { name: 'permissionIds', label: '绑定权限', type: 'checkbox-group', optionsSource: 'permissions' },
+    ],
     listColumns: [
       {
         key: 'roleName',
@@ -517,6 +533,7 @@ const resourceCatalog = [
   },
   {
     key: 'admin-roles',
+    hidden: true,
     section: '关联管理',
     navLabel: '管理员角色',
     singularLabel: '管理员角色关联',
@@ -584,6 +601,9 @@ const resourceCatalog = [
     navLabel: '权限',
     singularLabel: '权限',
     pluralLabel: '权限',
+    allowCreate: false,
+    allowEdit: false,
+    allowDelete: false,
     basePath: '/permissions',
     listEndpoint: '/api/v1/permissions?page_size=100',
     createEndpoint: '/api/v1/permissions/create',
@@ -591,9 +611,9 @@ const resourceCatalog = [
     getEndpoint: (id) => `/api/v1/permissions/${id}`,
     deleteEndpoint: (id) => `/api/v1/permissions/${id}`,
     listKey: ['permissions'],
-    subtitle: '维护权限树节点、路由句柄和排序权重。',
-    createDescription: '支持独立新增和编辑，避免和列表页混在一起。',
-    editDescription: '可修改父节点、标题、路由和权重。',
+    subtitle: '权限由程序路由自动同步到数据库，仅支持查看。',
+    createDescription: '权限由程序路由自动写入数据库，不支持手工新增。',
+    editDescription: '权限由程序路由维护，不支持手工编辑。',
     createForm: createPermissionForm,
     normalizeResponse: normalizePermissionResponse,
     normalizeForm: normalizePermissionForm,
@@ -646,6 +666,7 @@ const resourceCatalog = [
   },
   {
     key: 'group-permissions',
+    hidden: true,
     section: '关联管理',
     navLabel: '分组权限',
     singularLabel: '分组权限关联',
@@ -759,6 +780,181 @@ function buildSearchText(resource, item) {
   return `${title} ${meta}`.toLowerCase()
 }
 
+function mapRoleOptions(roles) {
+  return roles.map((role) => ({
+    value: String(role.id),
+    label: role.roleName || `角色 #${role.id}`,
+    description: `角色 ID：${role.id}`,
+  }))
+}
+
+function mapPermissionOptions(permissions) {
+  const sorted = [...permissions].sort((left, right) => {
+    if (left.parentId !== right.parentId) {
+      return left.parentId - right.parentId
+    }
+    if (left.weight !== right.weight) {
+      return left.weight - right.weight
+    }
+    return left.id - right.id
+  })
+
+  const childrenMap = new Map()
+  sorted.forEach((permission) => {
+    const parentId = permission.parentId || 0
+    const siblings = childrenMap.get(parentId) || []
+    siblings.push(permission)
+    childrenMap.set(parentId, siblings)
+  })
+
+  const flattened = []
+  const walk = (parentId, depth) => {
+    const children = childrenMap.get(parentId) || []
+    children.forEach((permission) => {
+      flattened.push({
+        value: String(permission.id),
+        label: permission.title || `权限 #${permission.id}`,
+        description: `${permission.handle || '未设置路由'} · 父级 ${permission.parentId}`,
+        parentValue: permission.parentId > 0 ? String(permission.parentId) : '',
+        depth,
+      })
+      walk(permission.id, depth + 1)
+    })
+  }
+
+  walk(0, 0)
+  return flattened
+}
+
+function collectPermissionDescendants(value, options) {
+  const childrenMap = new Map()
+  options.forEach((option) => {
+    const parentValue = option.parentValue || ''
+    const siblings = childrenMap.get(parentValue) || []
+    siblings.push(option.value)
+    childrenMap.set(parentValue, siblings)
+  })
+
+  const descendants = []
+  const walk = (currentValue) => {
+    const children = childrenMap.get(currentValue) || []
+    children.forEach((childValue) => {
+      descendants.push(childValue)
+      walk(childValue)
+    })
+  }
+
+  walk(value)
+  return descendants
+}
+
+function normalizePermissionSelection(selectedValues, options) {
+  const selected = new Set(normalizeIdList(selectedValues))
+  const childrenMap = new Map()
+
+  options.forEach((option) => {
+    const parentValue = option.parentValue || ''
+    const siblings = childrenMap.get(parentValue) || []
+    siblings.push(option.value)
+    childrenMap.set(parentValue, siblings)
+  })
+
+  let changed = true
+  while (changed) {
+    changed = false
+    options.forEach((option) => {
+      const children = childrenMap.get(option.value) || []
+      if (children.length === 0) {
+        return
+      }
+
+      const allChildrenSelected = children.every((childValue) => selected.has(childValue))
+      if (allChildrenSelected && !selected.has(option.value)) {
+        selected.add(option.value)
+        changed = true
+      }
+      if (!allChildrenSelected && selected.has(option.value)) {
+        selected.delete(option.value)
+        changed = true
+      }
+    })
+  }
+
+  return [...selected]
+}
+
+async function syncAdminRoleBindings(adminId, selectedRoleIds) {
+  const current = await requestJson('/api/v1/admin-roles?page_size=1000', {
+    headers: buildAuthHeaders(),
+  })
+  const currentItems = getListItems(current, ['adminRoles', 'admin_roles'])
+    .map(normalizeAdminRoleResponse)
+    .filter((item) => item && item.adminId === adminId)
+
+  const targetIds = new Set(normalizeIdList(selectedRoleIds).map(Number))
+  const currentIds = new Set(currentItems.map((item) => item.roleId))
+
+  const createTasks = [...targetIds]
+    .filter((roleId) => !currentIds.has(roleId))
+    .map((roleId) =>
+      requestJson('/api/v1/admin-roles/create', {
+        method: 'POST',
+        headers: buildAuthHeaders(),
+        body: JSON.stringify({
+          admin_id: adminId,
+          role_id: roleId,
+        }),
+      }),
+    )
+
+  const deleteTasks = currentItems
+    .filter((item) => !targetIds.has(item.roleId))
+    .map((item) =>
+      requestJson(`/api/v1/admin-roles/${item.id}`, {
+        method: 'DELETE',
+        headers: buildAuthHeaders(),
+      }),
+    )
+
+  await Promise.all([...createTasks, ...deleteTasks])
+}
+
+async function syncRolePermissionBindings(roleId, selectedPermissionIds) {
+  const current = await requestJson('/api/v1/group-permissions?page_size=1000', {
+    headers: buildAuthHeaders(),
+  })
+  const currentItems = getListItems(current, ['groupPermissions', 'group_permissions'])
+    .map(normalizeGroupPermissionResponse)
+    .filter((item) => item && item.groupId === roleId)
+
+  const targetIds = new Set(normalizeIdList(selectedPermissionIds).map(Number))
+  const currentIds = new Set(currentItems.map((item) => item.permissionId))
+
+  const createTasks = [...targetIds]
+    .filter((permissionId) => !currentIds.has(permissionId))
+    .map((permissionId) =>
+      requestJson('/api/v1/group-permissions/create', {
+        method: 'POST',
+        headers: buildAuthHeaders(),
+        body: JSON.stringify({
+          group_id: roleId,
+          permission_id: permissionId,
+        }),
+      }),
+    )
+
+  const deleteTasks = currentItems
+    .filter((item) => !targetIds.has(item.permissionId))
+    .map((item) =>
+      requestJson(`/api/v1/group-permissions/${item.id}`, {
+        method: 'DELETE',
+        headers: buildAuthHeaders(),
+      }),
+    )
+
+  await Promise.all([...createTasks, ...deleteTasks])
+}
+
 function LoginPage() {
   const navigate = useNavigate()
   const [form, setForm] = useState(initialLoginForm)
@@ -869,9 +1065,9 @@ function ConsoleLayout() {
   const currentResource = getCurrentResource(location.pathname)
   const breadcrumbTail = getResourceViewLabel(location.pathname, currentResource)
   const navSections = [
-    { title: '系统管理', items: resourceCatalog.filter((resource) => resource.section === '系统管理') },
-    { title: '关联管理', items: resourceCatalog.filter((resource) => resource.section === '关联管理') },
-  ]
+    { title: '系统管理', items: resourceCatalog.filter((resource) => resource.section === '系统管理' && !resource.hidden) },
+    { title: '关联管理', items: resourceCatalog.filter((resource) => resource.section === '关联管理' && !resource.hidden) },
+  ].filter((section) => section.items.length > 0)
 
   const handleLogout = () => {
     clearAuth()
@@ -901,7 +1097,6 @@ function ConsoleLayout() {
                   to={resource.basePath}
                 >
                   <span>{resource.navLabel}</span>
-                  <small>{resource.singularLabel}</small>
                 </NavLink>
               ))}
             </nav>
@@ -1045,9 +1240,11 @@ function ResourceListPage({ resource }) {
           <button className="ghost-button" onClick={loadItems} type="button">
             {loading ? '刷新中...' : '刷新列表'}
           </button>
-          <Link className="submit submit--compact action-link" to={`${resource.basePath}/new`}>
-            新建{resource.singularLabel}
-          </Link>
+          {resource.allowCreate === false ? null : (
+            <Link className="submit submit--compact action-link" to={`${resource.basePath}/new`}>
+              新建{resource.singularLabel}
+            </Link>
+          )}
         </div>
       </div>
 
@@ -1080,9 +1277,11 @@ function ResourceListPage({ resource }) {
                       {column.label}
                     </th>
                   ))}
-                  <th className="admin-table__actions" scope="col">
-                    操作
-                  </th>
+                  {resource.allowEdit === false && resource.allowDelete === false ? null : (
+                    <th className="admin-table__actions" scope="col">
+                      操作
+                    </th>
+                  )}
                 </tr>
               </thead>
               <tbody>
@@ -1091,16 +1290,22 @@ function ResourceListPage({ resource }) {
                     {resource.listColumns.map((column) => (
                       <td key={column.label}>{renderColumnContent(column, item)}</td>
                     ))}
-                    <td className="admin-table__actions-cell">
-                      <div className="table-actions">
-                        <Link className="ghost-button action-link action-link--inline" to={`${resource.basePath}/${item.id}/edit`}>
-                          编辑
-                        </Link>
-                        <button className="danger-button" onClick={() => handleDelete(item)} type="button">
-                          删除
-                        </button>
-                      </div>
-                    </td>
+                    {resource.allowEdit === false && resource.allowDelete === false ? null : (
+                      <td className="admin-table__actions-cell">
+                        <div className="table-actions">
+                          {resource.allowEdit === false ? null : (
+                            <Link className="ghost-button action-link action-link--inline" to={`${resource.basePath}/${item.id}/edit`}>
+                              编辑
+                            </Link>
+                          )}
+                          {resource.allowDelete === false ? null : (
+                            <button className="danger-button" onClick={() => handleDelete(item)} type="button">
+                              删除
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>
@@ -1150,28 +1355,94 @@ function ResourceFormPage({ resource, mode }) {
   const itemId = params.id || ''
   const isEditing = mode === 'edit'
   const [form, setForm] = useState(() => resource.createForm())
-  const [loading, setLoading] = useState(isEditing)
+  const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
+  const [referenceOptions, setReferenceOptions] = useState({
+    roles: [],
+    permissions: [],
+  })
 
   useEffect(() => {
     let cancelled = false
 
     async function loadItem() {
-      if (!isEditing) {
-        setForm(resource.createForm())
-        setLoading(false)
-        return
-      }
-
       setLoading(true)
       setError('')
+
       try {
-        const payload = await requestJson(resource.getEndpoint(itemId), {
-          headers: buildAuthHeaders(),
-        })
+        const headers = buildAuthHeaders()
+        const requests = [
+          isEditing
+            ? requestJson(resource.getEndpoint(itemId), {
+                headers,
+              })
+            : Promise.resolve(null),
+          resource.key === 'admins'
+            ? requestJson('/api/v1/roles?page_size=100', {
+                headers,
+              })
+            : Promise.resolve(null),
+          resource.key === 'admins' && isEditing
+            ? requestJson('/api/v1/admin-roles?page_size=1000', {
+                headers,
+              })
+            : Promise.resolve(null),
+          resource.key === 'roles'
+            ? requestJson('/api/v1/permissions?page_size=1000', {
+                headers,
+              })
+            : Promise.resolve(null),
+          resource.key === 'roles' && isEditing
+            ? requestJson('/api/v1/group-permissions?page_size=1000', {
+                headers,
+              })
+            : Promise.resolve(null),
+        ]
+
+        const [itemPayload, rolesPayload, adminRolesPayload, permissionsPayload, groupPermissionsPayload] = await Promise.all(requests)
+
         if (!cancelled) {
-          setForm(resource.normalizeForm(payload))
+          const nextForm = isEditing ? resource.normalizeForm(itemPayload) : resource.createForm()
+          const nextReferenceOptions = {
+            roles: [],
+            permissions: [],
+          }
+
+          if (rolesPayload) {
+            const roles = getListItems(rolesPayload, ['roles']).map(normalizeRoleResponse).filter(Boolean)
+            nextReferenceOptions.roles = mapRoleOptions(roles)
+
+            if (resource.key === 'admins') {
+              const selectedRoleIds = adminRolesPayload
+                ? getListItems(adminRolesPayload, ['adminRoles', 'admin_roles'])
+                    .map(normalizeAdminRoleResponse)
+                    .filter((relation) => relation && relation.adminId === Number(itemId))
+                    .map((relation) => String(relation.roleId))
+                : []
+
+              if (selectedRoleIds.length > 0) {
+                nextForm.roleIds = normalizeIdList(selectedRoleIds)
+              }
+            }
+          }
+
+          if (permissionsPayload) {
+            const permissions = getListItems(permissionsPayload, ['permissions']).map(normalizePermissionResponse).filter(Boolean)
+            nextReferenceOptions.permissions = mapPermissionOptions(permissions)
+
+            if (resource.key === 'roles' && groupPermissionsPayload) {
+              nextForm.permissionIds = normalizeIdList(
+                getListItems(groupPermissionsPayload, ['groupPermissions', 'group_permissions'])
+                  .map(normalizeGroupPermissionResponse)
+                  .filter((relation) => relation && relation.groupId === Number(itemId))
+                  .map((relation) => String(relation.permissionId)),
+              )
+            }
+          }
+
+          setReferenceOptions(nextReferenceOptions)
+          setForm(nextForm)
         }
       } catch (loadError) {
         if (!cancelled) {
@@ -1193,12 +1464,40 @@ function ResourceFormPage({ resource, mode }) {
 
   const canSubmit = resource.canSubmit(form, isEditing)
 
+  const getFieldOptions = (field) => {
+    if (field.optionsSource === 'roles') {
+      return referenceOptions.roles
+    }
+    if (field.optionsSource === 'permissions') {
+      return referenceOptions.permissions
+    }
+    return field.options || []
+  }
+
   const handleChange = (event) => {
     const { name, value } = event.target
     setForm((current) => ({
       ...current,
       [name]: value,
     }))
+  }
+
+  const handleCheckboxGroupChange = (name, value, checked) => {
+    setForm((current) => {
+      const currentValues = normalizeIdList(current[name])
+      const field = resource.fields.find((item) => item.name === name)
+      const options = getFieldOptions(field || {})
+      const descendants = field?.optionsSource === 'permissions' ? collectPermissionDescendants(value, options) : []
+      const touchedValues = [value, ...descendants]
+      const nextValues = checked
+        ? normalizeIdList([...currentValues, ...touchedValues])
+        : currentValues.filter((item) => !touchedValues.includes(item))
+
+      return {
+        ...current,
+        [name]: field?.optionsSource === 'permissions' ? normalizePermissionSelection(nextValues, options) : normalizeIdList(nextValues),
+      }
+    })
   }
 
   const handleSubmit = async (event) => {
@@ -1209,19 +1508,29 @@ function ResourceFormPage({ resource, mode }) {
     const payload = resource.buildPayload(form)
 
     try {
+      let savedResource = null
+
       if (isEditing) {
         const query = buildUpdateMaskQuery(resource.buildUpdateMaskPaths(form, payload))
-        await requestJson(`${resource.updateEndpoint}?${query}`, {
+        savedResource = await requestJson(`${resource.updateEndpoint}?${query}`, {
           method: 'PUT',
           headers: buildAuthHeaders(),
           body: JSON.stringify(payload),
         })
       } else {
-        await requestJson(resource.createEndpoint, {
+        savedResource = await requestJson(resource.createEndpoint, {
           method: 'POST',
           headers: buildAuthHeaders(),
           body: JSON.stringify(payload),
         })
+      }
+
+      const savedID = Number(pickValue(savedResource, ['id'], payload.id || itemId || 0))
+      if (resource.key === 'admins' && savedID > 0) {
+        await syncAdminRoleBindings(savedID, form.roleIds)
+      }
+      if (resource.key === 'roles' && savedID > 0) {
+        await syncRolePermissionBindings(savedID, form.permissionIds)
       }
 
       navigate(resource.basePath, {
@@ -1269,7 +1578,8 @@ function ResourceFormPage({ resource, mode }) {
                 {resource.fields.map((field) => {
                   const label = typeof field.label === 'function' ? field.label(isEditing) : field.label
                   const placeholder = typeof field.placeholder === 'function' ? field.placeholder(isEditing) : field.placeholder
-                  const className = field.type === 'textarea' ? 'field field--full' : 'field'
+                  const className = field.type === 'textarea' || field.type === 'checkbox-group' ? 'field field--full' : 'field'
+                  const options = getFieldOptions(field)
 
                   return (
                     <label className={className} key={field.name}>
@@ -1285,12 +1595,40 @@ function ResourceFormPage({ resource, mode }) {
                         />
                       ) : field.type === 'select' ? (
                         <select name={field.name} onChange={handleChange} value={form[field.name]}>
-                          {field.options.map((option) => (
+                          {options.map((option) => (
                             <option key={option.value} value={option.value}>
                               {option.label}
                             </option>
                           ))}
                         </select>
+                      ) : field.type === 'checkbox-group' ? (
+                        <div className="checkbox-group">
+                          {options.length === 0 ? (
+                            <p className="checkbox-group__empty">暂无可选项</p>
+                          ) : (
+                            options.map((option) => {
+                              const checked = Array.isArray(form[field.name]) && form[field.name].includes(option.value)
+
+                              return (
+                                <label
+                                  className="checkbox-option"
+                                  key={option.value}
+                                  style={option.depth ? { paddingLeft: `${12 + option.depth * 18}px` } : undefined}
+                                >
+                                  <input
+                                    checked={checked}
+                                    onChange={(event) => handleCheckboxGroupChange(field.name, option.value, event.target.checked)}
+                                    type="checkbox"
+                                  />
+                                  <div>
+                                    <strong>{option.label}</strong>
+                                    {option.description ? <small>{option.description}</small> : null}
+                                  </div>
+                                </label>
+                              )
+                            })
+                          )}
+                        </div>
                       ) : (
                         <input
                           name={field.name}

@@ -55,15 +55,15 @@ CREATE TABLE `permission`  (
   INDEX `idx_pid_weight`(`parent_id` ASC, `weight` ASC) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_bin COMMENT = '权限表' ROW_FORMAT = DYNAMIC;
 
-CREATE TABLE `group_permission`  (
+CREATE TABLE `role_permission`  (
   `id` int NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  `group_id` int NOT NULL COMMENT '分组ID',
+  `role_id` int NOT NULL COMMENT '角色ID',
   `permission_id` int NOT NULL,
   `create_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `idx`(`group_id` ASC, `permission_id` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_bin COMMENT = '分组权限' ROW_FORMAT = DYNAMIC;
+  UNIQUE INDEX `idx`(`role_id` ASC, `permission_id` ASC) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_bin COMMENT = '角色权限关联表' ROW_FORMAT = DYNAMIC;  
 
 CREATE TABLE `admin_operation_log` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键ID',
