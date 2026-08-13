@@ -33,6 +33,7 @@ const OperationAdminServiceGetAdminRole = "/admin.v1.AdminService/GetAdminRole"
 const OperationAdminServiceGetGroupPermission = "/admin.v1.AdminService/GetGroupPermission"
 const OperationAdminServiceGetPermission = "/admin.v1.AdminService/GetPermission"
 const OperationAdminServiceGetRole = "/admin.v1.AdminService/GetRole"
+const OperationAdminServiceListAdminOperationLogs = "/admin.v1.AdminService/ListAdminOperationLogs"
 const OperationAdminServiceListAdminRoles = "/admin.v1.AdminService/ListAdminRoles"
 const OperationAdminServiceListAdmins = "/admin.v1.AdminService/ListAdmins"
 const OperationAdminServiceListGroupPermissions = "/admin.v1.AdminService/ListGroupPermissions"
@@ -60,6 +61,7 @@ type AdminServiceHTTPServer interface {
 	GetGroupPermission(context.Context, *GetGroupPermissionRequest) (*GroupPermission, error)
 	GetPermission(context.Context, *GetPermissionRequest) (*Permission, error)
 	GetRole(context.Context, *GetRoleRequest) (*Role, error)
+	ListAdminOperationLogs(context.Context, *ListAdminOperationLogsRequest) (*AdminOperationLogSet, error)
 	ListAdminRoles(context.Context, *ListAdminRolesRequest) (*AdminRoleSet, error)
 	ListAdmins(context.Context, *ListAdminsRequest) (*AdminSet, error)
 	ListGroupPermissions(context.Context, *ListGroupPermissionsRequest) (*GroupPermissionSet, error)
@@ -99,6 +101,7 @@ func RegisterAdminServiceHTTPServer(s *http.Server, srv AdminServiceHTTPServer) 
 	r.Handle("GET", "/v1/group-permissions", _AdminService_ListGroupPermissions0_HTTP_Handler(srv))
 	r.Handle("PUT", "/v1/group-permissions/update", _AdminService_UpdateGroupPermission0_HTTP_Handler(srv))
 	r.Handle("DELETE", "/v1/group-permissions/{id}", _AdminService_DeleteGroupPermission0_HTTP_Handler(srv))
+	r.Handle("GET", "/v1/admin-operation-logs", _AdminService_ListAdminOperationLogs0_HTTP_Handler(srv))
 }
 
 func _AdminService_CreateAdmin0_HTTP_Handler(srv AdminServiceHTTPServer) func(ctx http.Context) error {
@@ -636,6 +639,25 @@ func _AdminService_DeleteGroupPermission0_HTTP_Handler(srv AdminServiceHTTPServe
 	}
 }
 
+func _AdminService_ListAdminOperationLogs0_HTTP_Handler(srv AdminServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListAdminOperationLogsRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationAdminServiceListAdminOperationLogs)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListAdminOperationLogs(ctx, req.(*ListAdminOperationLogsRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*AdminOperationLogSet)
+		return ctx.Result(200, reply)
+	}
+}
+
 type AdminServiceHTTPClient interface {
 	CreateAdmin(ctx context.Context, req *CreateAdminRequest, opts ...http.CallOption) (rsp *Admin, err error)
 	CreateAdminRole(ctx context.Context, req *CreateAdminRoleRequest, opts ...http.CallOption) (rsp *AdminRole, err error)
@@ -652,6 +674,7 @@ type AdminServiceHTTPClient interface {
 	GetGroupPermission(ctx context.Context, req *GetGroupPermissionRequest, opts ...http.CallOption) (rsp *GroupPermission, err error)
 	GetPermission(ctx context.Context, req *GetPermissionRequest, opts ...http.CallOption) (rsp *Permission, err error)
 	GetRole(ctx context.Context, req *GetRoleRequest, opts ...http.CallOption) (rsp *Role, err error)
+	ListAdminOperationLogs(ctx context.Context, req *ListAdminOperationLogsRequest, opts ...http.CallOption) (rsp *AdminOperationLogSet, err error)
 	ListAdminRoles(ctx context.Context, req *ListAdminRolesRequest, opts ...http.CallOption) (rsp *AdminRoleSet, err error)
 	ListAdmins(ctx context.Context, req *ListAdminsRequest, opts ...http.CallOption) (rsp *AdminSet, err error)
 	ListGroupPermissions(ctx context.Context, req *ListGroupPermissionsRequest, opts ...http.CallOption) (rsp *GroupPermissionSet, err error)
@@ -908,6 +931,22 @@ func (c *AdminServiceHTTPClientImpl) GetRole(ctx context.Context, in *GetRoleReq
 	opts = append([]http.CallOption{
 		http.Accept("application/protojson"),
 		http.Operation(OperationAdminServiceGetRole),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *AdminServiceHTTPClientImpl) ListAdminOperationLogs(ctx context.Context, in *ListAdminOperationLogsRequest, opts ...http.CallOption) (*AdminOperationLogSet, error) {
+	var out AdminOperationLogSet
+	pattern := "/v1/admin-operation-logs"
+	path := http.BuildPath(pattern, in, http.WithQueryParams())
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.Operation(OperationAdminServiceListAdminOperationLogs),
 		http.PathTemplate(pattern),
 	}, opts...)
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)

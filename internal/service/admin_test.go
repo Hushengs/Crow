@@ -29,6 +29,7 @@ func newTestAdminService() *AdminService {
 		biz.NewAdminRoleUsecase(&stubAdminRoleRepo{nextID: 1, adminRoles: make(map[int64]*biz.AdminRole)}),
 		biz.NewPermissionUsecase(&stubPermissionRepo{nextID: 1, permissions: make(map[int64]*biz.Permission)}),
 		biz.NewGroupPermissionUsecase(&stubGroupPermissionRepo{nextID: 1, groupPermissions: make(map[int64]*biz.GroupPermission)}),
+		biz.NewAdminOperationLogUsecase(&stubAdminOperationLogRepo{nextID: 1, logs: make(map[int64]*biz.AdminOperationLog)}),
 	)
 }
 

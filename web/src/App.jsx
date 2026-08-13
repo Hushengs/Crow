@@ -375,6 +375,24 @@ function buildGroupPermissionPayload(form) {
   }
 }
 
+function normalizeAdminOperationLogResponse(item) {
+  if (!item) {
+    return null
+  }
+  return {
+    id: Number(pickValue(item, ['id'], 0)),
+    adminId: Number(pickValue(item, ['adminId', 'admin_id'], 0)),
+    adminName: pickValue(item, ['adminName', 'admin_name']),
+    module: pickValue(item, ['module']),
+    action: pickValue(item, ['action']),
+    description: pickValue(item, ['description']),
+    requestMethod: pickValue(item, ['requestMethod', 'request_method']),
+    requestUrl: pickValue(item, ['requestUrl', 'request_url']),
+    requestParams: pickValue(item, ['requestParams', 'request_params']),
+    createTime: pickValue(item, ['createTime', 'create_time']),
+  }
+}
+
 const resourceCatalog = [
   {
     key: 'admins',
@@ -662,6 +680,81 @@ const resourceCatalog = [
       ['权重', String(item.weight)],
       ['创建时间', formatDateTime(item.createTime)],
       ['更新时间', formatDateTime(item.updateTime)],
+    ],
+  },
+  {
+    key: 'admin-operation-logs',
+    section: '系统管理',
+    navLabel: '操作日志',
+    singularLabel: '操作日志',
+    pluralLabel: '操作日志',
+    allowCreate: false,
+    allowEdit: false,
+    allowDelete: false,
+    basePath: '/admin-operation-logs',
+    listEndpoint: '/api/v1/admin-operation-logs?page_size=100',
+    listKey: ['adminOperationLogs', 'admin_operation_logs'],
+    subtitle: '查看管理员登录及后台操作记录。',
+    createDescription: '操作日志为系统只读数据。',
+    editDescription: '操作日志为系统只读数据。',
+    createForm: () => ({}),
+    normalizeResponse: normalizeAdminOperationLogResponse,
+    normalizeForm: () => ({}),
+    buildPayload: () => ({}),
+    buildUpdateMaskPaths: () => [],
+    canSubmit: () => false,
+    describe: () => '操作日志',
+    fields: [],
+    listColumns: [
+      {
+        key: 'adminName',
+        label: '操作人',
+        render: (item) => (
+          <div className="table-primary">
+            <strong>{item.adminName || '-'}</strong>
+            <span>ID #{item.adminId || 0}</span>
+          </div>
+        ),
+      },
+      {
+        key: 'module',
+        label: '模块 / 动作',
+        render: (item) => (
+          <div className="table-primary">
+            <strong>{item.module || '-'}</strong>
+            <span>{item.action || '-'}</span>
+          </div>
+        ),
+      },
+      {
+        key: 'description',
+        label: '描述',
+        render: (item) => item.description || '-',
+      },
+      {
+        key: 'requestUrl',
+        label: '请求',
+        render: (item) => (
+          <div className="table-primary">
+            <strong>{item.requestMethod || '-'}</strong>
+            <span>{item.requestUrl || '-'}</span>
+          </div>
+        ),
+      },
+      {
+        key: 'createTime',
+        label: '时间',
+        render: (item) => formatDateTime(item.createTime),
+      },
+    ],
+    getCardTitle: (item) => item.description || '操作日志',
+    getCardMeta: (item) => [
+      ['操作人', `${item.adminName || '-'} (#${item.adminId || 0})`],
+      ['模块', item.module || '-'],
+      ['动作', item.action || '-'],
+      ['请求', `${item.requestMethod || '-'} ${item.requestUrl || '-'}`],
+      ['参数', item.requestParams || '-'],
+      ['时间', formatDateTime(item.createTime)],
     ],
   },
   {
@@ -1704,11 +1797,15 @@ function App() {
             {resourceCatalog.map((resource) => (
               <Route key={resource.key}>
                 <Route element={<ResourceListPage resource={resource} />} path={resource.basePath} />
-                <Route element={<ResourceFormPage mode="new" resource={resource} />} path={`${resource.basePath}/new`} />
-                <Route
-                  element={<ResourceFormPage mode="edit" resource={resource} />}
-                  path={`${resource.basePath}/:id/edit`}
-                />
+                {resource.allowCreate === false ? null : (
+                  <Route element={<ResourceFormPage mode="new" resource={resource} />} path={`${resource.basePath}/new`} />
+                )}
+                {resource.allowEdit === false ? null : (
+                  <Route
+                    element={<ResourceFormPage mode="edit" resource={resource} />}
+                    path={`${resource.basePath}/:id/edit`}
+                  />
+                )}
               </Route>
             ))}
           </Route>

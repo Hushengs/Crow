@@ -20,6 +20,7 @@ type AdminService struct {
 	adminRoleUC       *biz.AdminRoleUsecase
 	permissionUC      *biz.PermissionUsecase
 	groupPermissionUC *biz.GroupPermissionUsecase
+	operationLogUC    *biz.AdminOperationLogUsecase
 }
 
 func NewAdminService(
@@ -28,6 +29,7 @@ func NewAdminService(
 	adminRoleUC *biz.AdminRoleUsecase,
 	permissionUC *biz.PermissionUsecase,
 	groupPermissionUC *biz.GroupPermissionUsecase,
+	operationLogUC *biz.AdminOperationLogUsecase,
 ) *AdminService {
 	return &AdminService{
 		adminUC:           adminUC,
@@ -35,6 +37,7 @@ func NewAdminService(
 		adminRoleUC:       adminRoleUC,
 		permissionUC:      permissionUC,
 		groupPermissionUC: groupPermissionUC,
+		operationLogUC:    operationLogUC,
 	}
 }
 

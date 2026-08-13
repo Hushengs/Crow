@@ -4,7 +4,9 @@ import (
 	adminv1 "crow/api/admin/v1"
 	loginv1 "crow/api/login/v1"
 	todov1 "crow/api/todo/v1"
+	"crow/internal/biz"
 	"crow/internal/conf"
+	appmiddleware "crow/internal/middleware"
 	"crow/internal/service"
 	"github.com/go-kratos/kratos/v3/middleware/recovery"
 	"github.com/go-kratos/kratos/v3/middleware/validate"
@@ -15,7 +17,7 @@ import (
 )
 
 // NewHTTPServer new an HTTP server.
-func NewHTTPServer(c *conf.Server, todo *service.TodoService, login *service.LoginService, admin *service.AdminService) *http.Server {
+func NewHTTPServer(c *conf.Server, auth *conf.Auth, operationLogUC *biz.AdminOperationLogUsecase, todo *service.TodoService, login *service.LoginService, admin *service.AdminService) *http.Server {
 	var opts = []http.ServerOption{
 		http.Middleware(
 			recovery.Recovery(),
@@ -27,6 +29,8 @@ func NewHTTPServer(c *conf.Server, todo *service.TodoService, login *service.Log
 				}
 				return nil
 			}),
+			appmiddleware.NewAdminAuth(auth),
+			appmiddleware.NewAdminOperationLog(operationLogUC),
 		),
 	}
 	if c.Http.Network != "" {

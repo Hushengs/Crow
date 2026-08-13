@@ -6,6 +6,36 @@ info:
     title: ""
     version: 0.0.1
 paths:
+    /v1/admin-operation-logs:
+        get:
+            tags:
+                - AdminService
+            operationId: AdminService_ListAdminOperationLogs
+            parameters:
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageToken
+                  in: query
+                  schema:
+                    type: string
+                - name: filter
+                  in: query
+                  schema:
+                    type: string
+                - name: orderBy
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/admin.v1.AdminOperationLogSet'
     /v1/admin-roles:
         get:
             tags:
@@ -791,6 +821,39 @@ components:
                 updateTime:
                     type: string
                     format: date-time
+        admin.v1.AdminOperationLog:
+            type: object
+            properties:
+                id:
+                    type: string
+                adminId:
+                    type: string
+                adminName:
+                    type: string
+                module:
+                    type: string
+                action:
+                    type: string
+                description:
+                    type: string
+                requestMethod:
+                    type: string
+                requestUrl:
+                    type: string
+                requestParams:
+                    type: string
+                createTime:
+                    type: string
+                    format: date-time
+        admin.v1.AdminOperationLogSet:
+            type: object
+            properties:
+                adminOperationLogs:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/admin.v1.AdminOperationLog'
+                nextPageToken:
+                    type: string
         admin.v1.AdminRole:
             type: object
             properties:

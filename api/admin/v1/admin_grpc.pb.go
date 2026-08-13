@@ -20,31 +20,32 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	AdminService_CreateAdmin_FullMethodName           = "/admin.v1.AdminService/CreateAdmin"
-	AdminService_GetAdmin_FullMethodName              = "/admin.v1.AdminService/GetAdmin"
-	AdminService_ListAdmins_FullMethodName            = "/admin.v1.AdminService/ListAdmins"
-	AdminService_UpdateAdmin_FullMethodName           = "/admin.v1.AdminService/UpdateAdmin"
-	AdminService_DeleteAdmin_FullMethodName           = "/admin.v1.AdminService/DeleteAdmin"
-	AdminService_CreateRole_FullMethodName            = "/admin.v1.AdminService/CreateRole"
-	AdminService_GetRole_FullMethodName               = "/admin.v1.AdminService/GetRole"
-	AdminService_ListRoles_FullMethodName             = "/admin.v1.AdminService/ListRoles"
-	AdminService_UpdateRole_FullMethodName            = "/admin.v1.AdminService/UpdateRole"
-	AdminService_DeleteRole_FullMethodName            = "/admin.v1.AdminService/DeleteRole"
-	AdminService_CreateAdminRole_FullMethodName       = "/admin.v1.AdminService/CreateAdminRole"
-	AdminService_GetAdminRole_FullMethodName          = "/admin.v1.AdminService/GetAdminRole"
-	AdminService_ListAdminRoles_FullMethodName        = "/admin.v1.AdminService/ListAdminRoles"
-	AdminService_UpdateAdminRole_FullMethodName       = "/admin.v1.AdminService/UpdateAdminRole"
-	AdminService_DeleteAdminRole_FullMethodName       = "/admin.v1.AdminService/DeleteAdminRole"
-	AdminService_CreatePermission_FullMethodName      = "/admin.v1.AdminService/CreatePermission"
-	AdminService_GetPermission_FullMethodName         = "/admin.v1.AdminService/GetPermission"
-	AdminService_ListPermissions_FullMethodName       = "/admin.v1.AdminService/ListPermissions"
-	AdminService_UpdatePermission_FullMethodName      = "/admin.v1.AdminService/UpdatePermission"
-	AdminService_DeletePermission_FullMethodName      = "/admin.v1.AdminService/DeletePermission"
-	AdminService_CreateGroupPermission_FullMethodName = "/admin.v1.AdminService/CreateGroupPermission"
-	AdminService_GetGroupPermission_FullMethodName    = "/admin.v1.AdminService/GetGroupPermission"
-	AdminService_ListGroupPermissions_FullMethodName  = "/admin.v1.AdminService/ListGroupPermissions"
-	AdminService_UpdateGroupPermission_FullMethodName = "/admin.v1.AdminService/UpdateGroupPermission"
-	AdminService_DeleteGroupPermission_FullMethodName = "/admin.v1.AdminService/DeleteGroupPermission"
+	AdminService_CreateAdmin_FullMethodName            = "/admin.v1.AdminService/CreateAdmin"
+	AdminService_GetAdmin_FullMethodName               = "/admin.v1.AdminService/GetAdmin"
+	AdminService_ListAdmins_FullMethodName             = "/admin.v1.AdminService/ListAdmins"
+	AdminService_UpdateAdmin_FullMethodName            = "/admin.v1.AdminService/UpdateAdmin"
+	AdminService_DeleteAdmin_FullMethodName            = "/admin.v1.AdminService/DeleteAdmin"
+	AdminService_CreateRole_FullMethodName             = "/admin.v1.AdminService/CreateRole"
+	AdminService_GetRole_FullMethodName                = "/admin.v1.AdminService/GetRole"
+	AdminService_ListRoles_FullMethodName              = "/admin.v1.AdminService/ListRoles"
+	AdminService_UpdateRole_FullMethodName             = "/admin.v1.AdminService/UpdateRole"
+	AdminService_DeleteRole_FullMethodName             = "/admin.v1.AdminService/DeleteRole"
+	AdminService_CreateAdminRole_FullMethodName        = "/admin.v1.AdminService/CreateAdminRole"
+	AdminService_GetAdminRole_FullMethodName           = "/admin.v1.AdminService/GetAdminRole"
+	AdminService_ListAdminRoles_FullMethodName         = "/admin.v1.AdminService/ListAdminRoles"
+	AdminService_UpdateAdminRole_FullMethodName        = "/admin.v1.AdminService/UpdateAdminRole"
+	AdminService_DeleteAdminRole_FullMethodName        = "/admin.v1.AdminService/DeleteAdminRole"
+	AdminService_CreatePermission_FullMethodName       = "/admin.v1.AdminService/CreatePermission"
+	AdminService_GetPermission_FullMethodName          = "/admin.v1.AdminService/GetPermission"
+	AdminService_ListPermissions_FullMethodName        = "/admin.v1.AdminService/ListPermissions"
+	AdminService_UpdatePermission_FullMethodName       = "/admin.v1.AdminService/UpdatePermission"
+	AdminService_DeletePermission_FullMethodName       = "/admin.v1.AdminService/DeletePermission"
+	AdminService_CreateGroupPermission_FullMethodName  = "/admin.v1.AdminService/CreateGroupPermission"
+	AdminService_GetGroupPermission_FullMethodName     = "/admin.v1.AdminService/GetGroupPermission"
+	AdminService_ListGroupPermissions_FullMethodName   = "/admin.v1.AdminService/ListGroupPermissions"
+	AdminService_UpdateGroupPermission_FullMethodName  = "/admin.v1.AdminService/UpdateGroupPermission"
+	AdminService_DeleteGroupPermission_FullMethodName  = "/admin.v1.AdminService/DeleteGroupPermission"
+	AdminService_ListAdminOperationLogs_FullMethodName = "/admin.v1.AdminService/ListAdminOperationLogs"
 )
 
 // AdminServiceClient is the client API for AdminService service.
@@ -76,6 +77,7 @@ type AdminServiceClient interface {
 	ListGroupPermissions(ctx context.Context, in *ListGroupPermissionsRequest, opts ...grpc.CallOption) (*GroupPermissionSet, error)
 	UpdateGroupPermission(ctx context.Context, in *UpdateGroupPermissionRequest, opts ...grpc.CallOption) (*GroupPermission, error)
 	DeleteGroupPermission(ctx context.Context, in *DeleteGroupPermissionRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	ListAdminOperationLogs(ctx context.Context, in *ListAdminOperationLogsRequest, opts ...grpc.CallOption) (*AdminOperationLogSet, error)
 }
 
 type adminServiceClient struct {
@@ -336,6 +338,16 @@ func (c *adminServiceClient) DeleteGroupPermission(ctx context.Context, in *Dele
 	return out, nil
 }
 
+func (c *adminServiceClient) ListAdminOperationLogs(ctx context.Context, in *ListAdminOperationLogsRequest, opts ...grpc.CallOption) (*AdminOperationLogSet, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AdminOperationLogSet)
+	err := c.cc.Invoke(ctx, AdminService_ListAdminOperationLogs_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AdminServiceServer is the server API for AdminService service.
 // All implementations must embed UnimplementedAdminServiceServer
 // for forward compatibility.
@@ -365,6 +377,7 @@ type AdminServiceServer interface {
 	ListGroupPermissions(context.Context, *ListGroupPermissionsRequest) (*GroupPermissionSet, error)
 	UpdateGroupPermission(context.Context, *UpdateGroupPermissionRequest) (*GroupPermission, error)
 	DeleteGroupPermission(context.Context, *DeleteGroupPermissionRequest) (*emptypb.Empty, error)
+	ListAdminOperationLogs(context.Context, *ListAdminOperationLogsRequest) (*AdminOperationLogSet, error)
 	mustEmbedUnimplementedAdminServiceServer()
 }
 
@@ -449,6 +462,9 @@ func (UnimplementedAdminServiceServer) UpdateGroupPermission(context.Context, *U
 }
 func (UnimplementedAdminServiceServer) DeleteGroupPermission(context.Context, *DeleteGroupPermissionRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteGroupPermission not implemented")
+}
+func (UnimplementedAdminServiceServer) ListAdminOperationLogs(context.Context, *ListAdminOperationLogsRequest) (*AdminOperationLogSet, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListAdminOperationLogs not implemented")
 }
 func (UnimplementedAdminServiceServer) mustEmbedUnimplementedAdminServiceServer() {}
 func (UnimplementedAdminServiceServer) testEmbeddedByValue()                      {}
@@ -921,6 +937,24 @@ func _AdminService_DeleteGroupPermission_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AdminService_ListAdminOperationLogs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListAdminOperationLogsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdminServiceServer).ListAdminOperationLogs(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AdminService_ListAdminOperationLogs_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdminServiceServer).ListAdminOperationLogs(ctx, req.(*ListAdminOperationLogsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AdminService_ServiceDesc is the grpc.ServiceDesc for AdminService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -1027,6 +1061,10 @@ var AdminService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteGroupPermission",
 			Handler:    _AdminService_DeleteGroupPermission_Handler,
+		},
+		{
+			MethodName: "ListAdminOperationLogs",
+			Handler:    _AdminService_ListAdminOperationLogs_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -81,6 +81,19 @@ CREATE TABLE `admin_operation_log` (
   KEY `idx_create_date` (`create_date`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='后台管理员操作日志表';
 
+CREATE TABLE `system_log` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `log_uid` CHAR(36) NOT NULL COMMENT '日志唯一标识，便于链路追踪',
+  `log_level` ENUM('TRACE','DEBUG','INFO','WARN','ERROR','FATAL') NOT NULL COMMENT '消息等级',
+  `message` TEXT NOT NULL COMMENT '日志消息内容',
+  `file_path` VARCHAR(512) DEFAULT NULL COMMENT '消息落地文件位置',
+  `line_number` INT UNSIGNED DEFAULT NULL COMMENT '日志所在源文件行号',
+  `create_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '操作时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_log_uid` (`log_uid`),
+  KEY `idx_create_date` (`create_date`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='后台系统日志表';
+
 INSERT INTO `admin` (`username`, `password`, `status`, `password_updated_at`)
 VALUES (
   'admin',

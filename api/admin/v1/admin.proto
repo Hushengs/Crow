@@ -173,6 +173,12 @@ service AdminService {
       delete: "/v1/group-permissions/{id}"
     };
   }
+
+  rpc ListAdminOperationLogs (ListAdminOperationLogsRequest) returns (AdminOperationLogSet) {
+    option (google.api.http) = {
+      get: "/v1/admin-operation-logs"
+    };
+  }
 }
 
 message Admin {
@@ -365,4 +371,29 @@ message UpdateGroupPermissionRequest {
 
 message DeleteGroupPermissionRequest {
   int64 id = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+message AdminOperationLog {
+  int64 id = 1;
+  int64 admin_id = 2;
+  string admin_name = 3;
+  string module = 4;
+  string action = 5;
+  string description = 6;
+  string request_method = 7;
+  string request_url = 8;
+  string request_params = 9;
+  google.protobuf.Timestamp create_time = 10;
+}
+
+message AdminOperationLogSet {
+  repeated AdminOperationLog admin_operation_logs = 1;
+  string next_page_token = 2;
+}
+
+message ListAdminOperationLogsRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  string filter = 3;
+  string order_by = 4;
 }

@@ -289,6 +289,44 @@ func (r *stubGroupPermissionRepo) DeleteGroupPermission(_ context.Context, id in
 	return nil
 }
 
+type stubAdminOperationLogRepo struct {
+	nextID int64
+	logs   map[int64]*biz.AdminOperationLog
+}
+
+func (r *stubAdminOperationLogRepo) Create(_ context.Context, log *biz.AdminOperationLog) (*biz.AdminOperationLog, error) {
+	now := time.Now()
+	created := cloneAdminOperationLogForTest(log)
+	created.ID = r.nextID
+	created.CreateTime = now
+	r.logs[created.ID] = cloneAdminOperationLogForTest(created)
+	r.nextID++
+	return cloneAdminOperationLogForTest(created), nil
+}
+
+func (r *stubAdminOperationLogRepo) List(_ context.Context, opts ...biz.AdminOperationLogListOption) ([]*biz.AdminOperationLog, error) {
+	options := biz.AdminOperationLogListOptions{Limit: 20}
+	for _, opt := range opts {
+		opt(&options)
+	}
+	if options.Offset < 0 || options.Limit <= 0 {
+		return nil, biz.ErrAdminOperationLogInvalidArgument
+	}
+	list := make([]*biz.AdminOperationLog, 0, len(r.logs))
+	for _, item := range r.logs {
+		list = append(list, cloneAdminOperationLogForTest(item))
+	}
+	sort.Slice(list, func(i, j int) bool { return list[i].ID > list[j].ID })
+	if options.Offset >= len(list) {
+		return []*biz.AdminOperationLog{}, nil
+	}
+	end := options.Offset + options.Limit
+	if end > len(list) {
+		end = len(list)
+	}
+	return list[options.Offset:end], nil
+}
+
 func newTestRBACService() *AdminService {
 	return NewAdminService(
 		biz.NewAdminUsecase(&stubAdminRepo{nextID: 1, admins: make(map[int64]*biz.Admin)}),
@@ -296,6 +334,7 @@ func newTestRBACService() *AdminService {
 		biz.NewAdminRoleUsecase(&stubAdminRoleRepo{nextID: 1, adminRoles: make(map[int64]*biz.AdminRole)}),
 		biz.NewPermissionUsecase(&stubPermissionRepo{nextID: 1, permissions: make(map[int64]*biz.Permission)}),
 		biz.NewGroupPermissionUsecase(&stubGroupPermissionRepo{nextID: 1, groupPermissions: make(map[int64]*biz.GroupPermission)}),
+		biz.NewAdminOperationLogUsecase(&stubAdminOperationLogRepo{nextID: 1, logs: make(map[int64]*biz.AdminOperationLog)}),
 	)
 }
 
@@ -543,6 +582,14 @@ func clonePermissionForTest(in *biz.Permission) *biz.Permission {
 }
 
 func cloneGroupPermissionForTest(in *biz.GroupPermission) *biz.GroupPermission {
+	if in == nil {
+		return nil
+	}
+	cloned := *in
+	return &cloned
+}
+
+func cloneAdminOperationLogForTest(in *biz.AdminOperationLog) *biz.AdminOperationLog {
 	if in == nil {
 		return nil
 	}

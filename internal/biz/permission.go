@@ -82,6 +82,8 @@ var programPermissionSpecs = []programPermissionSpec{
 	{Key: "permissions", ParentKey: "system", Title: "权限查看", Handle: "module://system/permissions", Weight: 30},
 	{Key: "permissions:list", ParentKey: "permissions", Title: "权限列表", Handle: "/v1/permissions", Weight: 10},
 	{Key: "permissions:get", ParentKey: "permissions", Title: "权限详情", Handle: "/v1/permissions/{id}", Weight: 20},
+	{Key: "operation_logs", ParentKey: "system", Title: "操作日志", Handle: "module://system/admin-operation-logs", Weight: 40},
+	{Key: "operation_logs:list", ParentKey: "operation_logs", Title: "操作日志列表", Handle: "/v1/admin-operation-logs", Weight: 10},
 }
 
 func NewPermissionUsecase(repo PermissionRepo) *PermissionUsecase {

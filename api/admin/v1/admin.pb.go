@@ -1981,6 +1981,242 @@ func (x *DeleteGroupPermissionRequest) GetId() int64 {
 	return 0
 }
 
+type AdminOperationLog struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	AdminId       int64                  `protobuf:"varint,2,opt,name=admin_id,json=adminId,proto3" json:"admin_id,omitempty"`
+	AdminName     string                 `protobuf:"bytes,3,opt,name=admin_name,json=adminName,proto3" json:"admin_name,omitempty"`
+	Module        string                 `protobuf:"bytes,4,opt,name=module,proto3" json:"module,omitempty"`
+	Action        string                 `protobuf:"bytes,5,opt,name=action,proto3" json:"action,omitempty"`
+	Description   string                 `protobuf:"bytes,6,opt,name=description,proto3" json:"description,omitempty"`
+	RequestMethod string                 `protobuf:"bytes,7,opt,name=request_method,json=requestMethod,proto3" json:"request_method,omitempty"`
+	RequestUrl    string                 `protobuf:"bytes,8,opt,name=request_url,json=requestUrl,proto3" json:"request_url,omitempty"`
+	RequestParams string                 `protobuf:"bytes,9,opt,name=request_params,json=requestParams,proto3" json:"request_params,omitempty"`
+	CreateTime    *timestamppb.Timestamp `protobuf:"bytes,10,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AdminOperationLog) Reset() {
+	*x = AdminOperationLog{}
+	mi := &file_admin_v1_admin_proto_msgTypes[35]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AdminOperationLog) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AdminOperationLog) ProtoMessage() {}
+
+func (x *AdminOperationLog) ProtoReflect() protoreflect.Message {
+	mi := &file_admin_v1_admin_proto_msgTypes[35]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AdminOperationLog.ProtoReflect.Descriptor instead.
+func (*AdminOperationLog) Descriptor() ([]byte, []int) {
+	return file_admin_v1_admin_proto_rawDescGZIP(), []int{35}
+}
+
+func (x *AdminOperationLog) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *AdminOperationLog) GetAdminId() int64 {
+	if x != nil {
+		return x.AdminId
+	}
+	return 0
+}
+
+func (x *AdminOperationLog) GetAdminName() string {
+	if x != nil {
+		return x.AdminName
+	}
+	return ""
+}
+
+func (x *AdminOperationLog) GetModule() string {
+	if x != nil {
+		return x.Module
+	}
+	return ""
+}
+
+func (x *AdminOperationLog) GetAction() string {
+	if x != nil {
+		return x.Action
+	}
+	return ""
+}
+
+func (x *AdminOperationLog) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *AdminOperationLog) GetRequestMethod() string {
+	if x != nil {
+		return x.RequestMethod
+	}
+	return ""
+}
+
+func (x *AdminOperationLog) GetRequestUrl() string {
+	if x != nil {
+		return x.RequestUrl
+	}
+	return ""
+}
+
+func (x *AdminOperationLog) GetRequestParams() string {
+	if x != nil {
+		return x.RequestParams
+	}
+	return ""
+}
+
+func (x *AdminOperationLog) GetCreateTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreateTime
+	}
+	return nil
+}
+
+type AdminOperationLogSet struct {
+	state              protoimpl.MessageState `protogen:"open.v1"`
+	AdminOperationLogs []*AdminOperationLog   `protobuf:"bytes,1,rep,name=admin_operation_logs,json=adminOperationLogs,proto3" json:"admin_operation_logs,omitempty"`
+	NextPageToken      string                 `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *AdminOperationLogSet) Reset() {
+	*x = AdminOperationLogSet{}
+	mi := &file_admin_v1_admin_proto_msgTypes[36]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AdminOperationLogSet) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AdminOperationLogSet) ProtoMessage() {}
+
+func (x *AdminOperationLogSet) ProtoReflect() protoreflect.Message {
+	mi := &file_admin_v1_admin_proto_msgTypes[36]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AdminOperationLogSet.ProtoReflect.Descriptor instead.
+func (*AdminOperationLogSet) Descriptor() ([]byte, []int) {
+	return file_admin_v1_admin_proto_rawDescGZIP(), []int{36}
+}
+
+func (x *AdminOperationLogSet) GetAdminOperationLogs() []*AdminOperationLog {
+	if x != nil {
+		return x.AdminOperationLogs
+	}
+	return nil
+}
+
+func (x *AdminOperationLogSet) GetNextPageToken() string {
+	if x != nil {
+		return x.NextPageToken
+	}
+	return ""
+}
+
+type ListAdminOperationLogsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PageSize      int32                  `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	PageToken     string                 `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
+	Filter        string                 `protobuf:"bytes,3,opt,name=filter,proto3" json:"filter,omitempty"`
+	OrderBy       string                 `protobuf:"bytes,4,opt,name=order_by,json=orderBy,proto3" json:"order_by,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListAdminOperationLogsRequest) Reset() {
+	*x = ListAdminOperationLogsRequest{}
+	mi := &file_admin_v1_admin_proto_msgTypes[37]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListAdminOperationLogsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListAdminOperationLogsRequest) ProtoMessage() {}
+
+func (x *ListAdminOperationLogsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_admin_v1_admin_proto_msgTypes[37]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListAdminOperationLogsRequest.ProtoReflect.Descriptor instead.
+func (*ListAdminOperationLogsRequest) Descriptor() ([]byte, []int) {
+	return file_admin_v1_admin_proto_rawDescGZIP(), []int{37}
+}
+
+func (x *ListAdminOperationLogsRequest) GetPageSize() int32 {
+	if x != nil {
+		return x.PageSize
+	}
+	return 0
+}
+
+func (x *ListAdminOperationLogsRequest) GetPageToken() string {
+	if x != nil {
+		return x.PageToken
+	}
+	return ""
+}
+
+func (x *ListAdminOperationLogsRequest) GetFilter() string {
+	if x != nil {
+		return x.Filter
+	}
+	return ""
+}
+
+func (x *ListAdminOperationLogsRequest) GetOrderBy() string {
+	if x != nil {
+		return x.OrderBy
+	}
+	return ""
+}
+
 var File_admin_v1_admin_proto protoreflect.FileDescriptor
 
 const file_admin_v1_admin_proto_rawDesc = "" +
@@ -2136,7 +2372,31 @@ const file_admin_v1_admin_proto_rawDesc = "" +
 	"\vupdate_mask\x18\x02 \x01(\v2\x1a.google.protobuf.FieldMaskB\x03\xe0A\x02R\n" +
 	"updateMask\"3\n" +
 	"\x1cDeleteGroupPermissionRequest\x12\x13\n" +
-	"\x02id\x18\x01 \x01(\x03B\x03\xe0A\x02R\x02id2\xe2\x14\n" +
+	"\x02id\x18\x01 \x01(\x03B\x03\xe0A\x02R\x02id\"\xdb\x02\n" +
+	"\x11AdminOperationLog\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x19\n" +
+	"\badmin_id\x18\x02 \x01(\x03R\aadminId\x12\x1d\n" +
+	"\n" +
+	"admin_name\x18\x03 \x01(\tR\tadminName\x12\x16\n" +
+	"\x06module\x18\x04 \x01(\tR\x06module\x12\x16\n" +
+	"\x06action\x18\x05 \x01(\tR\x06action\x12 \n" +
+	"\vdescription\x18\x06 \x01(\tR\vdescription\x12%\n" +
+	"\x0erequest_method\x18\a \x01(\tR\rrequestMethod\x12\x1f\n" +
+	"\vrequest_url\x18\b \x01(\tR\n" +
+	"requestUrl\x12%\n" +
+	"\x0erequest_params\x18\t \x01(\tR\rrequestParams\x12;\n" +
+	"\vcreate_time\x18\n" +
+	" \x01(\v2\x1a.google.protobuf.TimestampR\n" +
+	"createTime\"\x8d\x01\n" +
+	"\x14AdminOperationLogSet\x12M\n" +
+	"\x14admin_operation_logs\x18\x01 \x03(\v2\x1b.admin.v1.AdminOperationLogR\x12adminOperationLogs\x12&\n" +
+	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\"\x8e\x01\n" +
+	"\x1dListAdminOperationLogsRequest\x12\x1b\n" +
+	"\tpage_size\x18\x01 \x01(\x05R\bpageSize\x12\x1d\n" +
+	"\n" +
+	"page_token\x18\x02 \x01(\tR\tpageToken\x12\x16\n" +
+	"\x06filter\x18\x03 \x01(\tR\x06filter\x12\x19\n" +
+	"\border_by\x18\x04 \x01(\tR\aorderBy2\xe8\x15\n" +
 	"\fAdminService\x12^\n" +
 	"\vCreateAdmin\x12\x1c.admin.v1.CreateAdminRequest\x1a\x0f.admin.v1.Admin\" \x82\xd3\xe4\x93\x02\x1a:\x05admin\"\x11/v1/admins/create\x12O\n" +
 	"\bGetAdmin\x12\x19.admin.v1.GetAdminRequest\x1a\x0f.admin.v1.Admin\"\x17\x82\xd3\xe4\x93\x02\x11\x12\x0f/v1/admins/{id}\x12Q\n" +
@@ -2171,7 +2431,8 @@ const file_admin_v1_admin_proto_rawDesc = "" +
 	"\x12GetGroupPermission\x12#.admin.v1.GetGroupPermissionRequest\x1a\x19.admin.v1.GroupPermission\"\"\x82\xd3\xe4\x93\x02\x1c\x12\x1a/v1/group-permissions/{id}\x12z\n" +
 	"\x14ListGroupPermissions\x12%.admin.v1.ListGroupPermissionsRequest\x1a\x1c.admin.v1.GroupPermissionSet\"\x1d\x82\xd3\xe4\x93\x02\x17\x12\x15/v1/group-permissions\x12\x92\x01\n" +
 	"\x15UpdateGroupPermission\x12&.admin.v1.UpdateGroupPermissionRequest\x1a\x19.admin.v1.GroupPermission\"6\x82\xd3\xe4\x93\x020:\x10group_permission\x1a\x1c/v1/group-permissions/update\x12{\n" +
-	"\x15DeleteGroupPermission\x12&.admin.v1.DeleteGroupPermissionRequest\x1a\x16.google.protobuf.Empty\"\"\x82\xd3\xe4\x93\x02\x1c*\x1a/v1/group-permissions/{id}B?\n" +
+	"\x15DeleteGroupPermission\x12&.admin.v1.DeleteGroupPermissionRequest\x1a\x16.google.protobuf.Empty\"\"\x82\xd3\xe4\x93\x02\x1c*\x1a/v1/group-permissions/{id}\x12\x83\x01\n" +
+	"\x16ListAdminOperationLogs\x12'.admin.v1.ListAdminOperationLogsRequest\x1a\x1e.admin.v1.AdminOperationLogSet\" \x82\xd3\xe4\x93\x02\x1a\x12\x18/v1/admin-operation-logsB?\n" +
 	"\x19io.grpc.examples.admin.v1B\n" +
 	"AdminProtoP\x01Z\x14crow/api/admin/v1;v1b\x06proto3"
 
@@ -2187,135 +2448,142 @@ func file_admin_v1_admin_proto_rawDescGZIP() []byte {
 	return file_admin_v1_admin_proto_rawDescData
 }
 
-var file_admin_v1_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 35)
+var file_admin_v1_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 38)
 var file_admin_v1_admin_proto_goTypes = []any{
-	(*Admin)(nil),                        // 0: admin.v1.Admin
-	(*AdminSet)(nil),                     // 1: admin.v1.AdminSet
-	(*CreateAdminRequest)(nil),           // 2: admin.v1.CreateAdminRequest
-	(*GetAdminRequest)(nil),              // 3: admin.v1.GetAdminRequest
-	(*ListAdminsRequest)(nil),            // 4: admin.v1.ListAdminsRequest
-	(*UpdateAdminRequest)(nil),           // 5: admin.v1.UpdateAdminRequest
-	(*DeleteAdminRequest)(nil),           // 6: admin.v1.DeleteAdminRequest
-	(*Role)(nil),                         // 7: admin.v1.Role
-	(*RoleSet)(nil),                      // 8: admin.v1.RoleSet
-	(*CreateRoleRequest)(nil),            // 9: admin.v1.CreateRoleRequest
-	(*GetRoleRequest)(nil),               // 10: admin.v1.GetRoleRequest
-	(*ListRolesRequest)(nil),             // 11: admin.v1.ListRolesRequest
-	(*UpdateRoleRequest)(nil),            // 12: admin.v1.UpdateRoleRequest
-	(*DeleteRoleRequest)(nil),            // 13: admin.v1.DeleteRoleRequest
-	(*AdminRole)(nil),                    // 14: admin.v1.AdminRole
-	(*AdminRoleSet)(nil),                 // 15: admin.v1.AdminRoleSet
-	(*CreateAdminRoleRequest)(nil),       // 16: admin.v1.CreateAdminRoleRequest
-	(*GetAdminRoleRequest)(nil),          // 17: admin.v1.GetAdminRoleRequest
-	(*ListAdminRolesRequest)(nil),        // 18: admin.v1.ListAdminRolesRequest
-	(*UpdateAdminRoleRequest)(nil),       // 19: admin.v1.UpdateAdminRoleRequest
-	(*DeleteAdminRoleRequest)(nil),       // 20: admin.v1.DeleteAdminRoleRequest
-	(*Permission)(nil),                   // 21: admin.v1.Permission
-	(*PermissionSet)(nil),                // 22: admin.v1.PermissionSet
-	(*CreatePermissionRequest)(nil),      // 23: admin.v1.CreatePermissionRequest
-	(*GetPermissionRequest)(nil),         // 24: admin.v1.GetPermissionRequest
-	(*ListPermissionsRequest)(nil),       // 25: admin.v1.ListPermissionsRequest
-	(*UpdatePermissionRequest)(nil),      // 26: admin.v1.UpdatePermissionRequest
-	(*DeletePermissionRequest)(nil),      // 27: admin.v1.DeletePermissionRequest
-	(*GroupPermission)(nil),              // 28: admin.v1.GroupPermission
-	(*GroupPermissionSet)(nil),           // 29: admin.v1.GroupPermissionSet
-	(*CreateGroupPermissionRequest)(nil), // 30: admin.v1.CreateGroupPermissionRequest
-	(*GetGroupPermissionRequest)(nil),    // 31: admin.v1.GetGroupPermissionRequest
-	(*ListGroupPermissionsRequest)(nil),  // 32: admin.v1.ListGroupPermissionsRequest
-	(*UpdateGroupPermissionRequest)(nil), // 33: admin.v1.UpdateGroupPermissionRequest
-	(*DeleteGroupPermissionRequest)(nil), // 34: admin.v1.DeleteGroupPermissionRequest
-	(*timestamppb.Timestamp)(nil),        // 35: google.protobuf.Timestamp
-	(*fieldmaskpb.FieldMask)(nil),        // 36: google.protobuf.FieldMask
-	(*emptypb.Empty)(nil),                // 37: google.protobuf.Empty
+	(*Admin)(nil),                         // 0: admin.v1.Admin
+	(*AdminSet)(nil),                      // 1: admin.v1.AdminSet
+	(*CreateAdminRequest)(nil),            // 2: admin.v1.CreateAdminRequest
+	(*GetAdminRequest)(nil),               // 3: admin.v1.GetAdminRequest
+	(*ListAdminsRequest)(nil),             // 4: admin.v1.ListAdminsRequest
+	(*UpdateAdminRequest)(nil),            // 5: admin.v1.UpdateAdminRequest
+	(*DeleteAdminRequest)(nil),            // 6: admin.v1.DeleteAdminRequest
+	(*Role)(nil),                          // 7: admin.v1.Role
+	(*RoleSet)(nil),                       // 8: admin.v1.RoleSet
+	(*CreateRoleRequest)(nil),             // 9: admin.v1.CreateRoleRequest
+	(*GetRoleRequest)(nil),                // 10: admin.v1.GetRoleRequest
+	(*ListRolesRequest)(nil),              // 11: admin.v1.ListRolesRequest
+	(*UpdateRoleRequest)(nil),             // 12: admin.v1.UpdateRoleRequest
+	(*DeleteRoleRequest)(nil),             // 13: admin.v1.DeleteRoleRequest
+	(*AdminRole)(nil),                     // 14: admin.v1.AdminRole
+	(*AdminRoleSet)(nil),                  // 15: admin.v1.AdminRoleSet
+	(*CreateAdminRoleRequest)(nil),        // 16: admin.v1.CreateAdminRoleRequest
+	(*GetAdminRoleRequest)(nil),           // 17: admin.v1.GetAdminRoleRequest
+	(*ListAdminRolesRequest)(nil),         // 18: admin.v1.ListAdminRolesRequest
+	(*UpdateAdminRoleRequest)(nil),        // 19: admin.v1.UpdateAdminRoleRequest
+	(*DeleteAdminRoleRequest)(nil),        // 20: admin.v1.DeleteAdminRoleRequest
+	(*Permission)(nil),                    // 21: admin.v1.Permission
+	(*PermissionSet)(nil),                 // 22: admin.v1.PermissionSet
+	(*CreatePermissionRequest)(nil),       // 23: admin.v1.CreatePermissionRequest
+	(*GetPermissionRequest)(nil),          // 24: admin.v1.GetPermissionRequest
+	(*ListPermissionsRequest)(nil),        // 25: admin.v1.ListPermissionsRequest
+	(*UpdatePermissionRequest)(nil),       // 26: admin.v1.UpdatePermissionRequest
+	(*DeletePermissionRequest)(nil),       // 27: admin.v1.DeletePermissionRequest
+	(*GroupPermission)(nil),               // 28: admin.v1.GroupPermission
+	(*GroupPermissionSet)(nil),            // 29: admin.v1.GroupPermissionSet
+	(*CreateGroupPermissionRequest)(nil),  // 30: admin.v1.CreateGroupPermissionRequest
+	(*GetGroupPermissionRequest)(nil),     // 31: admin.v1.GetGroupPermissionRequest
+	(*ListGroupPermissionsRequest)(nil),   // 32: admin.v1.ListGroupPermissionsRequest
+	(*UpdateGroupPermissionRequest)(nil),  // 33: admin.v1.UpdateGroupPermissionRequest
+	(*DeleteGroupPermissionRequest)(nil),  // 34: admin.v1.DeleteGroupPermissionRequest
+	(*AdminOperationLog)(nil),             // 35: admin.v1.AdminOperationLog
+	(*AdminOperationLogSet)(nil),          // 36: admin.v1.AdminOperationLogSet
+	(*ListAdminOperationLogsRequest)(nil), // 37: admin.v1.ListAdminOperationLogsRequest
+	(*timestamppb.Timestamp)(nil),         // 38: google.protobuf.Timestamp
+	(*fieldmaskpb.FieldMask)(nil),         // 39: google.protobuf.FieldMask
+	(*emptypb.Empty)(nil),                 // 40: google.protobuf.Empty
 }
 var file_admin_v1_admin_proto_depIdxs = []int32{
-	35, // 0: admin.v1.Admin.last_login_time:type_name -> google.protobuf.Timestamp
-	35, // 1: admin.v1.Admin.password_updated_at:type_name -> google.protobuf.Timestamp
-	35, // 2: admin.v1.Admin.create_time:type_name -> google.protobuf.Timestamp
-	35, // 3: admin.v1.Admin.update_time:type_name -> google.protobuf.Timestamp
+	38, // 0: admin.v1.Admin.last_login_time:type_name -> google.protobuf.Timestamp
+	38, // 1: admin.v1.Admin.password_updated_at:type_name -> google.protobuf.Timestamp
+	38, // 2: admin.v1.Admin.create_time:type_name -> google.protobuf.Timestamp
+	38, // 3: admin.v1.Admin.update_time:type_name -> google.protobuf.Timestamp
 	0,  // 4: admin.v1.AdminSet.admins:type_name -> admin.v1.Admin
 	0,  // 5: admin.v1.CreateAdminRequest.admin:type_name -> admin.v1.Admin
 	0,  // 6: admin.v1.UpdateAdminRequest.admin:type_name -> admin.v1.Admin
-	36, // 7: admin.v1.UpdateAdminRequest.update_mask:type_name -> google.protobuf.FieldMask
-	35, // 8: admin.v1.Role.create_time:type_name -> google.protobuf.Timestamp
-	35, // 9: admin.v1.Role.update_time:type_name -> google.protobuf.Timestamp
+	39, // 7: admin.v1.UpdateAdminRequest.update_mask:type_name -> google.protobuf.FieldMask
+	38, // 8: admin.v1.Role.create_time:type_name -> google.protobuf.Timestamp
+	38, // 9: admin.v1.Role.update_time:type_name -> google.protobuf.Timestamp
 	7,  // 10: admin.v1.RoleSet.roles:type_name -> admin.v1.Role
 	7,  // 11: admin.v1.CreateRoleRequest.role:type_name -> admin.v1.Role
 	7,  // 12: admin.v1.UpdateRoleRequest.role:type_name -> admin.v1.Role
-	36, // 13: admin.v1.UpdateRoleRequest.update_mask:type_name -> google.protobuf.FieldMask
-	35, // 14: admin.v1.AdminRole.create_time:type_name -> google.protobuf.Timestamp
-	35, // 15: admin.v1.AdminRole.update_time:type_name -> google.protobuf.Timestamp
+	39, // 13: admin.v1.UpdateRoleRequest.update_mask:type_name -> google.protobuf.FieldMask
+	38, // 14: admin.v1.AdminRole.create_time:type_name -> google.protobuf.Timestamp
+	38, // 15: admin.v1.AdminRole.update_time:type_name -> google.protobuf.Timestamp
 	14, // 16: admin.v1.AdminRoleSet.admin_roles:type_name -> admin.v1.AdminRole
 	14, // 17: admin.v1.CreateAdminRoleRequest.admin_role:type_name -> admin.v1.AdminRole
 	14, // 18: admin.v1.UpdateAdminRoleRequest.admin_role:type_name -> admin.v1.AdminRole
-	36, // 19: admin.v1.UpdateAdminRoleRequest.update_mask:type_name -> google.protobuf.FieldMask
-	35, // 20: admin.v1.Permission.create_time:type_name -> google.protobuf.Timestamp
-	35, // 21: admin.v1.Permission.update_time:type_name -> google.protobuf.Timestamp
+	39, // 19: admin.v1.UpdateAdminRoleRequest.update_mask:type_name -> google.protobuf.FieldMask
+	38, // 20: admin.v1.Permission.create_time:type_name -> google.protobuf.Timestamp
+	38, // 21: admin.v1.Permission.update_time:type_name -> google.protobuf.Timestamp
 	21, // 22: admin.v1.PermissionSet.permissions:type_name -> admin.v1.Permission
 	21, // 23: admin.v1.CreatePermissionRequest.permission:type_name -> admin.v1.Permission
 	21, // 24: admin.v1.UpdatePermissionRequest.permission:type_name -> admin.v1.Permission
-	36, // 25: admin.v1.UpdatePermissionRequest.update_mask:type_name -> google.protobuf.FieldMask
-	35, // 26: admin.v1.GroupPermission.create_time:type_name -> google.protobuf.Timestamp
-	35, // 27: admin.v1.GroupPermission.update_time:type_name -> google.protobuf.Timestamp
+	39, // 25: admin.v1.UpdatePermissionRequest.update_mask:type_name -> google.protobuf.FieldMask
+	38, // 26: admin.v1.GroupPermission.create_time:type_name -> google.protobuf.Timestamp
+	38, // 27: admin.v1.GroupPermission.update_time:type_name -> google.protobuf.Timestamp
 	28, // 28: admin.v1.GroupPermissionSet.group_permissions:type_name -> admin.v1.GroupPermission
 	28, // 29: admin.v1.CreateGroupPermissionRequest.group_permission:type_name -> admin.v1.GroupPermission
 	28, // 30: admin.v1.UpdateGroupPermissionRequest.group_permission:type_name -> admin.v1.GroupPermission
-	36, // 31: admin.v1.UpdateGroupPermissionRequest.update_mask:type_name -> google.protobuf.FieldMask
-	2,  // 32: admin.v1.AdminService.CreateAdmin:input_type -> admin.v1.CreateAdminRequest
-	3,  // 33: admin.v1.AdminService.GetAdmin:input_type -> admin.v1.GetAdminRequest
-	4,  // 34: admin.v1.AdminService.ListAdmins:input_type -> admin.v1.ListAdminsRequest
-	5,  // 35: admin.v1.AdminService.UpdateAdmin:input_type -> admin.v1.UpdateAdminRequest
-	6,  // 36: admin.v1.AdminService.DeleteAdmin:input_type -> admin.v1.DeleteAdminRequest
-	9,  // 37: admin.v1.AdminService.CreateRole:input_type -> admin.v1.CreateRoleRequest
-	10, // 38: admin.v1.AdminService.GetRole:input_type -> admin.v1.GetRoleRequest
-	11, // 39: admin.v1.AdminService.ListRoles:input_type -> admin.v1.ListRolesRequest
-	12, // 40: admin.v1.AdminService.UpdateRole:input_type -> admin.v1.UpdateRoleRequest
-	13, // 41: admin.v1.AdminService.DeleteRole:input_type -> admin.v1.DeleteRoleRequest
-	16, // 42: admin.v1.AdminService.CreateAdminRole:input_type -> admin.v1.CreateAdminRoleRequest
-	17, // 43: admin.v1.AdminService.GetAdminRole:input_type -> admin.v1.GetAdminRoleRequest
-	18, // 44: admin.v1.AdminService.ListAdminRoles:input_type -> admin.v1.ListAdminRolesRequest
-	19, // 45: admin.v1.AdminService.UpdateAdminRole:input_type -> admin.v1.UpdateAdminRoleRequest
-	20, // 46: admin.v1.AdminService.DeleteAdminRole:input_type -> admin.v1.DeleteAdminRoleRequest
-	23, // 47: admin.v1.AdminService.CreatePermission:input_type -> admin.v1.CreatePermissionRequest
-	24, // 48: admin.v1.AdminService.GetPermission:input_type -> admin.v1.GetPermissionRequest
-	25, // 49: admin.v1.AdminService.ListPermissions:input_type -> admin.v1.ListPermissionsRequest
-	26, // 50: admin.v1.AdminService.UpdatePermission:input_type -> admin.v1.UpdatePermissionRequest
-	27, // 51: admin.v1.AdminService.DeletePermission:input_type -> admin.v1.DeletePermissionRequest
-	30, // 52: admin.v1.AdminService.CreateGroupPermission:input_type -> admin.v1.CreateGroupPermissionRequest
-	31, // 53: admin.v1.AdminService.GetGroupPermission:input_type -> admin.v1.GetGroupPermissionRequest
-	32, // 54: admin.v1.AdminService.ListGroupPermissions:input_type -> admin.v1.ListGroupPermissionsRequest
-	33, // 55: admin.v1.AdminService.UpdateGroupPermission:input_type -> admin.v1.UpdateGroupPermissionRequest
-	34, // 56: admin.v1.AdminService.DeleteGroupPermission:input_type -> admin.v1.DeleteGroupPermissionRequest
-	0,  // 57: admin.v1.AdminService.CreateAdmin:output_type -> admin.v1.Admin
-	0,  // 58: admin.v1.AdminService.GetAdmin:output_type -> admin.v1.Admin
-	1,  // 59: admin.v1.AdminService.ListAdmins:output_type -> admin.v1.AdminSet
-	0,  // 60: admin.v1.AdminService.UpdateAdmin:output_type -> admin.v1.Admin
-	37, // 61: admin.v1.AdminService.DeleteAdmin:output_type -> google.protobuf.Empty
-	7,  // 62: admin.v1.AdminService.CreateRole:output_type -> admin.v1.Role
-	7,  // 63: admin.v1.AdminService.GetRole:output_type -> admin.v1.Role
-	8,  // 64: admin.v1.AdminService.ListRoles:output_type -> admin.v1.RoleSet
-	7,  // 65: admin.v1.AdminService.UpdateRole:output_type -> admin.v1.Role
-	37, // 66: admin.v1.AdminService.DeleteRole:output_type -> google.protobuf.Empty
-	14, // 67: admin.v1.AdminService.CreateAdminRole:output_type -> admin.v1.AdminRole
-	14, // 68: admin.v1.AdminService.GetAdminRole:output_type -> admin.v1.AdminRole
-	15, // 69: admin.v1.AdminService.ListAdminRoles:output_type -> admin.v1.AdminRoleSet
-	14, // 70: admin.v1.AdminService.UpdateAdminRole:output_type -> admin.v1.AdminRole
-	37, // 71: admin.v1.AdminService.DeleteAdminRole:output_type -> google.protobuf.Empty
-	21, // 72: admin.v1.AdminService.CreatePermission:output_type -> admin.v1.Permission
-	21, // 73: admin.v1.AdminService.GetPermission:output_type -> admin.v1.Permission
-	22, // 74: admin.v1.AdminService.ListPermissions:output_type -> admin.v1.PermissionSet
-	21, // 75: admin.v1.AdminService.UpdatePermission:output_type -> admin.v1.Permission
-	37, // 76: admin.v1.AdminService.DeletePermission:output_type -> google.protobuf.Empty
-	28, // 77: admin.v1.AdminService.CreateGroupPermission:output_type -> admin.v1.GroupPermission
-	28, // 78: admin.v1.AdminService.GetGroupPermission:output_type -> admin.v1.GroupPermission
-	29, // 79: admin.v1.AdminService.ListGroupPermissions:output_type -> admin.v1.GroupPermissionSet
-	28, // 80: admin.v1.AdminService.UpdateGroupPermission:output_type -> admin.v1.GroupPermission
-	37, // 81: admin.v1.AdminService.DeleteGroupPermission:output_type -> google.protobuf.Empty
-	57, // [57:82] is the sub-list for method output_type
-	32, // [32:57] is the sub-list for method input_type
-	32, // [32:32] is the sub-list for extension type_name
-	32, // [32:32] is the sub-list for extension extendee
-	0,  // [0:32] is the sub-list for field type_name
+	39, // 31: admin.v1.UpdateGroupPermissionRequest.update_mask:type_name -> google.protobuf.FieldMask
+	38, // 32: admin.v1.AdminOperationLog.create_time:type_name -> google.protobuf.Timestamp
+	35, // 33: admin.v1.AdminOperationLogSet.admin_operation_logs:type_name -> admin.v1.AdminOperationLog
+	2,  // 34: admin.v1.AdminService.CreateAdmin:input_type -> admin.v1.CreateAdminRequest
+	3,  // 35: admin.v1.AdminService.GetAdmin:input_type -> admin.v1.GetAdminRequest
+	4,  // 36: admin.v1.AdminService.ListAdmins:input_type -> admin.v1.ListAdminsRequest
+	5,  // 37: admin.v1.AdminService.UpdateAdmin:input_type -> admin.v1.UpdateAdminRequest
+	6,  // 38: admin.v1.AdminService.DeleteAdmin:input_type -> admin.v1.DeleteAdminRequest
+	9,  // 39: admin.v1.AdminService.CreateRole:input_type -> admin.v1.CreateRoleRequest
+	10, // 40: admin.v1.AdminService.GetRole:input_type -> admin.v1.GetRoleRequest
+	11, // 41: admin.v1.AdminService.ListRoles:input_type -> admin.v1.ListRolesRequest
+	12, // 42: admin.v1.AdminService.UpdateRole:input_type -> admin.v1.UpdateRoleRequest
+	13, // 43: admin.v1.AdminService.DeleteRole:input_type -> admin.v1.DeleteRoleRequest
+	16, // 44: admin.v1.AdminService.CreateAdminRole:input_type -> admin.v1.CreateAdminRoleRequest
+	17, // 45: admin.v1.AdminService.GetAdminRole:input_type -> admin.v1.GetAdminRoleRequest
+	18, // 46: admin.v1.AdminService.ListAdminRoles:input_type -> admin.v1.ListAdminRolesRequest
+	19, // 47: admin.v1.AdminService.UpdateAdminRole:input_type -> admin.v1.UpdateAdminRoleRequest
+	20, // 48: admin.v1.AdminService.DeleteAdminRole:input_type -> admin.v1.DeleteAdminRoleRequest
+	23, // 49: admin.v1.AdminService.CreatePermission:input_type -> admin.v1.CreatePermissionRequest
+	24, // 50: admin.v1.AdminService.GetPermission:input_type -> admin.v1.GetPermissionRequest
+	25, // 51: admin.v1.AdminService.ListPermissions:input_type -> admin.v1.ListPermissionsRequest
+	26, // 52: admin.v1.AdminService.UpdatePermission:input_type -> admin.v1.UpdatePermissionRequest
+	27, // 53: admin.v1.AdminService.DeletePermission:input_type -> admin.v1.DeletePermissionRequest
+	30, // 54: admin.v1.AdminService.CreateGroupPermission:input_type -> admin.v1.CreateGroupPermissionRequest
+	31, // 55: admin.v1.AdminService.GetGroupPermission:input_type -> admin.v1.GetGroupPermissionRequest
+	32, // 56: admin.v1.AdminService.ListGroupPermissions:input_type -> admin.v1.ListGroupPermissionsRequest
+	33, // 57: admin.v1.AdminService.UpdateGroupPermission:input_type -> admin.v1.UpdateGroupPermissionRequest
+	34, // 58: admin.v1.AdminService.DeleteGroupPermission:input_type -> admin.v1.DeleteGroupPermissionRequest
+	37, // 59: admin.v1.AdminService.ListAdminOperationLogs:input_type -> admin.v1.ListAdminOperationLogsRequest
+	0,  // 60: admin.v1.AdminService.CreateAdmin:output_type -> admin.v1.Admin
+	0,  // 61: admin.v1.AdminService.GetAdmin:output_type -> admin.v1.Admin
+	1,  // 62: admin.v1.AdminService.ListAdmins:output_type -> admin.v1.AdminSet
+	0,  // 63: admin.v1.AdminService.UpdateAdmin:output_type -> admin.v1.Admin
+	40, // 64: admin.v1.AdminService.DeleteAdmin:output_type -> google.protobuf.Empty
+	7,  // 65: admin.v1.AdminService.CreateRole:output_type -> admin.v1.Role
+	7,  // 66: admin.v1.AdminService.GetRole:output_type -> admin.v1.Role
+	8,  // 67: admin.v1.AdminService.ListRoles:output_type -> admin.v1.RoleSet
+	7,  // 68: admin.v1.AdminService.UpdateRole:output_type -> admin.v1.Role
+	40, // 69: admin.v1.AdminService.DeleteRole:output_type -> google.protobuf.Empty
+	14, // 70: admin.v1.AdminService.CreateAdminRole:output_type -> admin.v1.AdminRole
+	14, // 71: admin.v1.AdminService.GetAdminRole:output_type -> admin.v1.AdminRole
+	15, // 72: admin.v1.AdminService.ListAdminRoles:output_type -> admin.v1.AdminRoleSet
+	14, // 73: admin.v1.AdminService.UpdateAdminRole:output_type -> admin.v1.AdminRole
+	40, // 74: admin.v1.AdminService.DeleteAdminRole:output_type -> google.protobuf.Empty
+	21, // 75: admin.v1.AdminService.CreatePermission:output_type -> admin.v1.Permission
+	21, // 76: admin.v1.AdminService.GetPermission:output_type -> admin.v1.Permission
+	22, // 77: admin.v1.AdminService.ListPermissions:output_type -> admin.v1.PermissionSet
+	21, // 78: admin.v1.AdminService.UpdatePermission:output_type -> admin.v1.Permission
+	40, // 79: admin.v1.AdminService.DeletePermission:output_type -> google.protobuf.Empty
+	28, // 80: admin.v1.AdminService.CreateGroupPermission:output_type -> admin.v1.GroupPermission
+	28, // 81: admin.v1.AdminService.GetGroupPermission:output_type -> admin.v1.GroupPermission
+	29, // 82: admin.v1.AdminService.ListGroupPermissions:output_type -> admin.v1.GroupPermissionSet
+	28, // 83: admin.v1.AdminService.UpdateGroupPermission:output_type -> admin.v1.GroupPermission
+	40, // 84: admin.v1.AdminService.DeleteGroupPermission:output_type -> google.protobuf.Empty
+	36, // 85: admin.v1.AdminService.ListAdminOperationLogs:output_type -> admin.v1.AdminOperationLogSet
+	60, // [60:86] is the sub-list for method output_type
+	34, // [34:60] is the sub-list for method input_type
+	34, // [34:34] is the sub-list for extension type_name
+	34, // [34:34] is the sub-list for extension extendee
+	0,  // [0:34] is the sub-list for field type_name
 }
 
 func init() { file_admin_v1_admin_proto_init() }
@@ -2329,7 +2597,7 @@ func file_admin_v1_admin_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_admin_v1_admin_proto_rawDesc), len(file_admin_v1_admin_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   35,
+			NumMessages:   38,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
