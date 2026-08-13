@@ -571,12 +571,42 @@ button:hover:not(:disabled),
 
 .table-toolbar {
   margin-top: 20px;
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: flex-end;
 }
 
 .search-field {
   display: grid;
   gap: 8px;
   max-width: 360px;
+}
+
+.search-field--compact {
+  max-width: 220px;
+}
+
+.search-field--compact input {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+.time-range-field {
+  position: relative;
+}
+
+.time-range-field__display {
+  cursor: pointer;
+}
+
+.time-range-field__native {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
 }
 
 .search-field span {
@@ -599,6 +629,10 @@ button:hover:not(:disabled),
 .search-field input:focus {
   border-color: #3b82f6;
   box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+}
+
+.search-field__input--placeholder::placeholder {
+  color: #94a3b8;
 }
 
 .list-overview {
@@ -681,7 +715,8 @@ button:hover:not(:disabled),
 
 .admin-table__actions,
 .admin-table__actions-cell {
-  width: 170px;
+  width: 220px;
+  min-width: 220px;
 }
 
 .table-primary {
@@ -703,7 +738,7 @@ button:hover:not(:disabled),
   display: flex;
   gap: 10px;
   justify-content: flex-start;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 
 .status-chip {

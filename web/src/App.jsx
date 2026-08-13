@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   BrowserRouter,
   Link,
@@ -23,6 +23,7 @@ const initialAuth = {
   tokenType: '',
   expiresIn: '',
   userId: '',
+  account: '',
 }
 
 const authStorageKey = 'crow.auth'
@@ -122,6 +123,26 @@ function buildAuthHeaders() {
   return headers
 }
 
+function readJwtAccount(token) {
+  if (!token) {
+    return ''
+  }
+
+  try {
+    const [, payload] = token.split('.')
+    if (!payload) {
+      return ''
+    }
+
+    const normalized = payload.replace(/-/g, '+').replace(/_/g, '/')
+    const decoded = window.atob(normalized.padEnd(Math.ceil(normalized.length / 4) * 4, '='))
+    const claims = JSON.parse(decoded)
+    return typeof claims.account === 'string' ? claims.account : ''
+  } catch {
+    return ''
+  }
+}
+
 function pickValue(source, keys, fallback = '') {
   for (const key of keys) {
     if (source?.[key] !== undefined && source?.[key] !== null) {
@@ -149,6 +170,40 @@ function formatDateTime(value) {
     return String(value)
   }
   return date.toLocaleString('zh-CN', { hour12: false })
+}
+
+function toDateTimestamp(value) {
+  if (!value) {
+    return Number.NaN
+  }
+  if (typeof value === 'object') {
+    const seconds = Number(value.seconds || 0)
+    const nanos = Number(value.nanos || 0)
+    const timestamp = seconds * 1000 + Math.floor(nanos / 1e6)
+    return timestamp > 0 ? timestamp : Number.NaN
+  }
+  const date = new Date(value)
+  return date.getTime()
+}
+
+function parseDateTimeFilter(value) {
+  if (!value) {
+    return null
+  }
+  const normalized = String(value).trim()
+  if (!normalized) {
+    return null
+  }
+  const candidate = normalized.replace(/\//g, '-').replace(/\s+/, 'T')
+  const timestamp = new Date(candidate).getTime()
+  return Number.isNaN(timestamp) ? null : timestamp
+}
+
+function formatDateTimeFilterValue(value) {
+  if (!value) {
+    return ''
+  }
+  return String(value).replace('T', ' ').replace(/-/g, '/')
 }
 
 function normalizeIdList(values) {
@@ -706,6 +761,7 @@ const resourceCatalog = [
     allowCreate: false,
     allowEdit: false,
     allowDelete: false,
+    enableTimeRangeSearch: true,
     basePath: '/admin-operation-logs',
     listEndpoint: '/api/v1/admin-operation-logs?page_size=100',
     listKey: ['adminOperationLogs', 'admin_operation_logs'],
@@ -781,6 +837,7 @@ const resourceCatalog = [
     allowCreate: false,
     allowEdit: false,
     allowDelete: false,
+    enableTimeRangeSearch: true,
     basePath: '/system-logs',
     listEndpoint: '/api/v1/system-logs?page_size=100',
     listKey: ['systemLogs', 'system_logs'],
@@ -1166,6 +1223,7 @@ function LoginPage() {
         tokenType: pickValue(payload, ['tokenType', 'token_type']),
         expiresIn: pickValue(payload, ['expiresIn', 'expires_in']),
         userId: pickValue(payload, ['userId', 'user_id']),
+        account: form.account.trim(),
       })
       navigate('/home', { replace: true })
     } catch (submitError) {
@@ -1291,8 +1349,8 @@ function ConsoleLayout() {
 
             <dl className="session-grid">
               <div>
-                <dt>用户 ID</dt>
-                <dd>{String(auth.userId || '-')}</dd>
+                <dt>用户名</dt>
+                <dd>{auth.account || readJwtAccount(auth.accessToken) || '-'}</dd>
               </div>
               <div>
                 <dt>令牌类型</dt>
@@ -1325,6 +1383,38 @@ function ConsoleLayout() {
   )
 }
 
+function TimeRangeField({ label, onChange, placeholder, value }) {
+  const inputRef = useRef(null)
+
+  const handleClick = () => {
+    inputRef.current?.showPicker?.()
+    inputRef.current?.focus()
+  }
+
+  return (
+    <label className="search-field search-field--compact">
+      <span>{label}</span>
+      <div className="time-range-field" onClick={handleClick} role="presentation">
+        <input
+          className="search-field__input--placeholder time-range-field__display"
+          placeholder={placeholder}
+          readOnly
+          tabIndex={-1}
+          type="text"
+          value={formatDateTimeFilterValue(value)}
+        />
+        <input
+          ref={inputRef}
+          className="time-range-field__native"
+          onChange={onChange}
+          type="datetime-local"
+          value={value}
+        />
+      </div>
+    </label>
+  )
+}
+
 function ResourceListPage({ resource }) {
   const location = useLocation()
   const [items, setItems] = useState([])
@@ -1332,17 +1422,32 @@ function ResourceListPage({ resource }) {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(location.state?.message || '')
   const [searchQuery, setSearchQuery] = useState('')
+  const [startTime, setStartTime] = useState('')
+  const [endTime, setEndTime] = useState('')
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
 
   const filteredItems = useMemo(() => {
     const keyword = searchQuery.trim().toLowerCase()
-    if (!keyword) {
-      return items
-    }
+    const startTimestamp = parseDateTimeFilter(startTime)
+    const endTimestamp = parseDateTimeFilter(endTime)
 
-    return items.filter((item) => buildSearchText(resource, item).includes(keyword))
-  }, [items, resource, searchQuery])
+    return items.filter((item) => {
+      if (keyword && !buildSearchText(resource, item).includes(keyword)) {
+        return false
+      }
+      if (resource.enableTimeRangeSearch) {
+        const createdAt = toDateTimestamp(item.createTime)
+        if (startTimestamp && (Number.isNaN(createdAt) || createdAt < startTimestamp)) {
+          return false
+        }
+        if (endTimestamp && (Number.isNaN(createdAt) || createdAt > endTimestamp)) {
+          return false
+        }
+      }
+      return true
+    })
+  }, [endTime, items, resource, searchQuery, startTime])
 
   const totalPages = Math.max(1, Math.ceil(filteredItems.length / pageSize))
   const paginatedItems = useMemo(() => {
@@ -1370,8 +1475,15 @@ function ResourceListPage({ resource }) {
   }, [location.state])
 
   useEffect(() => {
+    setSearchQuery('')
+    setStartTime('')
+    setEndTime('')
     setPage(1)
-  }, [resource.key, searchQuery, pageSize])
+  }, [resource.key])
+
+  useEffect(() => {
+    setPage(1)
+  }, [resource.key, searchQuery, startTime, endTime, pageSize])
 
   useEffect(() => {
     if (page > totalPages) {
@@ -1433,6 +1545,23 @@ function ResourceListPage({ resource }) {
             value={searchQuery}
           />
         </label>
+
+        {resource.enableTimeRangeSearch ? (
+          <>
+            <TimeRangeField
+              label="开始时间"
+              onChange={(event) => setStartTime(event.target.value)}
+              placeholder="YYYY/MM/DD HH:mm"
+              value={startTime}
+            />
+            <TimeRangeField
+              label="结束时间"
+              onChange={(event) => setEndTime(event.target.value)}
+              placeholder="YYYY/MM/DD HH:mm"
+              value={endTime}
+            />
+          </>
+        ) : null}
       </div>
 
       <div className="table-card">
@@ -1445,6 +1574,7 @@ function ResourceListPage({ resource }) {
             <table className="admin-table">
               <thead>
                 <tr>
+                  <th scope="col">ID</th>
                   {resource.listColumns.map((column) => (
                     <th key={column.label} scope="col">
                       {column.label}
@@ -1460,6 +1590,7 @@ function ResourceListPage({ resource }) {
               <tbody>
                 {paginatedItems.map((item) => (
                   <tr key={item.id}>
+                    <td>{item.id}</td>
                     {resource.listColumns.map((column) => (
                       <td key={column.label}>{renderColumnContent(column, item)}</td>
                     ))}
