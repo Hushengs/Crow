@@ -575,6 +575,36 @@ paths:
                 "200":
                     description: OK
                     content: {}
+    /v1/system-logs:
+        get:
+            tags:
+                - AdminService
+            operationId: AdminService_ListSystemLogs
+            parameters:
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageToken
+                  in: query
+                  schema:
+                    type: string
+                - name: filter
+                  in: query
+                  schema:
+                    type: string
+                - name: orderBy
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/admin.v1.SystemLogSet'
     /v1/todos/create:
         post:
             tags:
@@ -960,6 +990,34 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/admin.v1.Role'
+                nextPageToken:
+                    type: string
+        admin.v1.SystemLog:
+            type: object
+            properties:
+                id:
+                    type: string
+                logUid:
+                    type: string
+                logLevel:
+                    type: string
+                message:
+                    type: string
+                filePath:
+                    type: string
+                lineNumber:
+                    type: integer
+                    format: uint32
+                createTime:
+                    type: string
+                    format: date-time
+        admin.v1.SystemLogSet:
+            type: object
+            properties:
+                systemLogs:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/admin.v1.SystemLog'
                 nextPageToken:
                     type: string
         login.v1.LoginReply:

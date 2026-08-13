@@ -327,6 +327,44 @@ func (r *stubAdminOperationLogRepo) List(_ context.Context, opts ...biz.AdminOpe
 	return list[options.Offset:end], nil
 }
 
+type stubSystemLogRepo struct {
+	nextID int64
+	logs   map[int64]*biz.SystemLog
+}
+
+func (r *stubSystemLogRepo) Create(_ context.Context, item *biz.SystemLog) (*biz.SystemLog, error) {
+	now := time.Now()
+	created := cloneSystemLogForTest(item)
+	created.ID = r.nextID
+	created.CreateTime = now
+	r.logs[created.ID] = cloneSystemLogForTest(created)
+	r.nextID++
+	return cloneSystemLogForTest(created), nil
+}
+
+func (r *stubSystemLogRepo) List(_ context.Context, opts ...biz.SystemLogListOption) ([]*biz.SystemLog, error) {
+	options := biz.SystemLogListOptions{Limit: 20}
+	for _, opt := range opts {
+		opt(&options)
+	}
+	if options.Offset < 0 || options.Limit <= 0 {
+		return nil, biz.ErrSystemLogInvalidArgument
+	}
+	list := make([]*biz.SystemLog, 0, len(r.logs))
+	for _, item := range r.logs {
+		list = append(list, cloneSystemLogForTest(item))
+	}
+	sort.Slice(list, func(i, j int) bool { return list[i].ID > list[j].ID })
+	if options.Offset >= len(list) {
+		return []*biz.SystemLog{}, nil
+	}
+	end := options.Offset + options.Limit
+	if end > len(list) {
+		end = len(list)
+	}
+	return list[options.Offset:end], nil
+}
+
 func newTestRBACService() *AdminService {
 	return NewAdminService(
 		biz.NewAdminUsecase(&stubAdminRepo{nextID: 1, admins: make(map[int64]*biz.Admin)}),
@@ -335,6 +373,7 @@ func newTestRBACService() *AdminService {
 		biz.NewPermissionUsecase(&stubPermissionRepo{nextID: 1, permissions: make(map[int64]*biz.Permission)}),
 		biz.NewGroupPermissionUsecase(&stubGroupPermissionRepo{nextID: 1, groupPermissions: make(map[int64]*biz.GroupPermission)}),
 		biz.NewAdminOperationLogUsecase(&stubAdminOperationLogRepo{nextID: 1, logs: make(map[int64]*biz.AdminOperationLog)}),
+		biz.NewSystemLogUsecase(&stubSystemLogRepo{nextID: 1, logs: make(map[int64]*biz.SystemLog)}),
 	)
 }
 
@@ -590,6 +629,14 @@ func cloneGroupPermissionForTest(in *biz.GroupPermission) *biz.GroupPermission {
 }
 
 func cloneAdminOperationLogForTest(in *biz.AdminOperationLog) *biz.AdminOperationLog {
+	if in == nil {
+		return nil
+	}
+	cloned := *in
+	return &cloned
+}
+
+func cloneSystemLogForTest(in *biz.SystemLog) *biz.SystemLog {
 	if in == nil {
 		return nil
 	}

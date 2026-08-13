@@ -179,6 +179,12 @@ service AdminService {
       get: "/v1/admin-operation-logs"
     };
   }
+
+  rpc ListSystemLogs (ListSystemLogsRequest) returns (SystemLogSet) {
+    option (google.api.http) = {
+      get: "/v1/system-logs"
+    };
+  }
 }
 
 message Admin {
@@ -392,6 +398,28 @@ message AdminOperationLogSet {
 }
 
 message ListAdminOperationLogsRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  string filter = 3;
+  string order_by = 4;
+}
+
+message SystemLog {
+  int64 id = 1;
+  string log_uid = 2;
+  string log_level = 3;
+  string message = 4;
+  string file_path = 5;
+  uint32 line_number = 6;
+  google.protobuf.Timestamp create_time = 7;
+}
+
+message SystemLogSet {
+  repeated SystemLog system_logs = 1;
+  string next_page_token = 2;
+}
+
+message ListSystemLogsRequest {
   int32 page_size = 1;
   string page_token = 2;
   string filter = 3;

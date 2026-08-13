@@ -46,6 +46,7 @@ const (
 	AdminService_UpdateGroupPermission_FullMethodName  = "/admin.v1.AdminService/UpdateGroupPermission"
 	AdminService_DeleteGroupPermission_FullMethodName  = "/admin.v1.AdminService/DeleteGroupPermission"
 	AdminService_ListAdminOperationLogs_FullMethodName = "/admin.v1.AdminService/ListAdminOperationLogs"
+	AdminService_ListSystemLogs_FullMethodName         = "/admin.v1.AdminService/ListSystemLogs"
 )
 
 // AdminServiceClient is the client API for AdminService service.
@@ -78,6 +79,7 @@ type AdminServiceClient interface {
 	UpdateGroupPermission(ctx context.Context, in *UpdateGroupPermissionRequest, opts ...grpc.CallOption) (*GroupPermission, error)
 	DeleteGroupPermission(ctx context.Context, in *DeleteGroupPermissionRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	ListAdminOperationLogs(ctx context.Context, in *ListAdminOperationLogsRequest, opts ...grpc.CallOption) (*AdminOperationLogSet, error)
+	ListSystemLogs(ctx context.Context, in *ListSystemLogsRequest, opts ...grpc.CallOption) (*SystemLogSet, error)
 }
 
 type adminServiceClient struct {
@@ -348,6 +350,16 @@ func (c *adminServiceClient) ListAdminOperationLogs(ctx context.Context, in *Lis
 	return out, nil
 }
 
+func (c *adminServiceClient) ListSystemLogs(ctx context.Context, in *ListSystemLogsRequest, opts ...grpc.CallOption) (*SystemLogSet, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SystemLogSet)
+	err := c.cc.Invoke(ctx, AdminService_ListSystemLogs_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AdminServiceServer is the server API for AdminService service.
 // All implementations must embed UnimplementedAdminServiceServer
 // for forward compatibility.
@@ -378,6 +390,7 @@ type AdminServiceServer interface {
 	UpdateGroupPermission(context.Context, *UpdateGroupPermissionRequest) (*GroupPermission, error)
 	DeleteGroupPermission(context.Context, *DeleteGroupPermissionRequest) (*emptypb.Empty, error)
 	ListAdminOperationLogs(context.Context, *ListAdminOperationLogsRequest) (*AdminOperationLogSet, error)
+	ListSystemLogs(context.Context, *ListSystemLogsRequest) (*SystemLogSet, error)
 	mustEmbedUnimplementedAdminServiceServer()
 }
 
@@ -465,6 +478,9 @@ func (UnimplementedAdminServiceServer) DeleteGroupPermission(context.Context, *D
 }
 func (UnimplementedAdminServiceServer) ListAdminOperationLogs(context.Context, *ListAdminOperationLogsRequest) (*AdminOperationLogSet, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListAdminOperationLogs not implemented")
+}
+func (UnimplementedAdminServiceServer) ListSystemLogs(context.Context, *ListSystemLogsRequest) (*SystemLogSet, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListSystemLogs not implemented")
 }
 func (UnimplementedAdminServiceServer) mustEmbedUnimplementedAdminServiceServer() {}
 func (UnimplementedAdminServiceServer) testEmbeddedByValue()                      {}
@@ -955,6 +971,24 @@ func _AdminService_ListAdminOperationLogs_Handler(srv interface{}, ctx context.C
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AdminService_ListSystemLogs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListSystemLogsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdminServiceServer).ListSystemLogs(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AdminService_ListSystemLogs_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdminServiceServer).ListSystemLogs(ctx, req.(*ListSystemLogsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AdminService_ServiceDesc is the grpc.ServiceDesc for AdminService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -1065,6 +1099,10 @@ var AdminService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListAdminOperationLogs",
 			Handler:    _AdminService_ListAdminOperationLogs_Handler,
+		},
+		{
+			MethodName: "ListSystemLogs",
+			Handler:    _AdminService_ListSystemLogs_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

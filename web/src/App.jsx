@@ -393,6 +393,21 @@ function normalizeAdminOperationLogResponse(item) {
   }
 }
 
+function normalizeSystemLogResponse(item) {
+  if (!item) {
+    return null
+  }
+  return {
+    id: Number(pickValue(item, ['id'], 0)),
+    logUid: pickValue(item, ['logUid', 'log_uid']),
+    logLevel: pickValue(item, ['logLevel', 'log_level']),
+    message: pickValue(item, ['message']),
+    filePath: pickValue(item, ['filePath', 'file_path']),
+    lineNumber: Number(pickValue(item, ['lineNumber', 'line_number'], 0)),
+    createTime: pickValue(item, ['createTime', 'create_time']),
+  }
+}
+
 const resourceCatalog = [
   {
     key: 'admins',
@@ -754,6 +769,71 @@ const resourceCatalog = [
       ['动作', item.action || '-'],
       ['请求', `${item.requestMethod || '-'} ${item.requestUrl || '-'}`],
       ['参数', item.requestParams || '-'],
+      ['时间', formatDateTime(item.createTime)],
+    ],
+  },
+  {
+    key: 'system-logs',
+    section: '系统管理',
+    navLabel: '系统日志',
+    singularLabel: '系统日志',
+    pluralLabel: '系统日志',
+    allowCreate: false,
+    allowEdit: false,
+    allowDelete: false,
+    basePath: '/system-logs',
+    listEndpoint: '/api/v1/system-logs?page_size=100',
+    listKey: ['systemLogs', 'system_logs'],
+    subtitle: '查看服务运行时输出的系统日志。',
+    createDescription: '系统日志为只读数据。',
+    editDescription: '系统日志为只读数据。',
+    createForm: () => ({}),
+    normalizeResponse: normalizeSystemLogResponse,
+    normalizeForm: () => ({}),
+    buildPayload: () => ({}),
+    buildUpdateMaskPaths: () => [],
+    canSubmit: () => false,
+    describe: () => '系统日志',
+    fields: [],
+    listColumns: [
+      {
+        key: 'logLevel',
+        label: '等级',
+        render: (item) => item.logLevel || '-',
+      },
+      {
+        key: 'message',
+        label: '消息',
+        render: (item) => item.message || '-',
+      },
+      {
+        key: 'filePath',
+        label: '文件位置',
+        render: (item) => (
+          <div className="table-primary">
+            <strong>{item.filePath || '-'}</strong>
+            <span>{item.lineNumber ? `Line ${item.lineNumber}` : '未记录行号'}</span>
+          </div>
+        ),
+      },
+      {
+        key: 'logUid',
+        label: '日志 UID',
+        render: (item) => item.logUid || '-',
+      },
+      {
+        key: 'createTime',
+        label: '时间',
+        render: (item) => formatDateTime(item.createTime),
+      },
+    ],
+    getCardTitle: (item) => item.message || '系统日志',
+    getCardMeta: (item) => [
+      ['日志 UID', item.logUid || '-'],
+      ['等级', item.logLevel || '-'],
+      ['消息', item.message || '-'],
+      ['文件', item.filePath || '-'],
+      ['行号', item.lineNumber ? String(item.lineNumber) : '-'],
       ['时间', formatDateTime(item.createTime)],
     ],
   },
