@@ -150,6 +150,16 @@ function formatDateTime(value) {
   return date.toLocaleString('zh-CN', { hour12: false })
 }
 
+function maskToken(value) {
+  if (!value) {
+    return '-'
+  }
+  if (value.length <= 16) {
+    return value
+  }
+  return `${value.slice(0, 8)}...${value.slice(-6)}`
+}
+
 function statusLabel(status) {
   switch (Number(status)) {
     case 0:
@@ -409,6 +419,40 @@ const resourceCatalog = [
       text: statusLabel(item.status),
       className: `status-chip status-chip--${Number(item.status)}`,
     }),
+    listColumns: [
+      {
+        key: 'username',
+        label: '账号信息',
+        render: (item) => (
+          <div className="table-primary">
+            <strong>{item.username || '-'}</strong>
+            <span>{item.realName || '未填写真实姓名'}</span>
+          </div>
+        ),
+      },
+      {
+        key: 'roleId',
+        label: '角色',
+        render: (item) => `角色 #${item.roleId ?? 0}`,
+      },
+      {
+        key: 'status',
+        label: '状态',
+        render: (item) => (
+          <span className={`status-chip status-chip--${Number(item.status)}`}>{statusLabel(item.status)}</span>
+        ),
+      },
+      {
+        key: 'lastLoginTime',
+        label: '最后登录',
+        render: (item) => formatDateTime(item.lastLoginTime),
+      },
+      {
+        key: 'updateTime',
+        label: '更新时间',
+        render: (item) => formatDateTime(item.updateTime),
+      },
+    ],
     getCardMeta: (item) => [
       ['用户名', item.username || '-'],
       ['角色 ID', String(item.roleId ?? 0)],
@@ -442,6 +486,28 @@ const resourceCatalog = [
     canSubmit: (form) => form.roleName.trim() !== '',
     describe: (payload) => payload.role_name || '角色',
     fields: [{ name: 'roleName', label: '角色名称', type: 'text', placeholder: '请输入角色名称' }],
+    listColumns: [
+      {
+        key: 'roleName',
+        label: '角色名称',
+        render: (item) => (
+          <div className="table-primary">
+            <strong>{item.roleName || `角色 #${item.id}`}</strong>
+            <span>ID #{item.id}</span>
+          </div>
+        ),
+      },
+      {
+        key: 'createTime',
+        label: '创建时间',
+        render: (item) => formatDateTime(item.createTime),
+      },
+      {
+        key: 'updateTime',
+        label: '更新时间',
+        render: (item) => formatDateTime(item.updateTime),
+      },
+    ],
     getCardTitle: (item) => item.roleName || `角色 #${item.id}`,
     getCardMeta: (item) => [
       ['角色 ID', String(item.id)],
@@ -475,6 +541,33 @@ const resourceCatalog = [
     fields: [
       { name: 'adminId', label: '管理员 ID', type: 'number', placeholder: '请输入管理员 ID' },
       { name: 'roleId', label: '角色 ID', type: 'number', placeholder: '请输入角色 ID' },
+    ],
+    listColumns: [
+      {
+        key: 'adminId',
+        label: '管理员',
+        render: (item) => (
+          <div className="table-primary">
+            <strong>管理员 #{item.adminId}</strong>
+            <span>关联 ID #{item.id}</span>
+          </div>
+        ),
+      },
+      {
+        key: 'roleId',
+        label: '角色',
+        render: (item) => `角色 #${item.roleId}`,
+      },
+      {
+        key: 'createTime',
+        label: '创建时间',
+        render: (item) => formatDateTime(item.createTime),
+      },
+      {
+        key: 'updateTime',
+        label: '更新时间',
+        render: (item) => formatDateTime(item.updateTime),
+      },
     ],
     getCardTitle: (item) => `管理员 #${item.adminId} -> 角色 #${item.roleId}`,
     getCardMeta: (item) => [
@@ -514,6 +607,33 @@ const resourceCatalog = [
       { name: 'handle', label: '路由句柄', type: 'text', placeholder: '例如 /system/users' },
       { name: 'weight', label: '权重', type: 'number', placeholder: '请输入排序权重' },
     ],
+    listColumns: [
+      {
+        key: 'title',
+        label: '权限节点',
+        render: (item) => (
+          <div className="table-primary">
+            <strong>{item.title || `权限 #${item.id}`}</strong>
+            <span>{item.handle || '未设置句柄'}</span>
+          </div>
+        ),
+      },
+      {
+        key: 'parentId',
+        label: '父级 ID',
+        render: (item) => String(item.parentId ?? 0),
+      },
+      {
+        key: 'weight',
+        label: '权重',
+        render: (item) => String(item.weight ?? 0),
+      },
+      {
+        key: 'updateTime',
+        label: '更新时间',
+        render: (item) => formatDateTime(item.updateTime),
+      },
+    ],
     getCardTitle: (item) => item.title || `权限 #${item.id}`,
     getCardMeta: (item) => [
       ['权限 ID', String(item.id)],
@@ -551,6 +671,33 @@ const resourceCatalog = [
       { name: 'groupId', label: '分组 ID', type: 'number', placeholder: '请输入分组 ID' },
       { name: 'permissionId', label: '权限 ID', type: 'number', placeholder: '请输入权限 ID' },
     ],
+    listColumns: [
+      {
+        key: 'groupId',
+        label: '分组',
+        render: (item) => (
+          <div className="table-primary">
+            <strong>分组 #{item.groupId}</strong>
+            <span>关联 ID #{item.id}</span>
+          </div>
+        ),
+      },
+      {
+        key: 'permissionId',
+        label: '权限',
+        render: (item) => `权限 #${item.permissionId}`,
+      },
+      {
+        key: 'createTime',
+        label: '创建时间',
+        render: (item) => formatDateTime(item.createTime),
+      },
+      {
+        key: 'updateTime',
+        label: '更新时间',
+        render: (item) => formatDateTime(item.updateTime),
+      },
+    ],
     getCardTitle: (item) => `分组 #${item.groupId} -> 权限 #${item.permissionId}`,
     getCardMeta: (item) => [
       ['关联 ID', String(item.id)],
@@ -576,6 +723,40 @@ function getCurrentResource(pathname) {
   return resourceCatalog.find(
     (resource) => pathname === resource.basePath || pathname.startsWith(`${resource.basePath}/`),
   )
+}
+
+function getResourceViewLabel(pathname, resource) {
+  if (pathname.endsWith('/new')) {
+    return `新建${resource?.singularLabel || ''}`
+  }
+  if (pathname.endsWith('/edit')) {
+    return `编辑${resource?.singularLabel || ''}`
+  }
+  return `${resource?.pluralLabel || '管理'}列表`
+}
+
+function renderColumnContent(column, item) {
+  if (typeof column.render === 'function') {
+    return column.render(item)
+  }
+
+  const value = item?.[column.key]
+  if (value === undefined || value === null || value === '') {
+    return '-'
+  }
+  return value
+}
+
+function buildSearchText(resource, item) {
+  const title = resource.getCardTitle ? String(resource.getCardTitle(item) || '') : ''
+  const meta = resource.getCardMeta
+    ? resource
+        .getCardMeta(item)
+        .map(([label, value]) => `${label} ${value || ''}`)
+        .join(' ')
+    : Object.values(item || {}).join(' ')
+
+  return `${title} ${meta}`.toLowerCase()
 }
 
 function LoginPage() {
@@ -686,11 +867,7 @@ function ConsoleLayout() {
   const location = useLocation()
   const auth = readStoredAuth()
   const currentResource = getCurrentResource(location.pathname)
-  const breadcrumbTail = location.pathname.endsWith('/new')
-    ? `新建${currentResource?.singularLabel || ''}`
-    : location.pathname.endsWith('/edit')
-      ? `编辑${currentResource?.singularLabel || ''}`
-      : `${currentResource?.pluralLabel || '管理'}列表`
+  const breadcrumbTail = getResourceViewLabel(location.pathname, currentResource)
   const navSections = [
     { title: '系统管理', items: resourceCatalog.filter((resource) => resource.section === '系统管理') },
     { title: '关联管理', items: resourceCatalog.filter((resource) => resource.section === '关联管理') },
@@ -706,7 +883,7 @@ function ConsoleLayout() {
       <aside className="sidebar">
         <div className="sidebar__brand">
           <p className="eyebrow">Crow</p>
-          <h1>运营管理中心</h1>
+          <h1>播控管理中心</h1>
           <p>后台资源维护</p>
         </div>
 
@@ -731,53 +908,49 @@ function ConsoleLayout() {
           </section>
         ))}
 
-        <section className="result result--standalone sidebar__session">
-          <div className="result__title">
-            <h3>当前会话</h3>
-            <p className="subtitle">登录返回的令牌信息。</p>
+        <section className="sidebar__session">
+          <div className="sidebar__session-card">
+            <div className="sidebar__session-header">
+              <div>
+                <p className="eyebrow">Session</p>
+                <h3>当前登录状态</h3>
+              </div>
+              <span className="status-dot">
+                <span />
+                已连接
+              </span>
+            </div>
+
+            <dl className="session-grid">
+              <div>
+                <dt>用户 ID</dt>
+                <dd>{String(auth.userId || '-')}</dd>
+              </div>
+              <div>
+                <dt>令牌类型</dt>
+                <dd>{auth.tokenType || '-'}</dd>
+              </div>
+              <div>
+                <dt>有效期</dt>
+                <dd>{String(auth.expiresIn || '-')}</dd>
+              </div>
+              <div>
+                <dt>访问令牌</dt>
+                <dd>{maskToken(auth.accessToken)}</dd>
+              </div>
+            </dl>
+
+            <button className="ghost-button ghost-button--dark" onClick={handleLogout} type="button">
+              退出登录
+            </button>
           </div>
-          <dl>
-            <div>
-              <dt>accessToken</dt>
-              <dd>{auth.accessToken || '-'}</dd>
-            </div>
-            <div>
-              <dt>refreshToken</dt>
-              <dd>{auth.refreshToken || '-'}</dd>
-            </div>
-            <div>
-              <dt>tokenType</dt>
-              <dd>{auth.tokenType || '-'}</dd>
-            </div>
-            <div>
-              <dt>expiresIn</dt>
-              <dd>{String(auth.expiresIn || '-')}</dd>
-            </div>
-            <div>
-              <dt>userId</dt>
-              <dd>{String(auth.userId || '-')}</dd>
-            </div>
-          </dl>
         </section>
       </aside>
 
       <section className="workspace">
-        <header className="workspace__topbar">
-          <div className="workspace__header">
-            <p className="workspace__crumbs">工作台 / {currentResource?.navLabel || '管理中心'} / {breadcrumbTail}</p>
-            <h2>{breadcrumbTail}</h2>
-            <p className="subtitle">{currentResource?.subtitle || '统一维护后台资源数据。'}</p>
-          </div>
-
-          <div className="hero__actions">
-            <button className="submit submit--compact" onClick={handleLogout} type="button">
-              退出登录
-            </button>
-          </div>
-        </header>
 
         <section className="content-stack">
-            <Outlet />
+          <Outlet />
         </section>
       </section>
     </main>
@@ -790,6 +963,24 @@ function ResourceListPage({ resource }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(location.state?.message || '')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
+
+  const filteredItems = useMemo(() => {
+    const keyword = searchQuery.trim().toLowerCase()
+    if (!keyword) {
+      return items
+    }
+
+    return items.filter((item) => buildSearchText(resource, item).includes(keyword))
+  }, [items, resource, searchQuery])
+
+  const totalPages = Math.max(1, Math.ceil(filteredItems.length / pageSize))
+  const paginatedItems = useMemo(() => {
+    const start = (page - 1) * pageSize
+    return filteredItems.slice(start, start + pageSize)
+  }, [filteredItems, page, pageSize])
 
   const loadItems = useCallback(async () => {
     setLoading(true)
@@ -809,6 +1000,16 @@ function ResourceListPage({ resource }) {
   useEffect(() => {
     setSuccess(location.state?.message || '')
   }, [location.state])
+
+  useEffect(() => {
+    setPage(1)
+  }, [resource.key, searchQuery, pageSize])
+
+  useEffect(() => {
+    if (page > totalPages) {
+      setPage(totalPages)
+    }
+  }, [page, totalPages])
 
   useEffect(() => {
     loadItems()
@@ -853,42 +1054,91 @@ function ResourceListPage({ resource }) {
       {error && <p className="message message--error">{error}</p>}
       {success && <p className="message message--success">{success}</p>}
 
-      <div className="resource-list">
-        {items.length === 0 && !loading ? (
-          <p className="empty-state">暂无{resource.pluralLabel}数据。</p>
+      <div className="table-toolbar">
+        <label className="search-field">
+          <span>搜索</span>
+          <input
+            onChange={(event) => setSearchQuery(event.target.value)}
+            placeholder={`搜索${resource.singularLabel}名称、ID、状态等信息`}
+            value={searchQuery}
+          />
+        </label>
+      </div>
+
+      <div className="table-card">
+        {loading ? (
+          <p className="empty-state">加载中...</p>
+        ) : filteredItems.length === 0 ? (
+          <p className="empty-state">没有匹配的{resource.pluralLabel}数据。</p>
         ) : (
-          items.map((item) => {
-            const badge = resource.getCardBadge ? resource.getCardBadge(item) : null
-            return (
-              <article className="resource-item" key={item.id}>
-                <div className="resource-item__main">
-                  <div className="resource-item__title">
-                    <h3>{resource.getCardTitle(item)}</h3>
-                    {badge ? <span className={badge.className}>{badge.text}</span> : null}
-                  </div>
-
-                  <dl className="meta-grid">
-                    {resource.getCardMeta(item).map(([label, value]) => (
-                      <div key={label}>
-                        <dt>{label}</dt>
-                        <dd>{value || '-'}</dd>
-                      </div>
+          <div className="table-scroll">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  {resource.listColumns.map((column) => (
+                    <th key={column.label} scope="col">
+                      {column.label}
+                    </th>
+                  ))}
+                  <th className="admin-table__actions" scope="col">
+                    操作
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {paginatedItems.map((item) => (
+                  <tr key={item.id}>
+                    {resource.listColumns.map((column) => (
+                      <td key={column.label}>{renderColumnContent(column, item)}</td>
                     ))}
-                  </dl>
-                </div>
-
-                <div className="resource-item__actions">
-                  <Link className="ghost-button action-link" to={`${resource.basePath}/${item.id}/edit`}>
-                    编辑
-                  </Link>
-                  <button className="danger-button" onClick={() => handleDelete(item)} type="button">
-                    删除
-                  </button>
-                </div>
-              </article>
-            )
-          })
+                    <td className="admin-table__actions-cell">
+                      <div className="table-actions">
+                        <Link className="ghost-button action-link action-link--inline" to={`${resource.basePath}/${item.id}/edit`}>
+                          编辑
+                        </Link>
+                        <button className="danger-button" onClick={() => handleDelete(item)} type="button">
+                          删除
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
+      </div>
+
+      <div className="pagination">
+        <div className="pagination__summary">
+          共 {filteredItems.length} 条，当前第 {page} / {totalPages} 页
+        </div>
+
+        <div className="pagination__controls">
+          <label className="pagination__page-size">
+            <span>每页</span>
+            <select onChange={(event) => setPageSize(Number(event.target.value))} value={pageSize}>
+              {[10, 20, 50].map((size) => (
+                <option key={size} value={size}>
+                  {size}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <button className="ghost-button" disabled={page <= 1} onClick={() => setPage((current) => Math.max(1, current - 1))} type="button">
+            上一页
+          </button>
+          <span className="pagination__current">{page}</span>
+          <button
+            className="ghost-button"
+            disabled={page >= totalPages}
+            onClick={() => setPage((current) => Math.min(totalPages, current + 1))}
+            type="button"
+          >
+            下一页
+          </button>
+        </div>
       </div>
     </section>
   )
@@ -988,76 +1238,110 @@ function ResourceFormPage({ resource, mode }) {
   }
 
   return (
-    <section className="panel">
-      <div className="panel__header">
-        <div className="card__header">
-          <h2>{isEditing ? `编辑${resource.singularLabel}` : `新建${resource.singularLabel}`}</h2>
-          <p className="subtitle">{isEditing ? resource.editDescription : resource.createDescription}</p>
-        </div>
-
-        <div className="panel__actions">
-          <Link className="ghost-button action-link" to={resource.basePath}>
-            返回列表
-          </Link>
-        </div>
-      </div>
-
-      {error && <p className="message message--error">{error}</p>}
-
-      {loading ? (
-        <p className="empty-state">加载中...</p>
-      ) : (
-        <form className="form" onSubmit={handleSubmit}>
-          <div className="form-grid">
-            {resource.fields.map((field) => {
-              const label = typeof field.label === 'function' ? field.label(isEditing) : field.label
-              const placeholder = typeof field.placeholder === 'function' ? field.placeholder(isEditing) : field.placeholder
-              const className = field.type === 'textarea' ? 'field field--full' : 'field'
-
-              return (
-                <label className={className} key={field.name}>
-                  <span>{label}</span>
-
-                  {field.type === 'textarea' ? (
-                    <textarea
-                      name={field.name}
-                      onChange={handleChange}
-                      placeholder={placeholder}
-                      rows={field.rows || 4}
-                      value={form[field.name]}
-                    />
-                  ) : field.type === 'select' ? (
-                    <select name={field.name} onChange={handleChange} value={form[field.name]}>
-                      {field.options.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
-                  ) : (
-                    <input
-                      name={field.name}
-                      onChange={handleChange}
-                      placeholder={placeholder}
-                      type={field.type}
-                      value={form[field.name]}
-                    />
-                  )}
-                </label>
-              )
-            })}
+    <section className="form-page-grid">
+      <div className="panel panel--form">
+        <div className="panel__header">
+          <div className="card__header">
+            <h2>{isEditing ? `编辑${resource.singularLabel}` : `新建${resource.singularLabel}`}</h2>
+            <p className="subtitle">{isEditing ? resource.editDescription : resource.createDescription}</p>
           </div>
 
-          <div className="button-row">
-            <button className="submit submit--compact" disabled={!canSubmit || submitting} type="submit">
-              {submitting ? '提交中...' : isEditing ? '保存修改' : '确认创建'}
-            </button>
+          <div className="panel__actions">
             <Link className="ghost-button action-link" to={resource.basePath}>
-              取消
+              返回列表
             </Link>
           </div>
-        </form>
-      )}
+        </div>
+
+        {error && <p className="message message--error">{error}</p>}
+
+        {loading ? (
+          <p className="empty-state">加载中...</p>
+        ) : (
+          <form className="form form--spacious" onSubmit={handleSubmit}>
+            <div className="form-section">
+              <div className="form-section__header">
+                <h3>基础信息</h3>
+                <p>按照标准后台表单布局填写并保存当前资源。</p>
+              </div>
+
+              <div className="form-grid">
+                {resource.fields.map((field) => {
+                  const label = typeof field.label === 'function' ? field.label(isEditing) : field.label
+                  const placeholder = typeof field.placeholder === 'function' ? field.placeholder(isEditing) : field.placeholder
+                  const className = field.type === 'textarea' ? 'field field--full' : 'field'
+
+                  return (
+                    <label className={className} key={field.name}>
+                      <span>{label}</span>
+
+                      {field.type === 'textarea' ? (
+                        <textarea
+                          name={field.name}
+                          onChange={handleChange}
+                          placeholder={placeholder}
+                          rows={field.rows || 4}
+                          value={form[field.name]}
+                        />
+                      ) : field.type === 'select' ? (
+                        <select name={field.name} onChange={handleChange} value={form[field.name]}>
+                          {field.options.map((option) => (
+                            <option key={option.value} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        <input
+                          name={field.name}
+                          onChange={handleChange}
+                          placeholder={placeholder}
+                          type={field.type}
+                          value={form[field.name]}
+                        />
+                      )}
+                    </label>
+                  )
+                })}
+              </div>
+            </div>
+
+            <div className="button-row">
+              <button className="submit submit--compact" disabled={!canSubmit || submitting} type="submit">
+                {submitting ? '提交中...' : isEditing ? '保存修改' : '确认创建'}
+              </button>
+              <Link className="ghost-button action-link" to={resource.basePath}>
+                取消
+              </Link>
+            </div>
+          </form>
+        )}
+      </div>
+
+      <aside className="side-stack">
+        <article className="panel side-card">
+          <span className="side-card__label">当前操作</span>
+          <strong>{isEditing ? '编辑模式' : '创建模式'}</strong>
+          <p>{resource.section}</p>
+        </article>
+
+        <article className="panel side-card">
+          <span className="side-card__label">字段概览</span>
+          <strong>{resource.fields.length} 个字段</strong>
+          <ul className="side-card__list">
+            {resource.fields.slice(0, 5).map((field) => {
+              const label = typeof field.label === 'function' ? field.label(isEditing) : field.label
+              return <li key={field.name}>{label}</li>
+            })}
+          </ul>
+        </article>
+
+        <article className="panel side-card">
+          <span className="side-card__label">填写说明</span>
+          <strong>保存前校验必填项</strong>
+          <p>该页保持标准后台表单结构，适合连续录入和修改资源信息。</p>
+        </article>
+      </aside>
     </section>
   )
 }
