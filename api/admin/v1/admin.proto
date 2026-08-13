@@ -1,0 +1,368 @@
+syntax = "proto3";
+
+package admin.v1;
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "crow/api/admin/v1;v1";
+option java_multiple_files = true;
+option java_package = "io.grpc.examples.admin.v1";
+option java_outer_classname = "AdminProto";
+
+service AdminService {
+  rpc CreateAdmin (CreateAdminRequest) returns (Admin) {
+    option (google.api.http) = {
+      post: "/v1/admins/create"
+      body: "admin"
+    };
+  }
+
+  rpc GetAdmin (GetAdminRequest) returns (Admin) {
+    option (google.api.http) = {
+      get: "/v1/admins/{id}"
+    };
+  }
+
+  rpc ListAdmins (ListAdminsRequest) returns (AdminSet) {
+    option (google.api.http) = {
+      get: "/v1/admins"
+    };
+  }
+
+  rpc UpdateAdmin (UpdateAdminRequest) returns (Admin) {
+    option (google.api.http) = {
+      put: "/v1/admins/update"
+      body: "admin"
+    };
+  }
+
+  rpc DeleteAdmin (DeleteAdminRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/admins/{id}"
+    };
+  }
+
+  rpc CreateRole (CreateRoleRequest) returns (Role) {
+    option (google.api.http) = {
+      post: "/v1/roles/create"
+      body: "role"
+    };
+  }
+
+  rpc GetRole (GetRoleRequest) returns (Role) {
+    option (google.api.http) = {
+      get: "/v1/roles/{id}"
+    };
+  }
+
+  rpc ListRoles (ListRolesRequest) returns (RoleSet) {
+    option (google.api.http) = {
+      get: "/v1/roles"
+    };
+  }
+
+  rpc UpdateRole (UpdateRoleRequest) returns (Role) {
+    option (google.api.http) = {
+      put: "/v1/roles/update"
+      body: "role"
+    };
+  }
+
+  rpc DeleteRole (DeleteRoleRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/roles/{id}"
+    };
+  }
+
+  rpc CreateAdminRole (CreateAdminRoleRequest) returns (AdminRole) {
+    option (google.api.http) = {
+      post: "/v1/admin-roles/create"
+      body: "admin_role"
+    };
+  }
+
+  rpc GetAdminRole (GetAdminRoleRequest) returns (AdminRole) {
+    option (google.api.http) = {
+      get: "/v1/admin-roles/{id}"
+    };
+  }
+
+  rpc ListAdminRoles (ListAdminRolesRequest) returns (AdminRoleSet) {
+    option (google.api.http) = {
+      get: "/v1/admin-roles"
+    };
+  }
+
+  rpc UpdateAdminRole (UpdateAdminRoleRequest) returns (AdminRole) {
+    option (google.api.http) = {
+      put: "/v1/admin-roles/update"
+      body: "admin_role"
+    };
+  }
+
+  rpc DeleteAdminRole (DeleteAdminRoleRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/admin-roles/{id}"
+    };
+  }
+
+  rpc CreatePermission (CreatePermissionRequest) returns (Permission) {
+    option (google.api.http) = {
+      post: "/v1/permissions/create"
+      body: "permission"
+    };
+  }
+
+  rpc GetPermission (GetPermissionRequest) returns (Permission) {
+    option (google.api.http) = {
+      get: "/v1/permissions/{id}"
+    };
+  }
+
+  rpc ListPermissions (ListPermissionsRequest) returns (PermissionSet) {
+    option (google.api.http) = {
+      get: "/v1/permissions"
+    };
+  }
+
+  rpc UpdatePermission (UpdatePermissionRequest) returns (Permission) {
+    option (google.api.http) = {
+      put: "/v1/permissions/update"
+      body: "permission"
+    };
+  }
+
+  rpc DeletePermission (DeletePermissionRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/permissions/{id}"
+    };
+  }
+
+  rpc CreateGroupPermission (CreateGroupPermissionRequest) returns (GroupPermission) {
+    option (google.api.http) = {
+      post: "/v1/group-permissions/create"
+      body: "group_permission"
+    };
+  }
+
+  rpc GetGroupPermission (GetGroupPermissionRequest) returns (GroupPermission) {
+    option (google.api.http) = {
+      get: "/v1/group-permissions/{id}"
+    };
+  }
+
+  rpc ListGroupPermissions (ListGroupPermissionsRequest) returns (GroupPermissionSet) {
+    option (google.api.http) = {
+      get: "/v1/group-permissions"
+    };
+  }
+
+  rpc UpdateGroupPermission (UpdateGroupPermissionRequest) returns (GroupPermission) {
+    option (google.api.http) = {
+      put: "/v1/group-permissions/update"
+      body: "group_permission"
+    };
+  }
+
+  rpc DeleteGroupPermission (DeleteGroupPermissionRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/group-permissions/{id}"
+    };
+  }
+}
+
+message Admin {
+  int64 id = 1;
+  string username = 2;
+  string password = 3;
+  string real_name = 4;
+  int64 role_id = 5;
+  uint32 status = 6;
+  google.protobuf.Timestamp last_login_time = 7;
+  google.protobuf.Timestamp password_updated_at = 8;
+  string remark = 9;
+  google.protobuf.Timestamp create_time = 10;
+  google.protobuf.Timestamp update_time = 11;
+}
+
+message AdminSet {
+  repeated Admin admins = 1;
+  string next_page_token = 2;
+}
+
+message CreateAdminRequest {
+  Admin admin = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+message GetAdminRequest {
+  int64 id = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+message ListAdminsRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  string filter = 3;
+  string order_by = 4;
+}
+
+message UpdateAdminRequest {
+  Admin admin = 1 [(google.api.field_behavior) = REQUIRED];
+  google.protobuf.FieldMask update_mask = 2 [(google.api.field_behavior) = REQUIRED];
+}
+
+message DeleteAdminRequest {
+  int64 id = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+message Role {
+  int64 id = 1;
+  string role_name = 2;
+  google.protobuf.Timestamp create_time = 3;
+  google.protobuf.Timestamp update_time = 4;
+}
+
+message RoleSet {
+  repeated Role roles = 1;
+  string next_page_token = 2;
+}
+
+message CreateRoleRequest {
+  Role role = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+message GetRoleRequest {
+  int64 id = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+message ListRolesRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  string filter = 3;
+  string order_by = 4;
+}
+
+message UpdateRoleRequest {
+  Role role = 1 [(google.api.field_behavior) = REQUIRED];
+  google.protobuf.FieldMask update_mask = 2 [(google.api.field_behavior) = REQUIRED];
+}
+
+message DeleteRoleRequest {
+  int64 id = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+message AdminRole {
+  int64 id = 1;
+  int64 admin_id = 2;
+  int64 role_id = 3;
+  google.protobuf.Timestamp create_time = 4;
+  google.protobuf.Timestamp update_time = 5;
+}
+
+message AdminRoleSet {
+  repeated AdminRole admin_roles = 1;
+  string next_page_token = 2;
+}
+
+message CreateAdminRoleRequest {
+  AdminRole admin_role = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+message GetAdminRoleRequest {
+  int64 id = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+message ListAdminRolesRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  string filter = 3;
+  string order_by = 4;
+}
+
+message UpdateAdminRoleRequest {
+  AdminRole admin_role = 1 [(google.api.field_behavior) = REQUIRED];
+  google.protobuf.FieldMask update_mask = 2 [(google.api.field_behavior) = REQUIRED];
+}
+
+message DeleteAdminRoleRequest {
+  int64 id = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+message Permission {
+  int64 id = 1;
+  int64 parent_id = 2;
+  string title = 3;
+  string handle = 4;
+  int32 weight = 5;
+  google.protobuf.Timestamp create_time = 6;
+  google.protobuf.Timestamp update_time = 7;
+}
+
+message PermissionSet {
+  repeated Permission permissions = 1;
+  string next_page_token = 2;
+}
+
+message CreatePermissionRequest {
+  Permission permission = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+message GetPermissionRequest {
+  int64 id = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+message ListPermissionsRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  string filter = 3;
+  string order_by = 4;
+}
+
+message UpdatePermissionRequest {
+  Permission permission = 1 [(google.api.field_behavior) = REQUIRED];
+  google.protobuf.FieldMask update_mask = 2 [(google.api.field_behavior) = REQUIRED];
+}
+
+message DeletePermissionRequest {
+  int64 id = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+message GroupPermission {
+  int64 id = 1;
+  int64 group_id = 2;
+  int64 permission_id = 3;
+  google.protobuf.Timestamp create_time = 4;
+  google.protobuf.Timestamp update_time = 5;
+}
+
+message GroupPermissionSet {
+  repeated GroupPermission group_permissions = 1;
+  string next_page_token = 2;
+}
+
+message CreateGroupPermissionRequest {
+  GroupPermission group_permission = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+message GetGroupPermissionRequest {
+  int64 id = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+message ListGroupPermissionsRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  string filter = 3;
+  string order_by = 4;
+}
+
+message UpdateGroupPermissionRequest {
+  GroupPermission group_permission = 1 [(google.api.field_behavior) = REQUIRED];
+  google.protobuf.FieldMask update_mask = 2 [(google.api.field_behavior) = REQUIRED];
+}
+
+message DeleteGroupPermissionRequest {
+  int64 id = 1 [(google.api.field_behavior) = REQUIRED];
+}

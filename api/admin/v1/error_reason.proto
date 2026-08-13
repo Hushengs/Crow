@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package admin.v1;
+
+option go_package = "crow/api/admin/v1;v1";
+option java_multiple_files = true;
+option java_package = "admin.v1";
+option objc_class_prefix = "APIAdminV1";
+
+enum ErrorReason {
+  ADMIN_UNSPECIFIED = 0;
+  ADMIN_NOT_FOUND = 1;
+  ADMIN_INVALID_ARGUMENT = 2;
+  ADMIN_USERNAME_CONFLICT = 3;
+  ROLE_NOT_FOUND = 4;
+  ROLE_INVALID_ARGUMENT = 5;
+  ROLE_NAME_CONFLICT = 6;
+  ADMIN_ROLE_NOT_FOUND = 7;
+  ADMIN_ROLE_INVALID_ARGUMENT = 8;
+  ADMIN_ROLE_CONFLICT = 9;
+  PERMISSION_NOT_FOUND = 10;
+  PERMISSION_INVALID_ARGUMENT = 11;
+  PERMISSION_HANDLE_CONFLICT = 12;
+  GROUP_PERMISSION_NOT_FOUND = 13;
+  GROUP_PERMISSION_INVALID_ARGUMENT = 14;
+  GROUP_PERMISSION_CONFLICT = 15;
+}

@@ -2,8 +2,8 @@ package data
 
 import (
 	"context"
-	"database/sql"
 	"crow/internal/conf"
+	"database/sql"
 
 	"github.com/go-kratos/kratos/v3/log"
 	_ "github.com/go-sql-driver/mysql"
@@ -11,7 +11,16 @@ import (
 )
 
 // ProviderSet is data providers.
-var ProviderSet = wire.NewSet(NewData, NewTodoRepo, NewLoginRepo)
+var ProviderSet = wire.NewSet(
+	NewData,
+	NewTodoRepo,
+	NewLoginRepo,
+	NewAdminRepo,
+	NewRoleRepo,
+	NewAdminRoleRepo,
+	NewPermissionRepo,
+	NewGroupPermissionRepo,
+)
 
 // Data .
 type Data struct {

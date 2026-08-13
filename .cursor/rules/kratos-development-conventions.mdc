@@ -9,5 +9,6 @@ alwaysApply: true
 - Respect the layering contract: `service` handles DTO to DO conversion, `biz` owns domain models and repo interfaces, and `data` implements persistence with PO conversion.
 - Keep dependency directions clean: `service` may import `biz`, `biz` must not import `service` or `data`, and `data` must not import transport DTOs.
 - Use the Kratos workflow for API, config, and Wire generation.
+- When adding or updating API proto files, use `kratos` commands to generate the proto outputs and related stubs instead of hand-editing generated artifacts.
 - Do not hand-edit generated files such as `*.pb.go`, `*_grpc.pb.go`, `*_http.pb.go`, or `wire_gen.go`.
 - When adding features, prefer Kratos-aligned structure under `api/`, `cmd/`, `internal/service/`, `internal/biz/`, `internal/data/`, and `internal/server/`.

@@ -1,6 +1,7 @@
 package server
 
 import (
+	adminv1 "crow/api/admin/v1"
 	loginv1 "crow/api/login/v1"
 	todov1 "crow/api/todo/v1"
 	"crow/internal/conf"
@@ -14,7 +15,7 @@ import (
 )
 
 // NewHTTPServer new an HTTP server.
-func NewHTTPServer(c *conf.Server, todo *service.TodoService, login *service.LoginService) *http.Server {
+func NewHTTPServer(c *conf.Server, todo *service.TodoService, login *service.LoginService, admin *service.AdminService) *http.Server {
 	var opts = []http.ServerOption{
 		http.Middleware(
 			recovery.Recovery(),
@@ -40,5 +41,6 @@ func NewHTTPServer(c *conf.Server, todo *service.TodoService, login *service.Log
 	srv := http.NewServer(opts...)
 	todov1.RegisterTodoServiceHTTPServer(srv, todo)
 	loginv1.RegisterLoginServiceHTTPServer(srv, login)
+	adminv1.RegisterAdminServiceHTTPServer(srv, admin)
 	return srv
 }
