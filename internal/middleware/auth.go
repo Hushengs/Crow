@@ -96,6 +96,12 @@ func shouldProtectAdminPath(path string) bool {
 		return true
 	case strings.HasPrefix(path, "/v1/system-logs"):
 		return true
+	case strings.HasPrefix(path, "/v1/cps"):
+		return true
+	case strings.HasPrefix(path, "/v1/sps"):
+		return true
+	case strings.HasPrefix(path, "/v1/cp-sps"):
+		return true
 	default:
 		return false
 	}

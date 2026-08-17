@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package cdn.v1;
+
+option go_package = "crow/api/cdn/v1;v1";
+option java_multiple_files = true;
+option java_package = "cdn.v1";
+option objc_class_prefix = "APICdnV1";
+
+enum ErrorReason {
+  CP_UNSPECIFIED = 0;
+  CP_NOT_FOUND = 1;
+  CP_INVALID_ARGUMENT = 2;
+  CP_CODE_CONFLICT = 3;
+  SP_NOT_FOUND = 4;
+  SP_INVALID_ARGUMENT = 5;
+  SP_CODE_CONFLICT = 6;
+  CP_SP_NOT_FOUND = 7;
+  CP_SP_INVALID_ARGUMENT = 8;
+  CP_SP_CONFLICT = 9;
+}

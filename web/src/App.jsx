@@ -74,6 +74,26 @@ function createGroupPermissionForm() {
   }
 }
 
+function createCpForm() {
+  return {
+    id: '',
+    cpCode: '',
+    cpName: '',
+    spIds: [],
+    status: '1',
+  }
+}
+
+function createSpForm() {
+  return {
+    id: '',
+    spCode: '',
+    spName: '',
+    spConfig: '',
+    status: '1',
+  }
+}
+
 function readStoredAuth() {
   const raw = window.sessionStorage.getItem(authStorageKey)
   if (!raw) {
@@ -234,6 +254,19 @@ function statusLabel(status) {
       return '正常'
     case 2:
       return '锁定'
+    default:
+      return `状态 ${status}`
+  }
+}
+
+function cpStatusLabel(status) {
+  switch (Number(status)) {
+    case 0:
+      return '禁用'
+    case 1:
+      return '正常'
+    case 2:
+      return '冻结'
     default:
       return `状态 ${status}`
   }
@@ -430,6 +463,96 @@ function buildGroupPermissionPayload(form) {
   }
 }
 
+function normalizeCpResponse(cp) {
+  if (!cp) {
+    return null
+  }
+  return {
+    id: Number(pickValue(cp, ['id'], 0)),
+    cpCode: pickValue(cp, ['cpCode', 'cp_code']),
+    cpName: pickValue(cp, ['cpName', 'cp_name']),
+    status: Number(pickValue(cp, ['status'], 0)),
+    createTime: pickValue(cp, ['createTime', 'create_time']),
+    updateTime: pickValue(cp, ['updateTime', 'update_time']),
+  }
+}
+
+function normalizeCpForm(cp) {
+  const normalized = normalizeCpResponse(cp)
+  if (!normalized) {
+    return createCpForm()
+  }
+  return {
+    id: String(normalized.id || ''),
+    cpCode: normalized.cpCode,
+    cpName: normalized.cpName,
+    spIds: [],
+    status: String(normalized.status ?? 1),
+  }
+}
+
+function buildCpPayload(form) {
+  return {
+    id: Number(form.id) || 0,
+    cp_code: form.cpCode.trim(),
+    cp_name: form.cpName.trim(),
+    status: Number(form.status) || 0,
+  }
+}
+
+function normalizeSpResponse(sp) {
+  if (!sp) {
+    return null
+  }
+  return {
+    id: Number(pickValue(sp, ['id'], 0)),
+    spCode: pickValue(sp, ['spCode', 'sp_code']),
+    spName: pickValue(sp, ['spName', 'sp_name']),
+    spConfig: pickValue(sp, ['spConfig', 'sp_config']),
+    status: Number(pickValue(sp, ['status'], 0)),
+    createTime: pickValue(sp, ['createTime', 'create_time']),
+    updateTime: pickValue(sp, ['updateTime', 'update_time']),
+  }
+}
+
+function normalizeSpForm(sp) {
+  const normalized = normalizeSpResponse(sp)
+  if (!normalized) {
+    return createSpForm()
+  }
+  return {
+    id: String(normalized.id || ''),
+    spCode: normalized.spCode,
+    spName: normalized.spName,
+    spConfig: normalized.spConfig,
+    status: String(normalized.status ?? 1),
+  }
+}
+
+function buildSpPayload(form) {
+  return {
+    id: Number(form.id) || 0,
+    sp_code: form.spCode.trim(),
+    sp_name: form.spName.trim(),
+    sp_config: form.spConfig.trim(),
+    status: Number(form.status) || 0,
+  }
+}
+
+function normalizeCpSpResponse(item) {
+  if (!item) {
+    return null
+  }
+  return {
+    id: Number(pickValue(item, ['id'], 0)),
+    cpId: Number(pickValue(item, ['cpId', 'cp_id'], 0)),
+    spId: Number(pickValue(item, ['spId', 'sp_id'], 0)),
+    status: Number(pickValue(item, ['status'], 0)),
+    createTime: pickValue(item, ['createTime', 'create_time']),
+    updateTime: pickValue(item, ['updateTime', 'update_time']),
+  }
+}
+
 function normalizeAdminOperationLogResponse(item) {
   if (!item) {
     return null
@@ -464,6 +587,183 @@ function normalizeSystemLogResponse(item) {
 }
 
 const resourceCatalog = [
+  {
+    key: 'cps',
+    section: '内容管理',
+    navLabel: '内容提供商',
+    singularLabel: '内容提供商',
+    pluralLabel: '内容提供商',
+    basePath: '/cps',
+    listEndpoint: '/api/v1/cps?page_size=100',
+    createEndpoint: '/api/v1/cps/create',
+    updateEndpoint: '/api/v1/cps/update',
+    getEndpoint: (id) => `/api/v1/cps/${id}`,
+    deleteEndpoint: (id) => `/api/v1/cps/${id}`,
+    listKey: ['cps'],
+    subtitle: '维护向 CDN 注入媒资的版权/制作方，协议侧 CPID 使用 CP 编码。',
+    createDescription: 'CP 编码全局唯一，对应注入协议中的 CPID。可同时勾选多个内容服务商建立注入路由。',
+    editDescription: '修改内容提供商资料及绑定的内容服务商后返回列表。',
+    createForm: createCpForm,
+    normalizeResponse: normalizeCpResponse,
+    normalizeForm: normalizeCpForm,
+    buildPayload: buildCpPayload,
+    buildUpdateMaskPaths: () => ['cp_code', 'cp_name', 'status'],
+    canSubmit: (form) => form.cpCode.trim() !== '' && form.cpName.trim() !== '',
+    describe: (payload) => payload.cp_name || payload.cp_code || '内容提供商',
+    fields: [
+      { name: 'cpCode', label: 'CP 编码', type: 'text', placeholder: '协议侧 CPID，全局唯一' },
+      { name: 'cpName', label: 'CP 全称', type: 'text', placeholder: '请输入内容提供商全称' },
+      { name: 'spIds', label: '绑定内容服务商', type: 'checkbox-group', optionsSource: 'sps' },
+      {
+        name: 'status',
+        label: '状态',
+        type: 'select',
+        options: [
+          { value: '1', label: '正常' },
+          { value: '0', label: '禁用' },
+          { value: '2', label: '冻结' },
+        ],
+      },
+    ],
+    getCardTitle: (item) => item.cpName || item.cpCode,
+    getCardBadge: (item) => ({
+      text: cpStatusLabel(item.status),
+      className: `status-chip status-chip--${Number(item.status)}`,
+    }),
+    listColumns: [
+      {
+        key: 'cpName',
+        label: '内容提供商',
+        render: (item) => (
+          <div className="table-primary">
+            <strong>{item.cpName || '-'}</strong>
+            <span>{item.cpCode || '未填写 CP 编码'}</span>
+          </div>
+        ),
+      },
+      {
+        key: 'cpCode',
+        label: 'CP 编码',
+        render: (item) => item.cpCode || '-',
+      },
+      {
+        key: 'status',
+        label: '状态',
+        render: (item) => (
+          <span className={`status-chip status-chip--${Number(item.status)}`}>{cpStatusLabel(item.status)}</span>
+        ),
+      },
+      {
+        key: 'createTime',
+        label: '创建时间',
+        render: (item) => formatDateTime(item.createTime),
+      },
+      {
+        key: 'updateTime',
+        label: '更新时间',
+        render: (item) => formatDateTime(item.updateTime),
+      },
+    ],
+    getCardMeta: (item) => [
+      ['CP 编码', item.cpCode || '-'],
+      ['CP 全称', item.cpName || '-'],
+      ['状态', cpStatusLabel(item.status)],
+      ['创建时间', formatDateTime(item.createTime)],
+      ['更新时间', formatDateTime(item.updateTime)],
+    ],
+  },
+  {
+    key: 'sps',
+    section: '内容管理',
+    navLabel: '内容服务商',
+    singularLabel: '内容服务商',
+    pluralLabel: '内容服务商',
+    basePath: '/sps',
+    listEndpoint: '/api/v1/sps?page_size=100',
+    createEndpoint: '/api/v1/sps/create',
+    updateEndpoint: '/api/v1/sps/update',
+    getEndpoint: (id) => `/api/v1/sps/${id}`,
+    deleteEndpoint: (id) => `/api/v1/sps/${id}`,
+    listKey: ['sps'],
+    subtitle: '维护从 CDN 拉流给终端的 IPTV/OTT 分发平台，协议侧 SPID/CSPID 使用 SP 编码。',
+    createDescription: 'SP 编码全局唯一，对应播放协议中的 SPID/CSPID；配置为可选 JSON。',
+    editDescription: '修改内容服务商名称、编码、配置或状态后返回列表。',
+    createForm: createSpForm,
+    normalizeResponse: normalizeSpResponse,
+    normalizeForm: normalizeSpForm,
+    buildPayload: buildSpPayload,
+    buildUpdateMaskPaths: () => ['sp_code', 'sp_name', 'sp_config', 'status'],
+    canSubmit: (form) => form.spCode.trim() !== '' && form.spName.trim() !== '',
+    describe: (payload) => payload.sp_name || payload.sp_code || '内容服务商',
+    fields: [
+      { name: 'spCode', label: 'SP 编码', type: 'text', placeholder: '协议侧 SPID/CSPID，全局唯一' },
+      { name: 'spName', label: 'SP 全称', type: 'text', placeholder: '请输入内容服务商全称' },
+      {
+        name: 'status',
+        label: '状态',
+        type: 'select',
+        options: [
+          { value: '1', label: '正常' },
+          { value: '0', label: '禁用' },
+          { value: '2', label: '冻结' },
+        ],
+      },
+      {
+        name: 'spConfig',
+        label: 'SP 配置',
+        type: 'textarea',
+        placeholder: '{"play_domain":"example.com"}',
+        rows: 6,
+      },
+    ],
+    getCardTitle: (item) => item.spName || item.spCode,
+    getCardBadge: (item) => ({
+      text: cpStatusLabel(item.status),
+      className: `status-chip status-chip--${Number(item.status)}`,
+    }),
+    listColumns: [
+      {
+        key: 'spName',
+        label: '内容服务商',
+        render: (item) => (
+          <div className="table-primary">
+            <strong>{item.spName || '-'}</strong>
+            <span>{item.spCode || '未填写 SP 编码'}</span>
+          </div>
+        ),
+      },
+      {
+        key: 'spCode',
+        label: 'SP 编码',
+        render: (item) => item.spCode || '-',
+      },
+      {
+        key: 'status',
+        label: '状态',
+        render: (item) => (
+          <span className={`status-chip status-chip--${Number(item.status)}`}>{cpStatusLabel(item.status)}</span>
+        ),
+      },
+      {
+        key: 'createTime',
+        label: '创建时间',
+        render: (item) => formatDateTime(item.createTime),
+      },
+      {
+        key: 'updateTime',
+        label: '更新时间',
+        render: (item) => formatDateTime(item.updateTime),
+      },
+    ],
+    getCardMeta: (item) => [
+      ['SP 编码', item.spCode || '-'],
+      ['SP 全称', item.spName || '-'],
+      ['状态', cpStatusLabel(item.status)],
+      ['SP 配置', item.spConfig || '-'],
+      ['创建时间', formatDateTime(item.createTime)],
+      ['更新时间', formatDateTime(item.updateTime)],
+    ],
+  },
   {
     key: 'admins',
     section: '系统管理',
@@ -1018,6 +1318,14 @@ function mapRoleOptions(roles) {
   }))
 }
 
+function mapSpOptions(sps) {
+  return sps.map((sp) => ({
+    value: String(sp.id),
+    label: sp.spName || `内容服务商 #${sp.id}`,
+    description: `${sp.spCode || '未填写编码'} · ${cpStatusLabel(sp.status)}`,
+  }))
+}
+
 function mapPermissionOptions(permissions) {
   const sorted = [...permissions].sort((left, right) => {
     if (left.parentId !== right.parentId) {
@@ -1185,6 +1493,43 @@ async function syncRolePermissionBindings(roleId, selectedPermissionIds) {
   await Promise.all([...createTasks, ...deleteTasks])
 }
 
+async function syncCpSpBindings(cpId, selectedSpIds) {
+  const current = await requestJson('/api/v1/cp-sps?page_size=1000', {
+    headers: buildAuthHeaders(),
+  })
+  const currentItems = getListItems(current, ['cpSps', 'cp_sps'])
+    .map(normalizeCpSpResponse)
+    .filter((item) => item && item.cpId === cpId)
+
+  const targetIds = new Set(normalizeIdList(selectedSpIds).map(Number))
+  const currentIds = new Set(currentItems.map((item) => item.spId))
+
+  const createTasks = [...targetIds]
+    .filter((spId) => !currentIds.has(spId))
+    .map((spId) =>
+      requestJson('/api/v1/cp-sps/create', {
+        method: 'POST',
+        headers: buildAuthHeaders(),
+        body: JSON.stringify({
+          cp_id: cpId,
+          sp_id: spId,
+          status: 1,
+        }),
+      }),
+    )
+
+  const deleteTasks = currentItems
+    .filter((item) => !targetIds.has(item.spId))
+    .map((item) =>
+      requestJson(`/api/v1/cp-sps/${item.id}`, {
+        method: 'DELETE',
+        headers: buildAuthHeaders(),
+      }),
+    )
+
+  await Promise.all([...createTasks, ...deleteTasks])
+}
+
 function LoginPage() {
   const navigate = useNavigate()
   const [form, setForm] = useState(initialLoginForm)
@@ -1295,10 +1640,12 @@ function ConsoleLayout() {
   const auth = readStoredAuth()
   const currentResource = getCurrentResource(location.pathname)
   const breadcrumbTail = getResourceViewLabel(location.pathname, currentResource)
-  const navSections = [
-    { title: '系统管理', items: resourceCatalog.filter((resource) => resource.section === '系统管理' && !resource.hidden) },
-    { title: '关联管理', items: resourceCatalog.filter((resource) => resource.section === '关联管理' && !resource.hidden) },
-  ].filter((section) => section.items.length > 0)
+  const navSections = ['内容管理', '系统管理', '关联管理']
+    .map((title) => ({
+      title,
+      items: resourceCatalog.filter((resource) => resource.section === title && !resource.hidden),
+    }))
+    .filter((section) => section.items.length > 0)
 
   const handleLogout = () => {
     clearAuth()
@@ -1665,6 +2012,7 @@ function ResourceFormPage({ resource, mode }) {
   const [referenceOptions, setReferenceOptions] = useState({
     roles: [],
     permissions: [],
+    sps: [],
   })
 
   useEffect(() => {
@@ -1702,15 +2050,26 @@ function ResourceFormPage({ resource, mode }) {
                 headers,
               })
             : Promise.resolve(null),
+          resource.key === 'cps'
+            ? requestJson('/api/v1/sps?page_size=1000', {
+                headers,
+              })
+            : Promise.resolve(null),
+          resource.key === 'cps' && isEditing
+            ? requestJson('/api/v1/cp-sps?page_size=1000', {
+                headers,
+              })
+            : Promise.resolve(null),
         ]
 
-        const [itemPayload, rolesPayload, adminRolesPayload, permissionsPayload, groupPermissionsPayload] = await Promise.all(requests)
+        const [itemPayload, rolesPayload, adminRolesPayload, permissionsPayload, groupPermissionsPayload, spsPayload, cpSpsPayload] = await Promise.all(requests)
 
         if (!cancelled) {
           const nextForm = isEditing ? resource.normalizeForm(itemPayload) : resource.createForm()
           const nextReferenceOptions = {
             roles: [],
             permissions: [],
+            sps: [],
           }
 
           if (rolesPayload) {
@@ -1745,6 +2104,20 @@ function ResourceFormPage({ resource, mode }) {
             }
           }
 
+          if (spsPayload) {
+            const sps = getListItems(spsPayload, ['sps']).map(normalizeSpResponse).filter(Boolean)
+            nextReferenceOptions.sps = mapSpOptions(sps)
+
+            if (resource.key === 'cps' && cpSpsPayload) {
+              nextForm.spIds = normalizeIdList(
+                getListItems(cpSpsPayload, ['cpSps', 'cp_sps'])
+                  .map(normalizeCpSpResponse)
+                  .filter((relation) => relation && relation.cpId === Number(itemId))
+                  .map((relation) => String(relation.spId)),
+              )
+            }
+          }
+
           setReferenceOptions(nextReferenceOptions)
           setForm(nextForm)
         }
@@ -1774,6 +2147,9 @@ function ResourceFormPage({ resource, mode }) {
     }
     if (field.optionsSource === 'permissions') {
       return referenceOptions.permissions
+    }
+    if (field.optionsSource === 'sps') {
+      return referenceOptions.sps
     }
     return field.options || []
   }
@@ -1835,6 +2211,9 @@ function ResourceFormPage({ resource, mode }) {
       }
       if (resource.key === 'roles' && savedID > 0) {
         await syncRolePermissionBindings(savedID, form.permissionIds)
+      }
+      if (resource.key === 'cps' && savedID > 0) {
+        await syncCpSpBindings(savedID, form.spIds)
       }
 
       navigate(resource.basePath, {

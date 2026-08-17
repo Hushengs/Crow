@@ -80,6 +80,15 @@ func describeOperation(method, path string) (module, action, description string)
 	case strings.HasPrefix(path, "/v1/group-permissions"):
 		module = "role_permission"
 		description = "角色权限关联"
+	case strings.HasPrefix(path, "/v1/cps"):
+		module = "cp"
+		description = "内容提供商"
+	case strings.HasPrefix(path, "/v1/sps"):
+		module = "sp"
+		description = "内容服务商"
+	case strings.HasPrefix(path, "/v1/cp-sps"):
+		module = "cp_sp"
+		description = "内容提供商与内容服务商绑定"
 	default:
 		return "", "", ""
 	}

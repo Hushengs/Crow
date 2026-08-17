@@ -2,6 +2,7 @@ package server
 
 import (
 	adminv1 "crow/api/admin/v1"
+	cdnv1 "crow/api/cdn/v1"
 	loginv1 "crow/api/login/v1"
 	todov1 "crow/api/todo/v1"
 	"crow/internal/conf"
@@ -12,7 +13,7 @@ import (
 )
 
 // NewGRPCServer new a gRPC server.
-func NewGRPCServer(c *conf.Server, todo *service.TodoService, login *service.LoginService, admin *service.AdminService) *grpc.Server {
+func NewGRPCServer(c *conf.Server, todo *service.TodoService, login *service.LoginService, admin *service.AdminService, cp *service.CpService, sp *service.SpService, cpSp *service.CpSpService) *grpc.Server {
 	var opts = []grpc.ServerOption{
 		grpc.Middleware(
 			recovery.Recovery(),
@@ -31,5 +32,8 @@ func NewGRPCServer(c *conf.Server, todo *service.TodoService, login *service.Log
 	todov1.RegisterTodoServiceServer(srv, todo)
 	loginv1.RegisterLoginServiceServer(srv, login)
 	adminv1.RegisterAdminServiceServer(srv, admin)
+	cdnv1.RegisterCpServiceServer(srv, cp)
+	cdnv1.RegisterSpServiceServer(srv, sp)
+	cdnv1.RegisterCpSpServiceServer(srv, cpSp)
 	return srv
 }

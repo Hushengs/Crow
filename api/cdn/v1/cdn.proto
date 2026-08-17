@@ -1,0 +1,231 @@
+syntax = "proto3";
+
+package cdn.v1;
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "crow/api/cdn/v1;v1";
+option java_multiple_files = true;
+option java_package = "io.grpc.examples.cdn.v1";
+option java_outer_classname = "CdnProto";
+
+service CpService {
+  rpc CreateCp (CreateCpRequest) returns (Cp) {
+    option (google.api.http) = {
+      post: "/v1/cps/create"
+      body: "cp"
+    };
+  }
+
+  rpc GetCp (GetCpRequest) returns (Cp) {
+    option (google.api.http) = {
+      get: "/v1/cps/{id}"
+    };
+  }
+
+  rpc ListCps (ListCpsRequest) returns (CpSet) {
+    option (google.api.http) = {
+      get: "/v1/cps"
+    };
+  }
+
+  rpc UpdateCp (UpdateCpRequest) returns (Cp) {
+    option (google.api.http) = {
+      put: "/v1/cps/update"
+      body: "cp"
+    };
+  }
+
+  rpc DeleteCp (DeleteCpRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/cps/{id}"
+    };
+  }
+}
+
+message Cp {
+  int64 id = 1;
+  string cp_code = 2;
+  string cp_name = 3;
+  uint32 status = 4;
+  google.protobuf.Timestamp create_time = 5;
+  google.protobuf.Timestamp update_time = 6;
+}
+
+message CpSet {
+  repeated Cp cps = 1;
+  string next_page_token = 2;
+}
+
+message CreateCpRequest {
+  Cp cp = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+message GetCpRequest {
+  int64 id = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+message ListCpsRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  string filter = 3;
+  string order_by = 4;
+}
+
+message UpdateCpRequest {
+  Cp cp = 1 [(google.api.field_behavior) = REQUIRED];
+  google.protobuf.FieldMask update_mask = 2 [(google.api.field_behavior) = REQUIRED];
+}
+
+message DeleteCpRequest {
+  int64 id = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+service SpService {
+  rpc CreateSp (CreateSpRequest) returns (Sp) {
+    option (google.api.http) = {
+      post: "/v1/sps/create"
+      body: "sp"
+    };
+  }
+
+  rpc GetSp (GetSpRequest) returns (Sp) {
+    option (google.api.http) = {
+      get: "/v1/sps/{id}"
+    };
+  }
+
+  rpc ListSps (ListSpsRequest) returns (SpSet) {
+    option (google.api.http) = {
+      get: "/v1/sps"
+    };
+  }
+
+  rpc UpdateSp (UpdateSpRequest) returns (Sp) {
+    option (google.api.http) = {
+      put: "/v1/sps/update"
+      body: "sp"
+    };
+  }
+
+  rpc DeleteSp (DeleteSpRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/sps/{id}"
+    };
+  }
+}
+
+message Sp {
+  int64 id = 1;
+  string sp_code = 2;
+  string sp_name = 3;
+  string sp_config = 4;
+  uint32 status = 5;
+  google.protobuf.Timestamp create_time = 6;
+  google.protobuf.Timestamp update_time = 7;
+}
+
+message SpSet {
+  repeated Sp sps = 1;
+  string next_page_token = 2;
+}
+
+message CreateSpRequest {
+  Sp sp = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+message GetSpRequest {
+  int64 id = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+message ListSpsRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  string filter = 3;
+  string order_by = 4;
+}
+
+message UpdateSpRequest {
+  Sp sp = 1 [(google.api.field_behavior) = REQUIRED];
+  google.protobuf.FieldMask update_mask = 2 [(google.api.field_behavior) = REQUIRED];
+}
+
+message DeleteSpRequest {
+  int64 id = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+service CpSpService {
+  rpc CreateCpSp (CreateCpSpRequest) returns (CpSp) {
+    option (google.api.http) = {
+      post: "/v1/cp-sps/create"
+      body: "cp_sp"
+    };
+  }
+
+  rpc GetCpSp (GetCpSpRequest) returns (CpSp) {
+    option (google.api.http) = {
+      get: "/v1/cp-sps/{id}"
+    };
+  }
+
+  rpc ListCpSps (ListCpSpsRequest) returns (CpSpSet) {
+    option (google.api.http) = {
+      get: "/v1/cp-sps"
+    };
+  }
+
+  rpc UpdateCpSp (UpdateCpSpRequest) returns (CpSp) {
+    option (google.api.http) = {
+      put: "/v1/cp-sps/update"
+      body: "cp_sp"
+    };
+  }
+
+  rpc DeleteCpSp (DeleteCpSpRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/cp-sps/{id}"
+    };
+  }
+}
+
+message CpSp {
+  int64 id = 1;
+  int64 cp_id = 2;
+  int64 sp_id = 3;
+  uint32 status = 4;
+  google.protobuf.Timestamp create_time = 5;
+  google.protobuf.Timestamp update_time = 6;
+}
+
+message CpSpSet {
+  repeated CpSp cp_sps = 1;
+  string next_page_token = 2;
+}
+
+message CreateCpSpRequest {
+  CpSp cp_sp = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+message GetCpSpRequest {
+  int64 id = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+message ListCpSpsRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  string filter = 3;
+  string order_by = 4;
+}
+
+message UpdateCpSpRequest {
+  CpSp cp_sp = 1 [(google.api.field_behavior) = REQUIRED];
+  google.protobuf.FieldMask update_mask = 2 [(google.api.field_behavior) = REQUIRED];
+}
+
+message DeleteCpSpRequest {
+  int64 id = 1 [(google.api.field_behavior) = REQUIRED];
+}

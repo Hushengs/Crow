@@ -14,4 +14,7 @@ var ProviderSet = wire.NewSet(
 	NewGroupPermissionUsecase,
 	NewAdminOperationLogUsecase,
 	NewSystemLogUsecase,
+	NewCpUsecase,
+	NewSpUsecase,
+	NewCpSpUsecase,
 )
