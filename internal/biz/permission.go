@@ -105,6 +105,19 @@ var programPermissionSpecs = []programPermissionSpec{
 	{Key: "cp_sps:get", ParentKey: "cp_sps", Title: "CP-SP 绑定详情", Handle: "/v1/cp-sps/{id}", Weight: 30},
 	{Key: "cp_sps:update", ParentKey: "cp_sps", Title: "CP-SP 绑定编辑", Handle: "/v1/cp-sps/update", Weight: 40},
 	{Key: "cp_sps:delete", ParentKey: "cp_sps", Title: "CP-SP 绑定删除", Handle: "DELETE:/v1/cp-sps/{id}", Weight: 50},
+	{Key: "videos", ParentKey: "cdn", Title: "影片库", Handle: "module://cdn/videos", Weight: 30},
+	{Key: "videos:list", ParentKey: "videos", Title: "影片列表", Handle: "/v1/videos", Weight: 10},
+	{Key: "videos:create", ParentKey: "videos", Title: "影片新增", Handle: "/v1/videos/create", Weight: 20},
+	{Key: "videos:get", ParentKey: "videos", Title: "影片详情", Handle: "/v1/videos/{id}", Weight: 30},
+	{Key: "videos:delete", ParentKey: "videos", Title: "影片删除", Handle: "DELETE:/v1/videos/{id}", Weight: 40},
+	{Key: "video_categories:list", ParentKey: "videos", Title: "影片分类列表", Handle: "/v1/video-categories", Weight: 50},
+	{Key: "video_categories:create", ParentKey: "videos", Title: "影片分类新增", Handle: "/v1/video-categories/create", Weight: 60},
+	{Key: "episodes:list", ParentKey: "videos", Title: "节目列表", Handle: "/v1/episodes", Weight: 70},
+	{Key: "episodes:create", ParentKey: "videos", Title: "节目新增", Handle: "/v1/episodes/create", Weight: 80},
+	{Key: "episodes:delete", ParentKey: "videos", Title: "节目删除", Handle: "DELETE:/v1/episodes/{id}", Weight: 90},
+	{Key: "media:list", ParentKey: "videos", Title: "媒体列表", Handle: "/v1/media", Weight: 100},
+	{Key: "media:create", ParentKey: "videos", Title: "媒体新增", Handle: "/v1/media/create", Weight: 110},
+	{Key: "media:delete", ParentKey: "videos", Title: "媒体删除", Handle: "DELETE:/v1/media/{id}", Weight: 120},
 }
 
 func NewPermissionUsecase(repo PermissionRepo) *PermissionUsecase {

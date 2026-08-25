@@ -903,10 +903,296 @@ button:hover:not(:disabled),
   margin-top: 6px;
 }
 
+.vod-library {
+  display: grid;
+  grid-template-columns: 250px minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.vod-tree {
+  padding: 22px 16px;
+  position: sticky;
+  top: 24px;
+}
+
+.vod-section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.vod-section-title h2,
+.episode-create h2 {
+  margin: 4px 0 0;
+  color: #0f172a;
+}
+
+.vod-count {
+  display: grid;
+  place-items: center;
+  min-width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  color: #0369a1;
+  background: #e0f2fe;
+  font-weight: 800;
+}
+
+.vod-tree__node {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 11px 12px;
+  border: 0;
+  border-radius: 10px;
+  color: #475569;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.vod-tree__node:hover,
+.vod-tree__node.is-active {
+  color: #0c4a6e;
+  background: #e0f2fe;
+}
+
+.vod-category-form {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.vod-category-form input,
+.media-form input {
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid #d7deea;
+  border-radius: 10px;
+  outline: none;
+}
+
+.vod-content {
+  min-width: 0;
+}
+
+.vod-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 18px;
+  margin-top: 24px;
+}
+
+.vod-card {
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  color: inherit;
+  background: #fff;
+  text-decoration: none;
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+
+.vod-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 36px rgba(15, 23, 42, .12);
+}
+
+.vod-card__poster {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  color: #bae6fd;
+  background: linear-gradient(145deg, #082f49, #0e7490);
+  font-size: 54px;
+  font-weight: 900;
+}
+
+.vod-card__poster img,
+.vod-hero__poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.vod-card__poster i {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  padding: 5px 9px;
+  border-radius: 999px;
+  color: #fff;
+  background: rgba(8, 47, 73, .82);
+  font-size: 11px;
+  font-style: normal;
+}
+
+.vod-card__body {
+  padding: 14px;
+}
+
+.vod-card__body h3 {
+  margin: 0;
+  color: #0f172a;
+}
+
+.vod-card__body p {
+  min-height: 21px;
+  margin: 4px 0 12px;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.vod-card__body div,
+.vod-hero__meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  color: #64748b;
+  font-size: 12px;
+}
+
+.vod-card__body div span,
+.vod-hero__meta span {
+  padding: 4px 8px;
+  border-radius: 7px;
+  background: #f1f5f9;
+}
+
+.vod-detail {
+  display: grid;
+  gap: 20px;
+}
+
+.vod-hero {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 26px;
+  align-items: center;
+  background: linear-gradient(120deg, #fff 55%, #ecfeff);
+}
+
+.vod-hero__poster {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border-radius: 14px;
+  color: #bae6fd;
+  background: linear-gradient(145deg, #082f49, #0e7490);
+  font-size: 48px;
+  font-weight: 900;
+}
+
+.vod-hero h1 {
+  margin: 8px 0 4px;
+  color: #0f172a;
+  font-size: 34px;
+}
+
+.vod-hero p {
+  color: #64748b;
+}
+
+.vod-detail__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 330px;
+  gap: 20px;
+  align-items: start;
+}
+
+.episode-stack {
+  display: grid;
+  gap: 14px;
+}
+
+.episode-create {
+  position: sticky;
+  top: 24px;
+}
+
+.episode-card {
+  padding: 20px;
+  border: 1px solid #dfe6ef;
+  border-radius: 16px;
+  background: #fff;
+}
+
+.episode-card header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.episode-card header span {
+  color: #0891b2;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: .12em;
+}
+
+.episode-card h3 {
+  margin: 5px 0;
+  color: #0f172a;
+}
+
+.episode-card p {
+  margin: 0;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.media-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.media-row {
+  display: grid;
+  grid-template-columns: 130px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 11px 13px;
+  border-radius: 10px;
+  background: #f8fafc;
+  font-size: 13px;
+}
+
+.media-row span {
+  color: #64748b;
+}
+
+.media-row a {
+  color: #0284c7;
+  text-decoration: none;
+}
+
+.media-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px dashed #cbd5e1;
+}
+
 @media (max-width: 1180px) {
   .workspace__overview,
   .list-overview,
   .form-page-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .vod-detail__grid {
     grid-template-columns: 1fr;
   }
 
@@ -933,6 +1219,15 @@ button:hover:not(:disabled),
   .side-stack {
     grid-template-columns: 1fr;
   }
+
+  .vod-library {
+    grid-template-columns: 1fr;
+  }
+
+  .vod-tree,
+  .episode-create {
+    position: static;
+  }
 }
 
 @media (max-width: 640px) {
@@ -956,5 +1251,14 @@ button:hover:not(:disabled),
 
   .workspace__header h2 {
     font-size: 26px;
+  }
+
+  .vod-hero {
+    grid-template-columns: 100px minmax(0, 1fr);
+  }
+
+  .media-form,
+  .media-row {
+    grid-template-columns: 1fr;
   }
 }

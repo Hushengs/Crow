@@ -1,0 +1,124 @@
+syntax = "proto3";
+
+package vod.v1;
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "crow/api/vod/v1;v1";
+
+service VodService {
+  rpc ListCategories (ListCategoriesRequest) returns (CategorySet) {
+    option (google.api.http) = { get: "/v1/video-categories" };
+  }
+  rpc CreateCategory (CreateCategoryRequest) returns (Category) {
+    option (google.api.http) = { post: "/v1/video-categories/create" body: "category" };
+  }
+  rpc CreateVideo (CreateVideoRequest) returns (Video) {
+    option (google.api.http) = { post: "/v1/videos/create" body: "video" };
+  }
+  rpc GetVideo (GetVideoRequest) returns (Video) {
+    option (google.api.http) = { get: "/v1/videos/{id}" };
+  }
+  rpc ListVideos (ListVideosRequest) returns (VideoSet) {
+    option (google.api.http) = { get: "/v1/videos" };
+  }
+  rpc DeleteVideo (DeleteVideoRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = { delete: "/v1/videos/{id}" };
+  }
+  rpc CreateEpisode (CreateEpisodeRequest) returns (Episode) {
+    option (google.api.http) = { post: "/v1/episodes/create" body: "episode" };
+  }
+  rpc ListEpisodes (ListEpisodesRequest) returns (EpisodeSet) {
+    option (google.api.http) = { get: "/v1/episodes" };
+  }
+  rpc DeleteEpisode (DeleteEpisodeRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = { delete: "/v1/episodes/{id}" };
+  }
+  rpc CreateMedia (CreateMediaRequest) returns (Media) {
+    option (google.api.http) = { post: "/v1/media/create" body: "media" };
+  }
+  rpc ListMedia (ListMediaRequest) returns (MediaSet) {
+    option (google.api.http) = { get: "/v1/media" };
+  }
+  rpc DeleteMedia (DeleteMediaRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = { delete: "/v1/media/{id}" };
+  }
+}
+
+message Category {
+  int64 id = 1;
+  int64 parent_id = 2;
+  string name = 3;
+  int32 sort_order = 4;
+  uint32 status = 5;
+  google.protobuf.Timestamp create_time = 6;
+  google.protobuf.Timestamp update_time = 7;
+}
+message CategorySet { repeated Category categories = 1; }
+message ListCategoriesRequest {}
+message CreateCategoryRequest { Category category = 1 [(google.api.field_behavior) = REQUIRED]; }
+
+message Video {
+  int64 id = 1;
+  int64 category_id = 2;
+  string video_code = 3;
+  string title = 4;
+  string subtitle = 5;
+  uint32 video_type = 6;
+  string poster_vertical_url = 7;
+  string poster_horizontal_url = 8;
+  string thumbnail_url = 9;
+  string description = 10;
+  uint32 year = 11;
+  uint32 duration = 12;
+  uint32 status = 13;
+  google.protobuf.Timestamp create_time = 14;
+  google.protobuf.Timestamp update_time = 15;
+}
+message VideoSet { repeated Video videos = 1; }
+message CreateVideoRequest { Video video = 1 [(google.api.field_behavior) = REQUIRED]; }
+message GetVideoRequest { int64 id = 1 [(google.api.field_behavior) = REQUIRED]; }
+message ListVideosRequest {
+  int64 category_id = 1;
+  string keyword = 2;
+}
+message DeleteVideoRequest { int64 id = 1 [(google.api.field_behavior) = REQUIRED]; }
+
+message Episode {
+  int64 id = 1;
+  int64 video_id = 2;
+  uint32 episode_no = 3;
+  string title = 4;
+  uint32 duration = 5;
+  string description = 6;
+  uint32 status = 7;
+  google.protobuf.Timestamp create_time = 8;
+  google.protobuf.Timestamp update_time = 9;
+}
+message EpisodeSet { repeated Episode episodes = 1; }
+message CreateEpisodeRequest { Episode episode = 1 [(google.api.field_behavior) = REQUIRED]; }
+message ListEpisodesRequest { int64 video_id = 1 [(google.api.field_behavior) = REQUIRED]; }
+message DeleteEpisodeRequest { int64 id = 1 [(google.api.field_behavior) = REQUIRED]; }
+
+message Media {
+  int64 id = 1;
+  int64 video_id = 2;
+  int64 episode_id = 3;
+  string media_id = 4;
+  string media_url = 5;
+  string file_format = 6;
+  uint32 bitrate = 7;
+  string resolution = 8;
+  uint64 file_size = 9;
+  uint32 duration = 10;
+  uint32 status = 11;
+  google.protobuf.Timestamp create_time = 12;
+  google.protobuf.Timestamp update_time = 13;
+}
+message MediaSet { repeated Media media = 1; }
+message CreateMediaRequest { Media media = 1 [(google.api.field_behavior) = REQUIRED]; }
+message ListMediaRequest { int64 episode_id = 1 [(google.api.field_behavior) = REQUIRED]; }
+message DeleteMediaRequest { int64 id = 1 [(google.api.field_behavior) = REQUIRED]; }

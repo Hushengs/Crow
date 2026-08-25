@@ -28,14 +28,14 @@ func wireApp(confServer *conf.Server, confData *conf.Data, auth *conf.Auth, logg
 	if err != nil {
 		return nil, nil, err
 	}
+	adminOperationLogRepo := data.NewAdminOperationLogRepo(dataData)
+	adminOperationLogUsecase := biz.NewAdminOperationLogUsecase(adminOperationLogRepo)
 	todoRepo := data.NewTodoRepo(dataData)
 	todoUsecase := biz.NewTodoUsecase(todoRepo)
 	todoService := service.NewTodoService(todoUsecase)
 	loginRepo := data.NewLoginRepo(dataData)
 	tokenGenerator := biz.NewLoginTokenGenerator(auth)
 	loginUsecase := biz.NewLoginUsecase(loginRepo, tokenGenerator)
-	adminOperationLogRepo := data.NewAdminOperationLogRepo(dataData)
-	adminOperationLogUsecase := biz.NewAdminOperationLogUsecase(adminOperationLogRepo)
 	loginService := service.NewLoginService(loginUsecase, adminOperationLogUsecase)
 	adminRepo := data.NewAdminRepo(dataData)
 	adminUsecase := biz.NewAdminUsecase(adminRepo)
@@ -59,9 +59,11 @@ func wireApp(confServer *conf.Server, confData *conf.Data, auth *conf.Auth, logg
 	cpSpRepo := data.NewCpSpRepo(dataData)
 	cpSpUsecase := biz.NewCpSpUsecase(cpSpRepo)
 	cpSpService := service.NewCpSpService(cpSpUsecase)
-	grpcServer := server.NewGRPCServer(confServer, todoService, loginService, adminService, cpService, spService, cpSpService)
-	httpServer := server.NewHTTPServer(confServer, auth, adminOperationLogUsecase, todoService, loginService, adminService, cpService, spService, cpSpService)
-	app := newApp(logger, grpcServer, httpServer)
+	vodRepo := data.NewVodRepo(dataData)
+	vodUsecase := biz.NewVodUsecase(vodRepo)
+	vodService := service.NewVodService(vodUsecase)
+	httpServer := server.NewHTTPServer(confServer, auth, adminOperationLogUsecase, todoService, loginService, adminService, cpService, spService, cpSpService, vodService)
+	app := newApp(logger, httpServer)
 	return app, func() {
 		cleanup()
 	}, nil

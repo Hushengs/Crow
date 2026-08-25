@@ -5,6 +5,7 @@ import (
 	cdnv1 "crow/api/cdn/v1"
 	loginv1 "crow/api/login/v1"
 	todov1 "crow/api/todo/v1"
+	vodv1 "crow/api/vod/v1"
 	"crow/internal/biz"
 	"crow/internal/conf"
 	appmiddleware "crow/internal/middleware"
@@ -18,7 +19,7 @@ import (
 )
 
 // NewHTTPServer new an HTTP server.
-func NewHTTPServer(c *conf.Server, auth *conf.Auth, operationLogUC *biz.AdminOperationLogUsecase, todo *service.TodoService, login *service.LoginService, admin *service.AdminService, cp *service.CpService, sp *service.SpService, cpSp *service.CpSpService) *http.Server {
+func NewHTTPServer(c *conf.Server, auth *conf.Auth, operationLogUC *biz.AdminOperationLogUsecase, todo *service.TodoService, login *service.LoginService, admin *service.AdminService, cp *service.CpService, sp *service.SpService, cpSp *service.CpSpService, vod *service.VodService) *http.Server {
 	var opts = []http.ServerOption{
 		http.Middleware(
 			recovery.Recovery(),
@@ -50,5 +51,6 @@ func NewHTTPServer(c *conf.Server, auth *conf.Auth, operationLogUC *biz.AdminOpe
 	cdnv1.RegisterCpServiceHTTPServer(srv, cp)
 	cdnv1.RegisterSpServiceHTTPServer(srv, sp)
 	cdnv1.RegisterCpSpServiceHTTPServer(srv, cpSp)
+	vodv1.RegisterVodServiceHTTPServer(srv, vod)
 	return srv
 }

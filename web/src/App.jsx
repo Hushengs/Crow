@@ -11,6 +11,7 @@ import {
   useNavigate,
   useParams,
 } from 'react-router-dom'
+import { VideoCreatePage, VideoDetailPage, VideoLibraryPage } from './VodPages'
 
 const initialLoginForm = {
   account: '',
@@ -587,6 +588,15 @@ function normalizeSystemLogResponse(item) {
 }
 
 const resourceCatalog = [
+  {
+    key: 'videos',
+    custom: true,
+    section: '内容管理',
+    navLabel: '影片库',
+    singularLabel: '影片',
+    pluralLabel: '影片',
+    basePath: '/videos',
+  },
   {
     key: 'cps',
     section: '内容管理',
@@ -2372,7 +2382,7 @@ function HomeRedirect() {
   if (!auth.accessToken) {
     return <Navigate replace to="/" />
   }
-  return <Navigate replace to="/admins" />
+  return <Navigate replace to="/videos" />
 }
 
 function App() {
@@ -2384,7 +2394,10 @@ function App() {
 
         <Route element={<RequireAuth />} path="/">
           <Route element={<ConsoleLayout />}>
-            {resourceCatalog.map((resource) => (
+            <Route element={<VideoLibraryPage />} path="/videos" />
+            <Route element={<VideoCreatePage />} path="/videos/new" />
+            <Route element={<VideoDetailPage />} path="/videos/:id" />
+            {resourceCatalog.filter((resource) => !resource.custom).map((resource) => (
               <Route key={resource.key}>
                 <Route element={<ResourceListPage resource={resource} />} path={resource.basePath} />
                 {resource.allowCreate === false ? null : (

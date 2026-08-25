@@ -89,6 +89,18 @@ func describeOperation(method, path string) (module, action, description string)
 	case strings.HasPrefix(path, "/v1/cp-sps"):
 		module = "cp_sp"
 		description = "内容提供商与内容服务商绑定"
+	case strings.HasPrefix(path, "/v1/video-categories"):
+		module = "video_category"
+		description = "影片分类"
+	case strings.HasPrefix(path, "/v1/videos"):
+		module = "video"
+		description = "影片"
+	case strings.HasPrefix(path, "/v1/episodes"):
+		module = "episode"
+		description = "节目"
+	case strings.HasPrefix(path, "/v1/media"):
+		module = "media"
+		description = "媒体"
 	default:
 		return "", "", ""
 	}
