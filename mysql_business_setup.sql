@@ -40,7 +40,6 @@ CREATE TABLE `sp` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_sp_code` (`sp_code`),
   KEY `idx_status` (`status`),
-  KEY `idx_sp_type` (`sp_type`),
   KEY `idx_create_date` (`create_date`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='内容服务商表';
 

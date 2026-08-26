@@ -1,0 +1,8 @@
+.git
+.cursor
+.agents
+bin
+node_modules
+web/node_modules
+mysql_data
+*.log
