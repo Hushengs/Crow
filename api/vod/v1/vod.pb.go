@@ -580,6 +580,50 @@ func (x *ListVideosRequest) GetKeyword() string {
 	return ""
 }
 
+type UpdateVideoRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Video         *Video                 `protobuf:"bytes,1,opt,name=video,proto3" json:"video,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateVideoRequest) Reset() {
+	*x = UpdateVideoRequest{}
+	mi := &file_vod_v1_vod_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateVideoRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateVideoRequest) ProtoMessage() {}
+
+func (x *UpdateVideoRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_vod_v1_vod_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateVideoRequest.ProtoReflect.Descriptor instead.
+func (*UpdateVideoRequest) Descriptor() ([]byte, []int) {
+	return file_vod_v1_vod_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *UpdateVideoRequest) GetVideo() *Video {
+	if x != nil {
+		return x.Video
+	}
+	return nil
+}
+
 type DeleteVideoRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -589,7 +633,7 @@ type DeleteVideoRequest struct {
 
 func (x *DeleteVideoRequest) Reset() {
 	*x = DeleteVideoRequest{}
-	mi := &file_vod_v1_vod_proto_msgTypes[9]
+	mi := &file_vod_v1_vod_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -601,7 +645,7 @@ func (x *DeleteVideoRequest) String() string {
 func (*DeleteVideoRequest) ProtoMessage() {}
 
 func (x *DeleteVideoRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_vod_v1_vod_proto_msgTypes[9]
+	mi := &file_vod_v1_vod_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -614,7 +658,7 @@ func (x *DeleteVideoRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteVideoRequest.ProtoReflect.Descriptor instead.
 func (*DeleteVideoRequest) Descriptor() ([]byte, []int) {
-	return file_vod_v1_vod_proto_rawDescGZIP(), []int{9}
+	return file_vod_v1_vod_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *DeleteVideoRequest) GetId() int64 {
@@ -641,7 +685,7 @@ type Episode struct {
 
 func (x *Episode) Reset() {
 	*x = Episode{}
-	mi := &file_vod_v1_vod_proto_msgTypes[10]
+	mi := &file_vod_v1_vod_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -653,7 +697,7 @@ func (x *Episode) String() string {
 func (*Episode) ProtoMessage() {}
 
 func (x *Episode) ProtoReflect() protoreflect.Message {
-	mi := &file_vod_v1_vod_proto_msgTypes[10]
+	mi := &file_vod_v1_vod_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -666,7 +710,7 @@ func (x *Episode) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Episode.ProtoReflect.Descriptor instead.
 func (*Episode) Descriptor() ([]byte, []int) {
-	return file_vod_v1_vod_proto_rawDescGZIP(), []int{10}
+	return file_vod_v1_vod_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *Episode) GetId() int64 {
@@ -741,7 +785,7 @@ type EpisodeSet struct {
 
 func (x *EpisodeSet) Reset() {
 	*x = EpisodeSet{}
-	mi := &file_vod_v1_vod_proto_msgTypes[11]
+	mi := &file_vod_v1_vod_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -753,7 +797,7 @@ func (x *EpisodeSet) String() string {
 func (*EpisodeSet) ProtoMessage() {}
 
 func (x *EpisodeSet) ProtoReflect() protoreflect.Message {
-	mi := &file_vod_v1_vod_proto_msgTypes[11]
+	mi := &file_vod_v1_vod_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -766,7 +810,7 @@ func (x *EpisodeSet) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EpisodeSet.ProtoReflect.Descriptor instead.
 func (*EpisodeSet) Descriptor() ([]byte, []int) {
-	return file_vod_v1_vod_proto_rawDescGZIP(), []int{11}
+	return file_vod_v1_vod_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *EpisodeSet) GetEpisodes() []*Episode {
@@ -785,7 +829,7 @@ type CreateEpisodeRequest struct {
 
 func (x *CreateEpisodeRequest) Reset() {
 	*x = CreateEpisodeRequest{}
-	mi := &file_vod_v1_vod_proto_msgTypes[12]
+	mi := &file_vod_v1_vod_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -797,7 +841,7 @@ func (x *CreateEpisodeRequest) String() string {
 func (*CreateEpisodeRequest) ProtoMessage() {}
 
 func (x *CreateEpisodeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_vod_v1_vod_proto_msgTypes[12]
+	mi := &file_vod_v1_vod_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -810,7 +854,7 @@ func (x *CreateEpisodeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateEpisodeRequest.ProtoReflect.Descriptor instead.
 func (*CreateEpisodeRequest) Descriptor() ([]byte, []int) {
-	return file_vod_v1_vod_proto_rawDescGZIP(), []int{12}
+	return file_vod_v1_vod_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *CreateEpisodeRequest) GetEpisode() *Episode {
@@ -829,7 +873,7 @@ type ListEpisodesRequest struct {
 
 func (x *ListEpisodesRequest) Reset() {
 	*x = ListEpisodesRequest{}
-	mi := &file_vod_v1_vod_proto_msgTypes[13]
+	mi := &file_vod_v1_vod_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -841,7 +885,7 @@ func (x *ListEpisodesRequest) String() string {
 func (*ListEpisodesRequest) ProtoMessage() {}
 
 func (x *ListEpisodesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_vod_v1_vod_proto_msgTypes[13]
+	mi := &file_vod_v1_vod_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -854,7 +898,7 @@ func (x *ListEpisodesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListEpisodesRequest.ProtoReflect.Descriptor instead.
 func (*ListEpisodesRequest) Descriptor() ([]byte, []int) {
-	return file_vod_v1_vod_proto_rawDescGZIP(), []int{13}
+	return file_vod_v1_vod_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *ListEpisodesRequest) GetVideoId() int64 {
@@ -873,7 +917,7 @@ type DeleteEpisodeRequest struct {
 
 func (x *DeleteEpisodeRequest) Reset() {
 	*x = DeleteEpisodeRequest{}
-	mi := &file_vod_v1_vod_proto_msgTypes[14]
+	mi := &file_vod_v1_vod_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -885,7 +929,7 @@ func (x *DeleteEpisodeRequest) String() string {
 func (*DeleteEpisodeRequest) ProtoMessage() {}
 
 func (x *DeleteEpisodeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_vod_v1_vod_proto_msgTypes[14]
+	mi := &file_vod_v1_vod_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -898,7 +942,7 @@ func (x *DeleteEpisodeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteEpisodeRequest.ProtoReflect.Descriptor instead.
 func (*DeleteEpisodeRequest) Descriptor() ([]byte, []int) {
-	return file_vod_v1_vod_proto_rawDescGZIP(), []int{14}
+	return file_vod_v1_vod_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *DeleteEpisodeRequest) GetId() int64 {
@@ -929,7 +973,7 @@ type Media struct {
 
 func (x *Media) Reset() {
 	*x = Media{}
-	mi := &file_vod_v1_vod_proto_msgTypes[15]
+	mi := &file_vod_v1_vod_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -941,7 +985,7 @@ func (x *Media) String() string {
 func (*Media) ProtoMessage() {}
 
 func (x *Media) ProtoReflect() protoreflect.Message {
-	mi := &file_vod_v1_vod_proto_msgTypes[15]
+	mi := &file_vod_v1_vod_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -954,7 +998,7 @@ func (x *Media) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Media.ProtoReflect.Descriptor instead.
 func (*Media) Descriptor() ([]byte, []int) {
-	return file_vod_v1_vod_proto_rawDescGZIP(), []int{15}
+	return file_vod_v1_vod_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *Media) GetId() int64 {
@@ -1057,7 +1101,7 @@ type MediaSet struct {
 
 func (x *MediaSet) Reset() {
 	*x = MediaSet{}
-	mi := &file_vod_v1_vod_proto_msgTypes[16]
+	mi := &file_vod_v1_vod_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1069,7 +1113,7 @@ func (x *MediaSet) String() string {
 func (*MediaSet) ProtoMessage() {}
 
 func (x *MediaSet) ProtoReflect() protoreflect.Message {
-	mi := &file_vod_v1_vod_proto_msgTypes[16]
+	mi := &file_vod_v1_vod_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1082,7 +1126,7 @@ func (x *MediaSet) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MediaSet.ProtoReflect.Descriptor instead.
 func (*MediaSet) Descriptor() ([]byte, []int) {
-	return file_vod_v1_vod_proto_rawDescGZIP(), []int{16}
+	return file_vod_v1_vod_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *MediaSet) GetMedia() []*Media {
@@ -1101,7 +1145,7 @@ type CreateMediaRequest struct {
 
 func (x *CreateMediaRequest) Reset() {
 	*x = CreateMediaRequest{}
-	mi := &file_vod_v1_vod_proto_msgTypes[17]
+	mi := &file_vod_v1_vod_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1113,7 +1157,7 @@ func (x *CreateMediaRequest) String() string {
 func (*CreateMediaRequest) ProtoMessage() {}
 
 func (x *CreateMediaRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_vod_v1_vod_proto_msgTypes[17]
+	mi := &file_vod_v1_vod_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1126,7 +1170,7 @@ func (x *CreateMediaRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateMediaRequest.ProtoReflect.Descriptor instead.
 func (*CreateMediaRequest) Descriptor() ([]byte, []int) {
-	return file_vod_v1_vod_proto_rawDescGZIP(), []int{17}
+	return file_vod_v1_vod_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *CreateMediaRequest) GetMedia() *Media {
@@ -1145,7 +1189,7 @@ type ListMediaRequest struct {
 
 func (x *ListMediaRequest) Reset() {
 	*x = ListMediaRequest{}
-	mi := &file_vod_v1_vod_proto_msgTypes[18]
+	mi := &file_vod_v1_vod_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1157,7 +1201,7 @@ func (x *ListMediaRequest) String() string {
 func (*ListMediaRequest) ProtoMessage() {}
 
 func (x *ListMediaRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_vod_v1_vod_proto_msgTypes[18]
+	mi := &file_vod_v1_vod_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1170,7 +1214,7 @@ func (x *ListMediaRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListMediaRequest.ProtoReflect.Descriptor instead.
 func (*ListMediaRequest) Descriptor() ([]byte, []int) {
-	return file_vod_v1_vod_proto_rawDescGZIP(), []int{18}
+	return file_vod_v1_vod_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *ListMediaRequest) GetEpisodeId() int64 {
@@ -1189,7 +1233,7 @@ type DeleteMediaRequest struct {
 
 func (x *DeleteMediaRequest) Reset() {
 	*x = DeleteMediaRequest{}
-	mi := &file_vod_v1_vod_proto_msgTypes[19]
+	mi := &file_vod_v1_vod_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1201,7 +1245,7 @@ func (x *DeleteMediaRequest) String() string {
 func (*DeleteMediaRequest) ProtoMessage() {}
 
 func (x *DeleteMediaRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_vod_v1_vod_proto_msgTypes[19]
+	mi := &file_vod_v1_vod_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1214,7 +1258,7 @@ func (x *DeleteMediaRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteMediaRequest.ProtoReflect.Descriptor instead.
 func (*DeleteMediaRequest) Descriptor() ([]byte, []int) {
-	return file_vod_v1_vod_proto_rawDescGZIP(), []int{19}
+	return file_vod_v1_vod_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *DeleteMediaRequest) GetId() int64 {
@@ -1278,7 +1322,9 @@ const file_vod_v1_vod_proto_rawDesc = "" +
 	"\x11ListVideosRequest\x12\x1f\n" +
 	"\vcategory_id\x18\x01 \x01(\x03R\n" +
 	"categoryId\x12\x18\n" +
-	"\akeyword\x18\x02 \x01(\tR\akeyword\")\n" +
+	"\akeyword\x18\x02 \x01(\tR\akeyword\">\n" +
+	"\x12UpdateVideoRequest\x12(\n" +
+	"\x05video\x18\x01 \x01(\v2\r.vod.v1.VideoB\x03\xe0A\x02R\x05video\")\n" +
 	"\x12DeleteVideoRequest\x12\x13\n" +
 	"\x02id\x18\x01 \x01(\x03B\x03\xe0A\x02R\x02id\"\xb9\x02\n" +
 	"\aEpisode\x12\x0e\n" +
@@ -1332,7 +1378,7 @@ const file_vod_v1_vod_proto_rawDesc = "" +
 	"\n" +
 	"episode_id\x18\x01 \x01(\x03B\x03\xe0A\x02R\tepisodeId\")\n" +
 	"\x12DeleteMediaRequest\x12\x13\n" +
-	"\x02id\x18\x01 \x01(\x03B\x03\xe0A\x02R\x02id2\xd7\b\n" +
+	"\x02id\x18\x01 \x01(\x03B\x03\xe0A\x02R\x02id2\xb3\t\n" +
 	"\n" +
 	"VodService\x12b\n" +
 	"\x0eListCategories\x12\x1d.vod.v1.ListCategoriesRequest\x1a\x13.vod.v1.CategorySet\"\x1c\x82\xd3\xe4\x93\x02\x16\x12\x14/v1/video-categories\x12p\n" +
@@ -1342,6 +1388,7 @@ const file_vod_v1_vod_proto_rawDesc = "" +
 	"\n" +
 	"ListVideos\x12\x19.vod.v1.ListVideosRequest\x1a\x10.vod.v1.VideoSet\"\x12\x82\xd3\xe4\x93\x02\f\x12\n" +
 	"/v1/videos\x12Z\n" +
+	"\vUpdateVideo\x12\x1a.vod.v1.UpdateVideoRequest\x1a\r.vod.v1.Video\" \x82\xd3\xe4\x93\x02\x1a:\x05video\x1a\x11/v1/videos/update\x12Z\n" +
 	"\vDeleteVideo\x12\x1a.vod.v1.DeleteVideoRequest\x1a\x16.google.protobuf.Empty\"\x17\x82\xd3\xe4\x93\x02\x11*\x0f/v1/videos/{id}\x12d\n" +
 	"\rCreateEpisode\x12\x1c.vod.v1.CreateEpisodeRequest\x1a\x0f.vod.v1.Episode\"$\x82\xd3\xe4\x93\x02\x1e:\aepisode\"\x13/v1/episodes/create\x12U\n" +
 	"\fListEpisodes\x12\x1b.vod.v1.ListEpisodesRequest\x1a\x12.vod.v1.EpisodeSet\"\x14\x82\xd3\xe4\x93\x02\x0e\x12\f/v1/episodes\x12`\n" +
@@ -1362,7 +1409,7 @@ func file_vod_v1_vod_proto_rawDescGZIP() []byte {
 	return file_vod_v1_vod_proto_rawDescData
 }
 
-var file_vod_v1_vod_proto_msgTypes = make([]protoimpl.MessageInfo, 20)
+var file_vod_v1_vod_proto_msgTypes = make([]protoimpl.MessageInfo, 21)
 var file_vod_v1_vod_proto_goTypes = []any{
 	(*Category)(nil),              // 0: vod.v1.Category
 	(*CategorySet)(nil),           // 1: vod.v1.CategorySet
@@ -1373,66 +1420,70 @@ var file_vod_v1_vod_proto_goTypes = []any{
 	(*CreateVideoRequest)(nil),    // 6: vod.v1.CreateVideoRequest
 	(*GetVideoRequest)(nil),       // 7: vod.v1.GetVideoRequest
 	(*ListVideosRequest)(nil),     // 8: vod.v1.ListVideosRequest
-	(*DeleteVideoRequest)(nil),    // 9: vod.v1.DeleteVideoRequest
-	(*Episode)(nil),               // 10: vod.v1.Episode
-	(*EpisodeSet)(nil),            // 11: vod.v1.EpisodeSet
-	(*CreateEpisodeRequest)(nil),  // 12: vod.v1.CreateEpisodeRequest
-	(*ListEpisodesRequest)(nil),   // 13: vod.v1.ListEpisodesRequest
-	(*DeleteEpisodeRequest)(nil),  // 14: vod.v1.DeleteEpisodeRequest
-	(*Media)(nil),                 // 15: vod.v1.Media
-	(*MediaSet)(nil),              // 16: vod.v1.MediaSet
-	(*CreateMediaRequest)(nil),    // 17: vod.v1.CreateMediaRequest
-	(*ListMediaRequest)(nil),      // 18: vod.v1.ListMediaRequest
-	(*DeleteMediaRequest)(nil),    // 19: vod.v1.DeleteMediaRequest
-	(*timestamppb.Timestamp)(nil), // 20: google.protobuf.Timestamp
-	(*emptypb.Empty)(nil),         // 21: google.protobuf.Empty
+	(*UpdateVideoRequest)(nil),    // 9: vod.v1.UpdateVideoRequest
+	(*DeleteVideoRequest)(nil),    // 10: vod.v1.DeleteVideoRequest
+	(*Episode)(nil),               // 11: vod.v1.Episode
+	(*EpisodeSet)(nil),            // 12: vod.v1.EpisodeSet
+	(*CreateEpisodeRequest)(nil),  // 13: vod.v1.CreateEpisodeRequest
+	(*ListEpisodesRequest)(nil),   // 14: vod.v1.ListEpisodesRequest
+	(*DeleteEpisodeRequest)(nil),  // 15: vod.v1.DeleteEpisodeRequest
+	(*Media)(nil),                 // 16: vod.v1.Media
+	(*MediaSet)(nil),              // 17: vod.v1.MediaSet
+	(*CreateMediaRequest)(nil),    // 18: vod.v1.CreateMediaRequest
+	(*ListMediaRequest)(nil),      // 19: vod.v1.ListMediaRequest
+	(*DeleteMediaRequest)(nil),    // 20: vod.v1.DeleteMediaRequest
+	(*timestamppb.Timestamp)(nil), // 21: google.protobuf.Timestamp
+	(*emptypb.Empty)(nil),         // 22: google.protobuf.Empty
 }
 var file_vod_v1_vod_proto_depIdxs = []int32{
-	20, // 0: vod.v1.Category.create_time:type_name -> google.protobuf.Timestamp
-	20, // 1: vod.v1.Category.update_time:type_name -> google.protobuf.Timestamp
+	21, // 0: vod.v1.Category.create_time:type_name -> google.protobuf.Timestamp
+	21, // 1: vod.v1.Category.update_time:type_name -> google.protobuf.Timestamp
 	0,  // 2: vod.v1.CategorySet.categories:type_name -> vod.v1.Category
 	0,  // 3: vod.v1.CreateCategoryRequest.category:type_name -> vod.v1.Category
-	20, // 4: vod.v1.Video.create_time:type_name -> google.protobuf.Timestamp
-	20, // 5: vod.v1.Video.update_time:type_name -> google.protobuf.Timestamp
+	21, // 4: vod.v1.Video.create_time:type_name -> google.protobuf.Timestamp
+	21, // 5: vod.v1.Video.update_time:type_name -> google.protobuf.Timestamp
 	4,  // 6: vod.v1.VideoSet.videos:type_name -> vod.v1.Video
 	4,  // 7: vod.v1.CreateVideoRequest.video:type_name -> vod.v1.Video
-	20, // 8: vod.v1.Episode.create_time:type_name -> google.protobuf.Timestamp
-	20, // 9: vod.v1.Episode.update_time:type_name -> google.protobuf.Timestamp
-	10, // 10: vod.v1.EpisodeSet.episodes:type_name -> vod.v1.Episode
-	10, // 11: vod.v1.CreateEpisodeRequest.episode:type_name -> vod.v1.Episode
-	20, // 12: vod.v1.Media.create_time:type_name -> google.protobuf.Timestamp
-	20, // 13: vod.v1.Media.update_time:type_name -> google.protobuf.Timestamp
-	15, // 14: vod.v1.MediaSet.media:type_name -> vod.v1.Media
-	15, // 15: vod.v1.CreateMediaRequest.media:type_name -> vod.v1.Media
-	2,  // 16: vod.v1.VodService.ListCategories:input_type -> vod.v1.ListCategoriesRequest
-	3,  // 17: vod.v1.VodService.CreateCategory:input_type -> vod.v1.CreateCategoryRequest
-	6,  // 18: vod.v1.VodService.CreateVideo:input_type -> vod.v1.CreateVideoRequest
-	7,  // 19: vod.v1.VodService.GetVideo:input_type -> vod.v1.GetVideoRequest
-	8,  // 20: vod.v1.VodService.ListVideos:input_type -> vod.v1.ListVideosRequest
-	9,  // 21: vod.v1.VodService.DeleteVideo:input_type -> vod.v1.DeleteVideoRequest
-	12, // 22: vod.v1.VodService.CreateEpisode:input_type -> vod.v1.CreateEpisodeRequest
-	13, // 23: vod.v1.VodService.ListEpisodes:input_type -> vod.v1.ListEpisodesRequest
-	14, // 24: vod.v1.VodService.DeleteEpisode:input_type -> vod.v1.DeleteEpisodeRequest
-	17, // 25: vod.v1.VodService.CreateMedia:input_type -> vod.v1.CreateMediaRequest
-	18, // 26: vod.v1.VodService.ListMedia:input_type -> vod.v1.ListMediaRequest
-	19, // 27: vod.v1.VodService.DeleteMedia:input_type -> vod.v1.DeleteMediaRequest
-	1,  // 28: vod.v1.VodService.ListCategories:output_type -> vod.v1.CategorySet
-	0,  // 29: vod.v1.VodService.CreateCategory:output_type -> vod.v1.Category
-	4,  // 30: vod.v1.VodService.CreateVideo:output_type -> vod.v1.Video
-	4,  // 31: vod.v1.VodService.GetVideo:output_type -> vod.v1.Video
-	5,  // 32: vod.v1.VodService.ListVideos:output_type -> vod.v1.VideoSet
-	21, // 33: vod.v1.VodService.DeleteVideo:output_type -> google.protobuf.Empty
-	10, // 34: vod.v1.VodService.CreateEpisode:output_type -> vod.v1.Episode
-	11, // 35: vod.v1.VodService.ListEpisodes:output_type -> vod.v1.EpisodeSet
-	21, // 36: vod.v1.VodService.DeleteEpisode:output_type -> google.protobuf.Empty
-	15, // 37: vod.v1.VodService.CreateMedia:output_type -> vod.v1.Media
-	16, // 38: vod.v1.VodService.ListMedia:output_type -> vod.v1.MediaSet
-	21, // 39: vod.v1.VodService.DeleteMedia:output_type -> google.protobuf.Empty
-	28, // [28:40] is the sub-list for method output_type
-	16, // [16:28] is the sub-list for method input_type
-	16, // [16:16] is the sub-list for extension type_name
-	16, // [16:16] is the sub-list for extension extendee
-	0,  // [0:16] is the sub-list for field type_name
+	4,  // 8: vod.v1.UpdateVideoRequest.video:type_name -> vod.v1.Video
+	21, // 9: vod.v1.Episode.create_time:type_name -> google.protobuf.Timestamp
+	21, // 10: vod.v1.Episode.update_time:type_name -> google.protobuf.Timestamp
+	11, // 11: vod.v1.EpisodeSet.episodes:type_name -> vod.v1.Episode
+	11, // 12: vod.v1.CreateEpisodeRequest.episode:type_name -> vod.v1.Episode
+	21, // 13: vod.v1.Media.create_time:type_name -> google.protobuf.Timestamp
+	21, // 14: vod.v1.Media.update_time:type_name -> google.protobuf.Timestamp
+	16, // 15: vod.v1.MediaSet.media:type_name -> vod.v1.Media
+	16, // 16: vod.v1.CreateMediaRequest.media:type_name -> vod.v1.Media
+	2,  // 17: vod.v1.VodService.ListCategories:input_type -> vod.v1.ListCategoriesRequest
+	3,  // 18: vod.v1.VodService.CreateCategory:input_type -> vod.v1.CreateCategoryRequest
+	6,  // 19: vod.v1.VodService.CreateVideo:input_type -> vod.v1.CreateVideoRequest
+	7,  // 20: vod.v1.VodService.GetVideo:input_type -> vod.v1.GetVideoRequest
+	8,  // 21: vod.v1.VodService.ListVideos:input_type -> vod.v1.ListVideosRequest
+	9,  // 22: vod.v1.VodService.UpdateVideo:input_type -> vod.v1.UpdateVideoRequest
+	10, // 23: vod.v1.VodService.DeleteVideo:input_type -> vod.v1.DeleteVideoRequest
+	13, // 24: vod.v1.VodService.CreateEpisode:input_type -> vod.v1.CreateEpisodeRequest
+	14, // 25: vod.v1.VodService.ListEpisodes:input_type -> vod.v1.ListEpisodesRequest
+	15, // 26: vod.v1.VodService.DeleteEpisode:input_type -> vod.v1.DeleteEpisodeRequest
+	18, // 27: vod.v1.VodService.CreateMedia:input_type -> vod.v1.CreateMediaRequest
+	19, // 28: vod.v1.VodService.ListMedia:input_type -> vod.v1.ListMediaRequest
+	20, // 29: vod.v1.VodService.DeleteMedia:input_type -> vod.v1.DeleteMediaRequest
+	1,  // 30: vod.v1.VodService.ListCategories:output_type -> vod.v1.CategorySet
+	0,  // 31: vod.v1.VodService.CreateCategory:output_type -> vod.v1.Category
+	4,  // 32: vod.v1.VodService.CreateVideo:output_type -> vod.v1.Video
+	4,  // 33: vod.v1.VodService.GetVideo:output_type -> vod.v1.Video
+	5,  // 34: vod.v1.VodService.ListVideos:output_type -> vod.v1.VideoSet
+	4,  // 35: vod.v1.VodService.UpdateVideo:output_type -> vod.v1.Video
+	22, // 36: vod.v1.VodService.DeleteVideo:output_type -> google.protobuf.Empty
+	11, // 37: vod.v1.VodService.CreateEpisode:output_type -> vod.v1.Episode
+	12, // 38: vod.v1.VodService.ListEpisodes:output_type -> vod.v1.EpisodeSet
+	22, // 39: vod.v1.VodService.DeleteEpisode:output_type -> google.protobuf.Empty
+	16, // 40: vod.v1.VodService.CreateMedia:output_type -> vod.v1.Media
+	17, // 41: vod.v1.VodService.ListMedia:output_type -> vod.v1.MediaSet
+	22, // 42: vod.v1.VodService.DeleteMedia:output_type -> google.protobuf.Empty
+	30, // [30:43] is the sub-list for method output_type
+	17, // [17:30] is the sub-list for method input_type
+	17, // [17:17] is the sub-list for extension type_name
+	17, // [17:17] is the sub-list for extension extendee
+	0,  // [0:17] is the sub-list for field type_name
 }
 
 func init() { file_vod_v1_vod_proto_init() }
@@ -1446,7 +1497,7 @@ func file_vod_v1_vod_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_vod_v1_vod_proto_rawDesc), len(file_vod_v1_vod_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   20,
+			NumMessages:   21,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

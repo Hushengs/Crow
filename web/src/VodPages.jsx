@@ -3,18 +3,19 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 
 const authKey = 'crow.auth'
 
-function headers() {
+function headers(includeContentType = true) {
   let token = ''
   try {
     token = JSON.parse(sessionStorage.getItem(authKey) || '{}').accessToken || ''
   } catch {
     /* noop */
   }
-  return { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) }
+  return { ...(includeContentType ? { 'Content-Type': 'application/json' } : {}), ...(token ? { Authorization: `Bearer ${token}` } : {}) }
 }
 
 async function api(url, options = {}) {
-  const response = await fetch(url, { ...options, headers: { ...headers(), ...options.headers } })
+  const hasFormDataBody = options.body instanceof FormData
+  const response = await fetch(url, { ...options, headers: { ...headers(!hasFormDataBody), ...options.headers } })
   const data = await response.json().catch(() => ({}))
   if (!response.ok) throw new Error(data.message || '请求失败')
   return data
@@ -89,6 +90,56 @@ function normalizeMedia(item) {
   }
 }
 
+function createVideoForm(video = null) {
+  return {
+    id: String(video?.id || ''),
+    categoryId: String(video?.categoryId || ''),
+    videoCode: video?.videoCode || '',
+    title: video?.title || '',
+    subtitle: video?.subtitle || '',
+    videoType: String(video?.videoType || 1),
+    posterVerticalUrl: video?.posterVerticalUrl || '',
+    posterHorizontalUrl: video?.posterHorizontalUrl || '',
+    thumbnailUrl: video?.thumbnailUrl || '',
+    description: video?.description || '',
+    year: String(video?.year || ''),
+    duration: String(video?.duration || ''),
+    status: String(video?.status ?? 1),
+  }
+}
+
+function buildVideoPayload(form) {
+  return {
+    id: Number(form.id) || 0,
+    category_id: Number(form.categoryId),
+    video_code: form.videoCode.trim(),
+    title: form.title.trim(),
+    subtitle: form.subtitle.trim(),
+    video_type: Number(form.videoType),
+    poster_vertical_url: form.posterVerticalUrl.trim(),
+    poster_horizontal_url: form.posterHorizontalUrl.trim(),
+    thumbnail_url: form.thumbnailUrl.trim(),
+    description: form.description.trim(),
+    year: Number(form.year) || 0,
+    duration: Number(form.duration) || 0,
+    status: Number(form.status),
+  }
+}
+
+async function uploadImageAsset(file) {
+  const formData = new FormData()
+  formData.append('file', file)
+  const payload = await api('/api/v1/videos/posters/upload', {
+    method: 'POST',
+    body: formData,
+  })
+  const url = pick(payload, ['url'])
+  if (!url) {
+    throw new Error('上传成功但未返回图片地址')
+  }
+  return url
+}
+
 function field(name, label, value, onChange, options = {}) {
   return (
     <label className={options.full ? 'field field--full' : 'field'}>
@@ -107,6 +158,51 @@ function field(name, label, value, onChange, options = {}) {
         <input name={name} onChange={onChange} type={options.type || 'text'} value={value} placeholder={options.placeholder} />
       )}
     </label>
+  )
+}
+
+function ImageUploadField({ label, helper, shape = 'portrait', value, onChange }) {
+  const [uploading, setUploading] = useState(false)
+  const [error, setError] = useState('')
+
+  async function handleFileChange(event) {
+    const file = event.target.files?.[0]
+    if (!file) return
+    setUploading(true)
+    setError('')
+    try {
+      onChange(await uploadImageAsset(file))
+    } catch (err) {
+      setError(err.message || '图片上传失败')
+    } finally {
+      setUploading(false)
+      event.target.value = ''
+    }
+  }
+
+  return (
+    <div className="field field--full poster-upload">
+      <div className="poster-upload__header">
+        <span>{label}</span>
+        <small>{helper}</small>
+      </div>
+      <div className="poster-upload__body">
+        <div className={`poster-upload__frame ${shape === 'landscape' ? 'poster-upload__frame--landscape' : ''}`}>
+          {value ? <img alt={label} src={value} /> : <span>{shape === 'landscape' ? '16:9' : '3:4'}</span>}
+        </div>
+        <div className="poster-upload__actions">
+          <label className={`ghost-button poster-upload__button ${uploading ? 'is-disabled' : ''}`}>
+            <input accept="image/png,image/jpeg,image/webp,image/gif" disabled={uploading} onChange={handleFileChange} type="file" />
+            {uploading ? '上传中...' : value ? '重新上传' : '上传图片'}
+          </label>
+          <button className="ghost-button" disabled={!value || uploading} onClick={() => onChange('')} type="button">
+            清空
+          </button>
+          <code className="poster-upload__path">{value || '尚未上传图片'}</code>
+          {error ? <p className="message message--error">{error}</p> : null}
+        </div>
+      </div>
+    </div>
   )
 }
 
@@ -253,20 +349,7 @@ export function VideoCreatePage() {
   const navigate = useNavigate()
   const [categories, setCategories] = useState([])
   const [error, setError] = useState('')
-  const [form, setForm] = useState({
-    categoryId: '',
-    videoCode: '',
-    title: '',
-    subtitle: '',
-    videoType: '1',
-    posterVerticalUrl: '',
-    posterHorizontalUrl: '',
-    thumbnailUrl: '',
-    description: '',
-    year: '',
-    duration: '',
-    status: '1',
-  })
+  const [form, setForm] = useState(createVideoForm())
 
   useEffect(() => {
     api('/api/v1/video-categories')
@@ -275,26 +358,14 @@ export function VideoCreatePage() {
   }, [])
 
   const change = (e) => setForm((current) => ({ ...current, [e.target.name]: e.target.value }))
+  const changePoster = (name, value) => setForm((current) => ({ ...current, [name]: value }))
 
   async function submit(event) {
     event.preventDefault()
     try {
       const saved = await api('/api/v1/videos/create', {
         method: 'POST',
-        body: JSON.stringify({
-          category_id: Number(form.categoryId),
-          video_code: form.videoCode.trim(),
-          title: form.title.trim(),
-          subtitle: form.subtitle.trim(),
-          video_type: Number(form.videoType),
-          poster_vertical_url: form.posterVerticalUrl.trim(),
-          poster_horizontal_url: form.posterHorizontalUrl.trim(),
-          thumbnail_url: form.thumbnailUrl.trim(),
-          description: form.description.trim(),
-          year: Number(form.year) || 0,
-          duration: Number(form.duration) || 0,
-          status: Number(form.status),
-        }),
+        body: JSON.stringify(buildVideoPayload(form)),
       })
       navigate(`/videos/${saved.id}`)
     } catch (err) {
@@ -330,6 +401,26 @@ export function VideoCreatePage() {
           {field('videoCode', '影片编码', form.videoCode, change, { placeholder: '全局唯一业务编码' })}
           {field('title', '影片标题', form.title, change)}
           {field('subtitle', '副标题', form.subtitle, change)}
+          <ImageUploadField
+            helper="上传后自动生成海报地址，适合列表卡片与详情首屏。"
+            label="竖版海报"
+            onChange={(value) => changePoster('posterVerticalUrl', value)}
+            value={form.posterVerticalUrl}
+          />
+          <ImageUploadField
+            helper="建议上传横版宣传图，详情页或运营位可直接复用。"
+            label="横版海报"
+            onChange={(value) => changePoster('posterHorizontalUrl', value)}
+            shape="landscape"
+            value={form.posterHorizontalUrl}
+          />
+          <ImageUploadField
+            helper="上传后自动写入缩略图地址，适合列表、推荐位和轻量封面。"
+            label="缩略图"
+            onChange={(value) => changePoster('thumbnailUrl', value)}
+            shape="landscape"
+            value={form.thumbnailUrl}
+          />
           {field('year', '出品年份', form.year, change, { type: 'number' })}
           {field('duration', '总时长（秒）', form.duration, change, { type: 'number' })}
           {field('status', '状态', form.status, change, {
@@ -338,9 +429,6 @@ export function VideoCreatePage() {
               { value: '0', label: '禁用' },
             ],
           })}
-          {field('posterVerticalUrl', '竖版海报 URL', form.posterVerticalUrl, change)}
-          {field('posterHorizontalUrl', '横版海报 URL', form.posterHorizontalUrl, change)}
-          {field('thumbnailUrl', '缩略图 URL', form.thumbnailUrl, change, { full: true })}
           {field('description', '影片简介', form.description, change, { type: 'textarea', full: true })}
         </div>
         <div className="button-row">
@@ -466,16 +554,25 @@ function MediaPanel({ episode, videoId }) {
 export function VideoDetailPage() {
   const { id } = useParams()
   const [video, setVideo] = useState(null)
+  const [categories, setCategories] = useState([])
   const [episodes, setEpisodes] = useState([])
   const [error, setError] = useState('')
+  const [videoForm, setVideoForm] = useState(createVideoForm())
+  const [videoFormError, setVideoFormError] = useState('')
+  const [videoFormSuccess, setVideoFormSuccess] = useState('')
+  const [videoSubmitting, setVideoSubmitting] = useState(false)
   const [form, setForm] = useState({ episodeNo: '1', title: '', duration: '', description: '', status: '1' })
 
   const load = useCallback(async () => {
-    const [videoData, episodeData] = await Promise.all([
+    const [categoryData, videoData, episodeData] = await Promise.all([
+      api('/api/v1/video-categories'),
       api(`/api/v1/videos/${id}`),
       api(`/api/v1/episodes?video_id=${id}`),
     ])
-    setVideo(normalizeVideo(videoData))
+    const nextVideo = normalizeVideo(videoData)
+    setCategories(buildTree((categoryData.categories || []).map(normalizeCategory).filter(Boolean)))
+    setVideo(nextVideo)
+    setVideoForm(createVideoForm(nextVideo))
     setEpisodes((episodeData.episodes || []).map(normalizeEpisode).filter(Boolean))
   }, [id])
 
@@ -484,6 +581,36 @@ export function VideoDetailPage() {
   }, [load])
 
   const change = (e) => setForm((current) => ({ ...current, [e.target.name]: e.target.value }))
+  const changeVideo = (e) => {
+    setVideoFormSuccess('')
+    setVideoForm((current) => ({ ...current, [e.target.name]: e.target.value }))
+  }
+  const changeVideoPoster = (name, value) => {
+    setVideoFormSuccess('')
+    setVideoForm((current) => ({ ...current, [name]: value }))
+  }
+
+  async function submitVideo(event) {
+    event.preventDefault()
+    setVideoSubmitting(true)
+    setVideoFormError('')
+    setVideoFormSuccess('')
+    try {
+      const saved = normalizeVideo(
+        await api('/api/v1/videos/update', {
+          method: 'PUT',
+          body: JSON.stringify(buildVideoPayload(videoForm)),
+        }),
+      )
+      setVideo(saved)
+      setVideoForm(createVideoForm(saved))
+      setVideoFormSuccess('影片基础信息已更新。')
+    } catch (err) {
+      setVideoFormError(err.message || '影片信息更新失败')
+    } finally {
+      setVideoSubmitting(false)
+    }
+  }
 
   async function submit(event) {
     event.preventDefault()
@@ -555,18 +682,79 @@ export function VideoDetailPage() {
           ))}
           {!episodes.length && <p className="panel empty-state">还没有节目，请先在右侧添加。</p>}
         </section>
-        <aside className="panel episode-create">
-          <h2>添加节目</h2>
-          <p className="subtitle">节目保存后，可在节目卡片中继续添加不同码率、格式的媒体。</p>
-          <form className="form" onSubmit={submit}>
-            {field('episodeNo', '集序号', form.episodeNo, change, { type: 'number' })}
-            {field('title', '节目标题', form.title, change)}
-            {field('duration', '时长（秒）', form.duration, change, { type: 'number' })}
-            {field('description', '节目简介', form.description, change, { type: 'textarea' })}
-            <button className="submit submit--compact" disabled={!form.title.trim() || Number(form.episodeNo) < 1} type="submit">
-              保存节目
-            </button>
-          </form>
+        <aside className="vod-detail__side">
+          <section className="panel episode-create">
+            <h2>编辑影片</h2>
+            <p className="subtitle">海报改为直接上传图片，保存后立即更新当前影片资料。</p>
+            {videoFormError ? <p className="message message--error">{videoFormError}</p> : null}
+            {videoFormSuccess ? <p className="message message--success">{videoFormSuccess}</p> : null}
+            <form className="form form--spacious" onSubmit={submitVideo}>
+              {field('categoryId', '所属分类', videoForm.categoryId, changeVideo, {
+                choices: [{ value: '', label: '请选择分类' }, ...categories.map((c) => ({ value: c.id, label: `${'　'.repeat(c.depth)}${c.name}` }))],
+              })}
+              {field('videoType', '影片类型', videoForm.videoType, changeVideo, {
+                choices: [
+                  { value: '1', label: '电影' },
+                  { value: '2', label: '剧集' },
+                  { value: '3', label: '综艺' },
+                  { value: '4', label: '其他' },
+                ],
+              })}
+              {field('videoCode', '影片编码', videoForm.videoCode, changeVideo)}
+              {field('title', '影片标题', videoForm.title, changeVideo)}
+              {field('subtitle', '副标题', videoForm.subtitle, changeVideo)}
+              <ImageUploadField
+                helper="用于竖版卡片封面。"
+                label="竖版海报"
+                onChange={(value) => changeVideoPoster('posterVerticalUrl', value)}
+                value={videoForm.posterVerticalUrl}
+              />
+              <ImageUploadField
+                helper="用于横版宣传位或详情延展位。"
+                label="横版海报"
+                onChange={(value) => changeVideoPoster('posterHorizontalUrl', value)}
+                shape="landscape"
+                value={videoForm.posterHorizontalUrl}
+              />
+              <ImageUploadField
+                helper="用于推荐位和轻量封面展示。"
+                label="缩略图"
+                onChange={(value) => changeVideoPoster('thumbnailUrl', value)}
+                shape="landscape"
+                value={videoForm.thumbnailUrl}
+              />
+              {field('year', '出品年份', videoForm.year, changeVideo, { type: 'number' })}
+              {field('duration', '总时长（秒）', videoForm.duration, changeVideo, { type: 'number' })}
+              {field('status', '状态', videoForm.status, changeVideo, {
+                choices: [
+                  { value: '1', label: '正常' },
+                  { value: '0', label: '禁用' },
+                ],
+              })}
+              {field('description', '影片简介', videoForm.description, changeVideo, { type: 'textarea' })}
+              <button
+                className="submit submit--compact"
+                disabled={!videoForm.categoryId || !videoForm.videoCode.trim() || !videoForm.title.trim() || videoSubmitting}
+                type="submit"
+              >
+                {videoSubmitting ? '保存中...' : '保存影片'}
+              </button>
+            </form>
+          </section>
+
+          <section className="panel episode-create">
+            <h2>添加节目</h2>
+            <p className="subtitle">节目保存后，可在节目卡片中继续添加不同码率、格式的媒体。</p>
+            <form className="form" onSubmit={submit}>
+              {field('episodeNo', '集序号', form.episodeNo, change, { type: 'number' })}
+              {field('title', '节目标题', form.title, change)}
+              {field('duration', '时长（秒）', form.duration, change, { type: 'number' })}
+              {field('description', '节目简介', form.description, change, { type: 'textarea' })}
+              <button className="submit submit--compact" disabled={!form.title.trim() || Number(form.episodeNo) < 1} type="submit">
+                保存节目
+              </button>
+            </form>
+          </section>
         </aside>
       </div>
     </section>

@@ -25,6 +25,7 @@ const (
 	VodService_CreateVideo_FullMethodName    = "/vod.v1.VodService/CreateVideo"
 	VodService_GetVideo_FullMethodName       = "/vod.v1.VodService/GetVideo"
 	VodService_ListVideos_FullMethodName     = "/vod.v1.VodService/ListVideos"
+	VodService_UpdateVideo_FullMethodName    = "/vod.v1.VodService/UpdateVideo"
 	VodService_DeleteVideo_FullMethodName    = "/vod.v1.VodService/DeleteVideo"
 	VodService_CreateEpisode_FullMethodName  = "/vod.v1.VodService/CreateEpisode"
 	VodService_ListEpisodes_FullMethodName   = "/vod.v1.VodService/ListEpisodes"
@@ -43,6 +44,7 @@ type VodServiceClient interface {
 	CreateVideo(ctx context.Context, in *CreateVideoRequest, opts ...grpc.CallOption) (*Video, error)
 	GetVideo(ctx context.Context, in *GetVideoRequest, opts ...grpc.CallOption) (*Video, error)
 	ListVideos(ctx context.Context, in *ListVideosRequest, opts ...grpc.CallOption) (*VideoSet, error)
+	UpdateVideo(ctx context.Context, in *UpdateVideoRequest, opts ...grpc.CallOption) (*Video, error)
 	DeleteVideo(ctx context.Context, in *DeleteVideoRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	CreateEpisode(ctx context.Context, in *CreateEpisodeRequest, opts ...grpc.CallOption) (*Episode, error)
 	ListEpisodes(ctx context.Context, in *ListEpisodesRequest, opts ...grpc.CallOption) (*EpisodeSet, error)
@@ -104,6 +106,16 @@ func (c *vodServiceClient) ListVideos(ctx context.Context, in *ListVideosRequest
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(VideoSet)
 	err := c.cc.Invoke(ctx, VodService_ListVideos_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *vodServiceClient) UpdateVideo(ctx context.Context, in *UpdateVideoRequest, opts ...grpc.CallOption) (*Video, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Video)
+	err := c.cc.Invoke(ctx, VodService_UpdateVideo_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -189,6 +201,7 @@ type VodServiceServer interface {
 	CreateVideo(context.Context, *CreateVideoRequest) (*Video, error)
 	GetVideo(context.Context, *GetVideoRequest) (*Video, error)
 	ListVideos(context.Context, *ListVideosRequest) (*VideoSet, error)
+	UpdateVideo(context.Context, *UpdateVideoRequest) (*Video, error)
 	DeleteVideo(context.Context, *DeleteVideoRequest) (*emptypb.Empty, error)
 	CreateEpisode(context.Context, *CreateEpisodeRequest) (*Episode, error)
 	ListEpisodes(context.Context, *ListEpisodesRequest) (*EpisodeSet, error)
@@ -220,6 +233,9 @@ func (UnimplementedVodServiceServer) GetVideo(context.Context, *GetVideoRequest)
 }
 func (UnimplementedVodServiceServer) ListVideos(context.Context, *ListVideosRequest) (*VideoSet, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListVideos not implemented")
+}
+func (UnimplementedVodServiceServer) UpdateVideo(context.Context, *UpdateVideoRequest) (*Video, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateVideo not implemented")
 }
 func (UnimplementedVodServiceServer) DeleteVideo(context.Context, *DeleteVideoRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteVideo not implemented")
@@ -349,6 +365,24 @@ func _VodService_ListVideos_Handler(srv interface{}, ctx context.Context, dec fu
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(VodServiceServer).ListVideos(ctx, req.(*ListVideosRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _VodService_UpdateVideo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateVideoRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VodServiceServer).UpdateVideo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: VodService_UpdateVideo_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VodServiceServer).UpdateVideo(ctx, req.(*UpdateVideoRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -505,6 +539,10 @@ var VodService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListVideos",
 			Handler:    _VodService_ListVideos_Handler,
+		},
+		{
+			MethodName: "UpdateVideo",
+			Handler:    _VodService_UpdateVideo_Handler,
 		},
 		{
 			MethodName: "DeleteVideo",

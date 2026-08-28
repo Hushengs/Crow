@@ -101,7 +101,8 @@ design rather than add the import.
 
 1. **DTO**: define `Create<Resource>` / `Get<Resource>` /
    `List<Resources>` / `Update<Resource>` / `Delete<Resource>` in
-   `api/<domain>/<version>/`, then `make api`.
+   `api/<domain>/<version>/`, then regenerate the touched outputs with
+   direct `protoc` commands.
 2. **DO + repo interface**: declare both in `biz`; build the usecase on
    top of the interface.
 3. **Repo impl**: implement in `data` returning `biz.<Resource>Repo`;
@@ -110,7 +111,9 @@ design rather than add the import.
 4. **Wiring**: register the repo constructor in `data.ProviderSet`, the
    usecase in `biz.ProviderSet`, the service in `service.ProviderSet`;
    register HTTP/gRPC services in `internal/server`.
-5. **Regenerate**: `make all` to refresh Wire and `go.mod`.
+5. **Regenerate**: prefer direct `protoc` invocations for proto outputs;
+   use the corresponding generation tools for Wire/config refresh when
+   needed.
 
 ### Testing seam
 
@@ -120,8 +123,10 @@ tests exercise repo implementations at the storage boundary.
 
 ## Generation & generated files
 
-Regenerate via `make api`, `make config`, or `make all`; never hand-edit
-`*.pb.go`, `*_grpc.pb.go`, `*_http.pb.go`, or `wire_gen.go`.
+For this repository, prefer direct `protoc` commands that mirror
+`buf.gen.yaml` when refreshing proto-generated files, instead of defaulting
+to `make`, `kratos`, or `buf` wrapper commands. Never hand-edit `*.pb.go`,
+`*_grpc.pb.go`, `*_http.pb.go`, or `wire_gen.go`.
 
 ## Naming & error reasons
 

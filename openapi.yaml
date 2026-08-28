@@ -1300,6 +1300,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/vod.v1.Video'
+    /v1/videos/update:
+        put:
+            tags:
+                - VodService
+            operationId: VodService_UpdateVideo
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/vod.v1.Video'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/vod.v1.Video'
     /v1/videos/{id}:
         get:
             tags:

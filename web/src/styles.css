@@ -1109,14 +1109,112 @@ button:hover:not(:disabled),
   align-items: start;
 }
 
+.vod-detail__side {
+  position: sticky;
+  top: 24px;
+  display: grid;
+  gap: 20px;
+}
+
 .episode-stack {
   display: grid;
   gap: 14px;
 }
 
 .episode-create {
-  position: sticky;
-  top: 24px;
+  display: grid;
+  gap: 14px;
+}
+
+.poster-upload {
+  gap: 12px;
+}
+
+.poster-upload__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.poster-upload__header small {
+  color: #64748b;
+  font-size: 12px;
+}
+
+.poster-upload__body {
+  display: grid;
+  grid-template-columns: 118px minmax(0, 1fr);
+  gap: 14px;
+  padding: 14px;
+  border: 1px solid #dbe7f3;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #f8fcff, #f4f8fc);
+}
+
+.poster-upload__frame {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border-radius: 14px;
+  color: #67e8f9;
+  background:
+    radial-gradient(circle at top, rgba(125, 211, 252, .34), transparent 52%),
+    linear-gradient(160deg, #082f49, #155e75 68%, #164e63);
+  font-size: 30px;
+  font-weight: 900;
+  letter-spacing: .12em;
+}
+
+.poster-upload__frame--landscape {
+  aspect-ratio: 16 / 9;
+  font-size: 26px;
+}
+
+.poster-upload__frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.poster-upload__actions {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+}
+
+.poster-upload__button {
+  position: relative;
+  justify-content: center;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.poster-upload__button input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.poster-upload__button.is-disabled {
+  opacity: .65;
+  pointer-events: none;
+}
+
+.poster-upload__path {
+  display: block;
+  padding: 10px 12px;
+  overflow-wrap: anywhere;
+  border-radius: 12px;
+  color: #0f172a;
+  background: rgba(226, 232, 240, .7);
+  font-size: 12px;
+}
+
+.poster-upload .message {
+  margin: 0;
 }
 
 .episode-card {
@@ -1193,6 +1291,14 @@ button:hover:not(:disabled),
   }
 
   .vod-detail__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .vod-detail__side {
+    position: static;
+  }
+
+  .poster-upload__body {
     grid-template-columns: 1fr;
   }
 

@@ -56,6 +56,7 @@ type VodRepo interface {
 	ListCategories(context.Context) ([]*VideoCategory, error)
 	CreateCategory(context.Context, *VideoCategory) (*VideoCategory, error)
 	CreateVideo(context.Context, *Video) (*Video, error)
+	UpdateVideo(context.Context, *Video) (*Video, error)
 	FindVideo(context.Context, int64) (*Video, error)
 	ListVideos(context.Context, int64, string) ([]*Video, error)
 	DeleteVideo(context.Context, int64) error
@@ -88,8 +89,15 @@ func (uc *VodUsecase) CreateVideo(ctx context.Context, v *Video) (*Video, error)
 	if v == nil || v.CategoryID <= 0 || strings.TrimSpace(v.VideoCode) == "" || strings.TrimSpace(v.Title) == "" || v.VideoType < 1 || v.VideoType > 4 || v.Status > 1 {
 		return nil, ErrVodInvalid
 	}
-	v.VideoCode, v.Title = strings.TrimSpace(v.VideoCode), strings.TrimSpace(v.Title)
+	normalizeVideo(v)
 	return uc.repo.CreateVideo(ctx, v)
+}
+func (uc *VodUsecase) UpdateVideo(ctx context.Context, v *Video) (*Video, error) {
+	if v == nil || v.ID <= 0 || v.CategoryID <= 0 || strings.TrimSpace(v.VideoCode) == "" || strings.TrimSpace(v.Title) == "" || v.VideoType < 1 || v.VideoType > 4 || v.Status > 1 {
+		return nil, ErrVodInvalid
+	}
+	normalizeVideo(v)
+	return uc.repo.UpdateVideo(ctx, v)
 }
 func (uc *VodUsecase) GetVideo(ctx context.Context, id int64) (*Video, error) {
 	if id <= 0 {
@@ -146,4 +154,14 @@ func (uc *VodUsecase) DeleteMedia(ctx context.Context, id int64) error {
 		return ErrVodInvalid
 	}
 	return uc.repo.DeleteMedia(ctx, id)
+}
+
+func normalizeVideo(v *Video) {
+	v.VideoCode = strings.TrimSpace(v.VideoCode)
+	v.Title = strings.TrimSpace(v.Title)
+	v.Subtitle = strings.TrimSpace(v.Subtitle)
+	v.PosterVerticalURL = strings.TrimSpace(v.PosterVerticalURL)
+	v.PosterHorizontalURL = strings.TrimSpace(v.PosterHorizontalURL)
+	v.ThumbnailURL = strings.TrimSpace(v.ThumbnailURL)
+	v.Description = strings.TrimSpace(v.Description)
 }

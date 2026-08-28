@@ -52,5 +52,6 @@ func NewHTTPServer(c *conf.Server, auth *conf.Auth, operationLogUC *biz.AdminOpe
 	cdnv1.RegisterSpServiceHTTPServer(srv, sp)
 	cdnv1.RegisterCpSpServiceHTTPServer(srv, cpSp)
 	vodv1.RegisterVodServiceHTTPServer(srv, vod)
+	registerPosterRoutes(srv)
 	return srv
 }

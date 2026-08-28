@@ -8,7 +8,8 @@ alwaysApply: true
 - Follow the Kratos framework conventions already used by this project.
 - Respect the layering contract: `service` handles DTO to DO conversion, `biz` owns domain models and repo interfaces, and `data` implements persistence with PO conversion.
 - Keep dependency directions clean: `service` may import `biz`, `biz` must not import `service` or `data`, and `data` must not import transport DTOs.
-- Use the Kratos workflow for API, config, and Wire generation.
-- When adding or updating API proto files, use `kratos` commands to generate the proto outputs and related stubs instead of hand-editing generated artifacts.
+- Use the Kratos workflow and project layering, but in this repository prefer invoking the underlying generation tools directly when refreshing generated files locally.
+- When adding or updating API proto files, regenerate outputs with direct `protoc` commands that mirror the versions/options in `buf.gen.yaml`; do not default to `make`, `kratos`, or `buf` wrapper commands for this repo.
+- Example expectation: run `protoc` with `--go_out`, `--go-grpc_out`, `--go-http_out`, and `protoc-gen-openapi` as needed, then keep the generated artifacts in the same change as the source proto update.
 - Do not hand-edit generated files such as `*.pb.go`, `*_grpc.pb.go`, `*_http.pb.go`, or `wire_gen.go`.
 - When adding features, prefer Kratos-aligned structure under `api/`, `cmd/`, `internal/service/`, `internal/biz/`, `internal/data/`, and `internal/server/`.

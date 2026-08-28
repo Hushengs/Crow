@@ -46,6 +46,13 @@ func (s *VodService) CreateVideo(ctx context.Context, req *pb.CreateVideoRequest
 	}
 	return videoReply(item), nil
 }
+func (s *VodService) UpdateVideo(ctx context.Context, req *pb.UpdateVideoRequest) (*pb.Video, error) {
+	item, err := s.uc.UpdateVideo(ctx, videoBiz(req.GetVideo()))
+	if err != nil {
+		return nil, err
+	}
+	return videoReply(item), nil
+}
 func (s *VodService) GetVideo(ctx context.Context, req *pb.GetVideoRequest) (*pb.Video, error) {
 	item, err := s.uc.GetVideo(ctx, req.GetId())
 	if err != nil {

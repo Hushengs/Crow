@@ -30,6 +30,7 @@ const OperationVodServiceListCategories = "/vod.v1.VodService/ListCategories"
 const OperationVodServiceListEpisodes = "/vod.v1.VodService/ListEpisodes"
 const OperationVodServiceListMedia = "/vod.v1.VodService/ListMedia"
 const OperationVodServiceListVideos = "/vod.v1.VodService/ListVideos"
+const OperationVodServiceUpdateVideo = "/vod.v1.VodService/UpdateVideo"
 
 type VodServiceHTTPServer interface {
 	CreateCategory(context.Context, *CreateCategoryRequest) (*Category, error)
@@ -44,6 +45,7 @@ type VodServiceHTTPServer interface {
 	ListEpisodes(context.Context, *ListEpisodesRequest) (*EpisodeSet, error)
 	ListMedia(context.Context, *ListMediaRequest) (*MediaSet, error)
 	ListVideos(context.Context, *ListVideosRequest) (*VideoSet, error)
+	UpdateVideo(context.Context, *UpdateVideoRequest) (*Video, error)
 }
 
 func RegisterVodServiceHTTPServer(s *http.Server, srv VodServiceHTTPServer) {
@@ -53,6 +55,7 @@ func RegisterVodServiceHTTPServer(s *http.Server, srv VodServiceHTTPServer) {
 	r.Handle("POST", "/v1/videos/create", _VodService_CreateVideo0_HTTP_Handler(srv))
 	r.Handle("GET", "/v1/videos/{id}", _VodService_GetVideo0_HTTP_Handler(srv))
 	r.Handle("GET", "/v1/videos", _VodService_ListVideos0_HTTP_Handler(srv))
+	r.Handle("PUT", "/v1/videos/update", _VodService_UpdateVideo0_HTTP_Handler(srv))
 	r.Handle("DELETE", "/v1/videos/{id}", _VodService_DeleteVideo0_HTTP_Handler(srv))
 	r.Handle("POST", "/v1/episodes/create", _VodService_CreateEpisode0_HTTP_Handler(srv))
 	r.Handle("GET", "/v1/episodes", _VodService_ListEpisodes0_HTTP_Handler(srv))
@@ -162,6 +165,28 @@ func _VodService_ListVideos0_HTTP_Handler(srv VodServiceHTTPServer) func(ctx htt
 			return err
 		}
 		reply := out.(*VideoSet)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _VodService_UpdateVideo0_HTTP_Handler(srv VodServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in UpdateVideoRequest
+		if err := ctx.Bind(&in.Video); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationVodServiceUpdateVideo)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.UpdateVideo(ctx, req.(*UpdateVideoRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*Video)
 		return ctx.Result(200, reply)
 	}
 }
@@ -327,6 +352,7 @@ type VodServiceHTTPClient interface {
 	ListEpisodes(ctx context.Context, req *ListEpisodesRequest, opts ...http.CallOption) (rsp *EpisodeSet, err error)
 	ListMedia(ctx context.Context, req *ListMediaRequest, opts ...http.CallOption) (rsp *MediaSet, err error)
 	ListVideos(ctx context.Context, req *ListVideosRequest, opts ...http.CallOption) (rsp *VideoSet, err error)
+	UpdateVideo(ctx context.Context, req *UpdateVideoRequest, opts ...http.CallOption) (rsp *Video, err error)
 }
 
 type VodServiceHTTPClientImpl struct {
@@ -527,6 +553,23 @@ func (c *VodServiceHTTPClientImpl) ListVideos(ctx context.Context, in *ListVideo
 		http.PathTemplate(pattern),
 	}, opts...)
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *VodServiceHTTPClientImpl) UpdateVideo(ctx context.Context, in *UpdateVideoRequest, opts ...http.CallOption) (*Video, error) {
+	var out Video
+	pattern := "/v1/videos/update"
+	path := http.BuildPath(pattern, in, http.WithQueryParams(), http.WithOmitFields("video"))
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.ContentType("application/protojson"),
+		http.Operation(OperationVodServiceUpdateVideo),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "PUT", path, in.Video, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

@@ -25,6 +25,9 @@ service VodService {
   rpc ListVideos (ListVideosRequest) returns (VideoSet) {
     option (google.api.http) = { get: "/v1/videos" };
   }
+  rpc UpdateVideo (UpdateVideoRequest) returns (Video) {
+    option (google.api.http) = { put: "/v1/videos/update" body: "video" };
+  }
   rpc DeleteVideo (DeleteVideoRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = { delete: "/v1/videos/{id}" };
   }
@@ -85,6 +88,7 @@ message ListVideosRequest {
   int64 category_id = 1;
   string keyword = 2;
 }
+message UpdateVideoRequest { Video video = 1 [(google.api.field_behavior) = REQUIRED]; }
 message DeleteVideoRequest { int64 id = 1 [(google.api.field_behavior) = REQUIRED]; }
 
 message Episode {

@@ -146,6 +146,22 @@ func (r *vodRepo) CreateVideo(ctx context.Context, v *biz.Video) (*biz.Video, er
 	return r.FindVideo(ctx, id)
 }
 
+func (r *vodRepo) UpdateVideo(ctx context.Context, v *biz.Video) (*biz.Video, error) {
+	res, err := r.data.db.ExecContext(ctx, `UPDATE video SET category_id=?,video_code=?,title=?,subtitle=?,video_type=?,poster_vertical_url=?,poster_horizontal_url=?,thumbnail_url=?,description=?,year=?,duration=?,status=? WHERE id=?`,
+		v.CategoryID, v.VideoCode, v.Title, v.Subtitle, v.VideoType, v.PosterVerticalURL, v.PosterHorizontalURL, v.ThumbnailURL, v.Description, nullableYear(v.Year), v.Duration, v.Status, v.ID)
+	if err != nil {
+		return nil, mapVodWriteError(err)
+	}
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return nil, err
+	}
+	if rows == 0 {
+		return nil, biz.ErrVodNotFound
+	}
+	return r.FindVideo(ctx, v.ID)
+}
+
 func nullableYear(year uint32) any {
 	if year == 0 {
 		return nil
