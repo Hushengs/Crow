@@ -96,7 +96,7 @@ VALUES (?, ?, ?)
 }
 
 func (r *cpRepo) UpdateCp(ctx context.Context, cp *biz.Cp) (*biz.Cp, error) {
-	result, err := r.data.db.ExecContext(ctx, `
+	_, err := r.data.db.ExecContext(ctx, `
 UPDATE cp
 SET cp_code = ?, cp_name = ?, status = ?
 WHERE id = ?
@@ -107,13 +107,7 @@ WHERE id = ?
 		}
 		return nil, err
 	}
-	rowsAffected, err := result.RowsAffected()
-	if err != nil {
-		return nil, err
-	}
-	if rowsAffected == 0 {
-		return nil, biz.ErrCpNotFound
-	}
+	// Prefer FindByID over RowsAffected: unchanged values yield 0 rows on MySQL.
 	return r.FindByID(ctx, cp.ID)
 }
 

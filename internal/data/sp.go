@@ -97,7 +97,7 @@ VALUES (?, ?, ?, ?)
 }
 
 func (r *spRepo) UpdateSp(ctx context.Context, sp *biz.Sp) (*biz.Sp, error) {
-	result, err := r.data.db.ExecContext(ctx, `
+	_, err := r.data.db.ExecContext(ctx, `
 UPDATE sp
 SET sp_code = ?, sp_name = ?, sp_config = ?, status = ?
 WHERE id = ?
@@ -108,13 +108,7 @@ WHERE id = ?
 		}
 		return nil, err
 	}
-	rowsAffected, err := result.RowsAffected()
-	if err != nil {
-		return nil, err
-	}
-	if rowsAffected == 0 {
-		return nil, biz.ErrSpNotFound
-	}
+	// Prefer FindByID over RowsAffected: unchanged values yield 0 rows on MySQL.
 	return r.FindByID(ctx, sp.ID)
 }
 
