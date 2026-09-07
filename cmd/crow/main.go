@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"crow/internal/conf"
+	"crow/internal/server"
 	"crow/internal/systemlog"
 
 	"github.com/go-kratos/kratos/contrib/otel/v3/tracing"
@@ -48,7 +49,7 @@ func init() {
 // 	)
 // }
 
-func newApp(logger *slog.Logger, hs *http.Server) *kratos.App {
+func newApp(logger *slog.Logger, hs *http.Server, injectWorker *server.InjectWorker) *kratos.App {
 	return kratos.New(
 		kratos.ID(id),
 		kratos.Name(Name),
@@ -57,6 +58,7 @@ func newApp(logger *slog.Logger, hs *http.Server) *kratos.App {
 		kratos.Logger(logger),
 		kratos.Server(
 			hs,
+			injectWorker,
 		),
 	)
 }

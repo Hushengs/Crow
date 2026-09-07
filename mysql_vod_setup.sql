@@ -34,6 +34,7 @@ CREATE TABLE `video_category` (
 CREATE TABLE `video` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '影片ID',
   `category_id` int(10) unsigned NOT NULL COMMENT '所属分类ID',
+  `cp_id` int(10) unsigned NOT NULL COMMENT '内容提供商ID（cp.id，决定注入路由）',
   `video_code` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '影片编码（业务侧唯一）',
   `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '影片标题',
   `subtitle` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '副标题',
@@ -50,11 +51,16 @@ CREATE TABLE `video` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_video_code` (`video_code`),
   KEY `idx_category_id` (`category_id`),
+  KEY `idx_cp_id` (`cp_id`),
   KEY `idx_title` (`title`),
   KEY `idx_video_type` (`video_type`),
   KEY `idx_status` (`status`),
   KEY `idx_create_date` (`create_date`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='影片表';
+
+-- 已有库升级：
+-- ALTER TABLE `video` ADD COLUMN `cp_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '内容提供商ID（cp.id，决定注入路由）' AFTER `category_id`;
+-- ALTER TABLE `video` ADD KEY `idx_cp_id` (`cp_id`);
 
 -- ---------------------------------------------------------------------------
 -- 节目（Episode）

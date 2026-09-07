@@ -587,6 +587,154 @@ function normalizeSystemLogResponse(item) {
   }
 }
 
+function injectResourceTypeLabel(value) {
+  switch (Number(value)) {
+    case 1:
+      return '影片'
+    case 2:
+      return '节目'
+    case 3:
+      return '媒体'
+    default:
+      return `类型 ${value || 0}`
+  }
+}
+
+function injectActionLabel(value) {
+  switch (Number(value)) {
+    case 1:
+      return '新增'
+    case 2:
+      return '修改'
+    case 3:
+      return '删除'
+    default:
+      return `操作 ${value || 0}`
+  }
+}
+
+function injectContentStatusLabel(value) {
+  switch (Number(value)) {
+    case 0:
+      return '等待'
+    case 1:
+      return '注入中'
+    case 2:
+      return '成功'
+    case 3:
+      return '失败'
+    default:
+      return `状态 ${value || 0}`
+  }
+}
+
+function injectContentStatusClass(value) {
+  switch (Number(value)) {
+    case 0:
+      return 'status-chip--wait'
+    case 1:
+      return 'status-chip--run'
+    case 2:
+      return 'status-chip--ok'
+    case 3:
+      return 'status-chip--fail'
+    default:
+      return 'status-chip--wait'
+  }
+}
+
+function injectTaskStatusLabel(value) {
+  switch (Number(value)) {
+    case 0:
+      return '待注入'
+    case 1:
+      return '注入中'
+    default:
+      return `状态 ${value || 0}`
+  }
+}
+
+function injectTaskStatusClass(value) {
+  return Number(value) === 1 ? 'status-chip--run' : 'status-chip--wait'
+}
+
+function injectLogStatusLabel(value) {
+  switch (Number(value)) {
+    case 0:
+      return '等待'
+    case 1:
+      return '成功'
+    case 2:
+      return '失败'
+    default:
+      return `状态 ${value || 0}`
+  }
+}
+
+function normalizeInjectContentResponse(item) {
+  if (!item) {
+    return null
+  }
+  return {
+    id: Number(pickValue(item, ['id'], 0)),
+    resourceType: Number(pickValue(item, ['resourceType', 'resource_type'], 0)),
+    resourceId: Number(pickValue(item, ['resourceId', 'resource_id'], 0)),
+    videoId: Number(pickValue(item, ['videoId', 'video_id'], 0)),
+    episodeId: Number(pickValue(item, ['episodeId', 'episode_id'], 0)),
+    mediaId: Number(pickValue(item, ['mediaId', 'media_id'], 0)),
+    action: Number(pickValue(item, ['action'], 0)),
+    lastTaskId: Number(pickValue(item, ['lastTaskId', 'last_task_id'], 0)),
+    status: Number(pickValue(item, ['status'], 0)),
+    failReason: pickValue(item, ['failReason', 'fail_reason']),
+    createTime: pickValue(item, ['createTime', 'create_time']),
+    updateTime: pickValue(item, ['updateTime', 'update_time']),
+  }
+}
+
+function normalizeInjectTaskResponse(item) {
+  if (!item) {
+    return null
+  }
+  return {
+    id: Number(pickValue(item, ['id'], 0)),
+    contentId: Number(pickValue(item, ['contentId', 'content_id'], 0)),
+    resourceType: Number(pickValue(item, ['resourceType', 'resource_type'], 0)),
+    resourceId: Number(pickValue(item, ['resourceId', 'resource_id'], 0)),
+    videoId: Number(pickValue(item, ['videoId', 'video_id'], 0)),
+    episodeId: Number(pickValue(item, ['episodeId', 'episode_id'], 0)),
+    mediaId: Number(pickValue(item, ['mediaId', 'media_id'], 0)),
+    action: Number(pickValue(item, ['action'], 0)),
+    status: Number(pickValue(item, ['status'], 0)),
+    createTime: pickValue(item, ['createTime', 'create_time']),
+    updateTime: pickValue(item, ['updateTime', 'update_time']),
+  }
+}
+
+function normalizeInjectLogResponse(item) {
+  if (!item) {
+    return null
+  }
+  return {
+    id: Number(pickValue(item, ['id'], 0)),
+    taskId: Number(pickValue(item, ['taskId', 'task_id'], 0)),
+    contentId: Number(pickValue(item, ['contentId', 'content_id'], 0)),
+    spId: Number(pickValue(item, ['spId', 'sp_id'], 0)),
+    resourceType: Number(pickValue(item, ['resourceType', 'resource_type'], 0)),
+    resourceId: Number(pickValue(item, ['resourceId', 'resource_id'], 0)),
+    videoId: Number(pickValue(item, ['videoId', 'video_id'], 0)),
+    episodeId: Number(pickValue(item, ['episodeId', 'episode_id'], 0)),
+    mediaId: Number(pickValue(item, ['mediaId', 'media_id'], 0)),
+    action: Number(pickValue(item, ['action'], 0)),
+    correlateId: pickValue(item, ['correlateId', 'correlate_id']),
+    syncStatus: Number(pickValue(item, ['syncStatus', 'sync_status'], 0)),
+    asyncStatus: Number(pickValue(item, ['asyncStatus', 'async_status'], 0)),
+    syncMessage: pickValue(item, ['syncMessage', 'sync_message']),
+    asyncMessage: pickValue(item, ['asyncMessage', 'async_message']),
+    createTime: pickValue(item, ['createTime', 'create_time']),
+    updateTime: pickValue(item, ['updateTime', 'update_time']),
+  }
+}
+
 const resourceCatalog = [
   {
     key: 'videos',
@@ -1268,6 +1416,225 @@ const resourceCatalog = [
       ['更新时间', formatDateTime(item.updateTime)],
     ],
   },
+  {
+    key: 'inject-contents',
+    section: '内容管理',
+    navLabel: '注入内容',
+    singularLabel: '注入内容',
+    pluralLabel: '注入内容',
+    allowCreate: false,
+    allowEdit: false,
+    allowDelete: false,
+    enableTimeRangeSearch: true,
+    basePath: '/inject-contents',
+    listEndpoint: '/api/v1/inject-contents?page_size=100',
+    listKey: ['contents'],
+    subtitle: '每个影片 / 节目 / 媒体一条当前注入状态。任务消费后的成功或失败落在这里。',
+    createForm: () => ({}),
+    normalizeResponse: normalizeInjectContentResponse,
+    normalizeForm: () => ({}),
+    buildPayload: () => ({}),
+    buildUpdateMaskPaths: () => [],
+    canSubmit: () => false,
+    describe: () => '注入内容',
+    fields: [],
+    rowActions: [
+      {
+        key: 'retry',
+        label: '重新注入',
+        confirm: (item) => `确定将内容 #${item.id} 重新排队注入吗？`,
+        run: async (item) => {
+          await requestJson(`/api/v1/inject-contents/${item.id}/retry`, {
+            method: 'POST',
+            headers: buildAuthHeaders(),
+            body: '{}',
+          })
+        },
+      },
+    ],
+    listColumns: [
+      {
+        key: 'resource',
+        label: '媒资',
+        render: (item) => (
+          <div className="table-primary">
+            <strong>{injectResourceTypeLabel(item.resourceType)}</strong>
+            <span>资源 #{item.resourceId}</span>
+          </div>
+        ),
+      },
+      {
+        key: 'tree',
+        label: '归属',
+        render: (item) => `影片 ${item.videoId || 0} / 节目 ${item.episodeId || 0} / 媒体 ${item.mediaId || 0}`,
+      },
+      {
+        key: 'action',
+        label: '最后操作',
+        render: (item) => injectActionLabel(item.action),
+      },
+      {
+        key: 'status',
+        label: '状态',
+        render: (item) => (
+          <span className={`status-chip ${injectContentStatusClass(item.status)}`}>{injectContentStatusLabel(item.status)}</span>
+        ),
+      },
+      {
+        key: 'failReason',
+        label: '失败原因',
+        render: (item) => item.failReason || '-',
+      },
+      {
+        key: 'updateTime',
+        label: '更新时间',
+        render: (item) => formatDateTime(item.updateTime),
+      },
+    ],
+    getCardTitle: (item) => `${injectResourceTypeLabel(item.resourceType)} #${item.resourceId}`,
+    getCardMeta: (item) => [
+      ['内容 ID', String(item.id)],
+      ['操作', injectActionLabel(item.action)],
+      ['状态', injectContentStatusLabel(item.status)],
+      ['最近任务', String(item.lastTaskId || 0)],
+      ['失败原因', item.failReason || '-'],
+      ['更新时间', formatDateTime(item.updateTime)],
+    ],
+  },
+  {
+    key: 'inject-tasks',
+    section: '内容管理',
+    navLabel: '注入任务',
+    singularLabel: '注入任务',
+    pluralLabel: '注入任务',
+    allowCreate: false,
+    allowEdit: false,
+    allowDelete: false,
+    enableTimeRangeSearch: true,
+    basePath: '/inject-tasks',
+    listEndpoint: '/api/v1/inject-tasks?page_size=100',
+    listKey: ['tasks'],
+    subtitle: '工作队列：待注入与注入中。调度消费完成后任务会从队列移除，终态在注入内容表。',
+    createForm: () => ({}),
+    normalizeResponse: normalizeInjectTaskResponse,
+    normalizeForm: () => ({}),
+    buildPayload: () => ({}),
+    buildUpdateMaskPaths: () => [],
+    canSubmit: () => false,
+    describe: () => '注入任务',
+    fields: [],
+    listColumns: [
+      {
+        key: 'contentId',
+        label: '内容 ID',
+        render: (item) => String(item.contentId || 0),
+      },
+      {
+        key: 'resource',
+        label: '媒资',
+        render: (item) => (
+          <div className="table-primary">
+            <strong>{injectResourceTypeLabel(item.resourceType)}</strong>
+            <span>资源 #{item.resourceId}</span>
+          </div>
+        ),
+      },
+      {
+        key: 'action',
+        label: '操作',
+        render: (item) => injectActionLabel(item.action),
+      },
+      {
+        key: 'status',
+        label: '排队状态',
+        render: (item) => (
+          <span className={`status-chip ${injectTaskStatusClass(item.status)}`}>{injectTaskStatusLabel(item.status)}</span>
+        ),
+      },
+      {
+        key: 'createTime',
+        label: '创建时间',
+        render: (item) => formatDateTime(item.createTime),
+      },
+    ],
+    getCardTitle: (item) => `任务 #${item.id}`,
+    getCardMeta: (item) => [
+      ['内容 ID', String(item.contentId || 0)],
+      ['媒资', `${injectResourceTypeLabel(item.resourceType)} #${item.resourceId}`],
+      ['操作', injectActionLabel(item.action)],
+      ['状态', injectTaskStatusLabel(item.status)],
+      ['创建时间', formatDateTime(item.createTime)],
+    ],
+  },
+  {
+    key: 'inject-logs',
+    section: '内容管理',
+    navLabel: '注入日志',
+    singularLabel: '注入日志',
+    pluralLabel: '注入日志',
+    allowCreate: false,
+    allowEdit: false,
+    allowDelete: false,
+    enableTimeRangeSearch: true,
+    basePath: '/inject-logs',
+    listEndpoint: '/api/v1/inject-logs?page_size=100',
+    listKey: ['logs'],
+    subtitle: '每次向下游 SP 发起注入的同步应答与异步回调记录。',
+    createForm: () => ({}),
+    normalizeResponse: normalizeInjectLogResponse,
+    normalizeForm: () => ({}),
+    buildPayload: () => ({}),
+    buildUpdateMaskPaths: () => [],
+    canSubmit: () => false,
+    describe: () => '注入日志',
+    fields: [],
+    listColumns: [
+      {
+        key: 'ids',
+        label: '关联',
+        render: (item) => (
+          <div className="table-primary">
+            <strong>任务 {item.taskId} / 内容 {item.contentId}</strong>
+            <span>SP #{item.spId}</span>
+          </div>
+        ),
+      },
+      {
+        key: 'resource',
+        label: '媒资',
+        render: (item) => `${injectResourceTypeLabel(item.resourceType)} #${item.resourceId}`,
+      },
+      {
+        key: 'action',
+        label: '操作',
+        render: (item) => injectActionLabel(item.action),
+      },
+      {
+        key: 'sync',
+        label: '同步 / 异步',
+        render: (item) => `${injectLogStatusLabel(item.syncStatus)} / ${injectLogStatusLabel(item.asyncStatus)}`,
+      },
+      {
+        key: 'correlateId',
+        label: '关联 ID',
+        render: (item) => item.correlateId || '-',
+      },
+      {
+        key: 'createTime',
+        label: '时间',
+        render: (item) => formatDateTime(item.createTime),
+      },
+    ],
+    getCardTitle: (item) => item.correlateId || `日志 #${item.id}`,
+    getCardMeta: (item) => [
+      ['任务 ID', String(item.taskId || 0)],
+      ['内容 ID', String(item.contentId || 0)],
+      ['SP ID', String(item.spId || 0)],
+      ['同步', `${injectLogStatusLabel(item.syncStatus)} ${item.syncMessage || ''}`],
+      ['异步', `${injectLogStatusLabel(item.asyncStatus)} ${item.asyncMessage || ''}`],
+      ['时间', formatDateTime(item.createTime)],
+    ],
+  },
 ]
 
 function getListItems(payload, keys) {
@@ -1870,6 +2237,24 @@ function ResourceListPage({ resource }) {
     }
   }
 
+  const handleRowAction = async (action, item) => {
+    if (action.confirm && !window.confirm(action.confirm(item))) {
+      return
+    }
+    setError('')
+    setSuccess('')
+    try {
+      await action.run(item)
+      setSuccess(`${action.label}已提交。`)
+      await loadItems()
+    } catch (actionError) {
+      setError(actionError.message || `${action.label}失败。`)
+    }
+  }
+
+  const rowActions = resource.rowActions || []
+  const showRowActions = resource.allowEdit !== false || resource.allowDelete !== false || rowActions.length > 0
+
   return (
     <section className="panel">
       <div className="panel__header">
@@ -1937,11 +2322,11 @@ function ResourceListPage({ resource }) {
                       {column.label}
                     </th>
                   ))}
-                  {resource.allowEdit === false && resource.allowDelete === false ? null : (
+                  {showRowActions ? (
                     <th className="admin-table__actions" scope="col">
                       操作
                     </th>
-                  )}
+                  ) : null}
                 </tr>
               </thead>
               <tbody>
@@ -1951,7 +2336,7 @@ function ResourceListPage({ resource }) {
                     {resource.listColumns.map((column) => (
                       <td key={column.label}>{renderColumnContent(column, item)}</td>
                     ))}
-                    {resource.allowEdit === false && resource.allowDelete === false ? null : (
+                    {showRowActions ? (
                       <td className="admin-table__actions-cell">
                         <div className="table-actions">
                           {resource.allowEdit === false ? null : (
@@ -1959,6 +2344,16 @@ function ResourceListPage({ resource }) {
                               编辑
                             </Link>
                           )}
+                          {rowActions.map((action) => (
+                            <button
+                              className="ghost-button action-link action-link--inline"
+                              key={action.key}
+                              onClick={() => handleRowAction(action, item)}
+                              type="button"
+                            >
+                              {action.label}
+                            </button>
+                          ))}
                           {resource.allowDelete === false ? null : (
                             <button className="danger-button" onClick={() => handleDelete(item)} type="button">
                               删除
@@ -1966,7 +2361,7 @@ function ResourceListPage({ resource }) {
                           )}
                         </div>
                       </td>
-                    )}
+                    ) : null}
                   </tr>
                 ))}
               </tbody>

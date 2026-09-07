@@ -80,6 +80,7 @@ message Video {
   uint32 status = 13;
   google.protobuf.Timestamp create_time = 14;
   google.protobuf.Timestamp update_time = 15;
+  int64 cp_id = 16;
 }
 message VideoSet { repeated Video videos = 1; }
 message CreateVideoRequest { Video video = 1 [(google.api.field_behavior) = REQUIRED]; }

@@ -60,10 +60,14 @@ func wireApp(confServer *conf.Server, confData *conf.Data, auth *conf.Auth, logg
 	cpSpUsecase := biz.NewCpSpUsecase(cpSpRepo)
 	cpSpService := service.NewCpSpService(cpSpUsecase)
 	vodRepo := data.NewVodRepo(dataData)
-	vodUsecase := biz.NewVodUsecase(vodRepo)
+	injectRepo := data.NewInjectRepo(dataData)
+	injectUsecase := biz.NewInjectUsecase(injectRepo)
+	vodUsecase := biz.NewVodUsecase(vodRepo, injectUsecase)
 	vodService := service.NewVodService(vodUsecase)
-	httpServer := server.NewHTTPServer(confServer, auth, adminOperationLogUsecase, todoService, loginService, adminService, cpService, spService, cpSpService, vodService)
-	app := newApp(logger, httpServer)
+	injectService := service.NewInjectService(injectUsecase)
+	httpServer := server.NewHTTPServer(confServer, auth, adminOperationLogUsecase, todoService, loginService, adminService, cpService, spService, cpSpService, vodService, injectService)
+	injectWorker := server.NewInjectWorker(injectUsecase)
+	app := newApp(logger, httpServer, injectWorker)
 	return app, func() {
 		cleanup()
 	}, nil

@@ -101,8 +101,21 @@ func describeOperation(method, path string) (module, action, description string)
 	case strings.HasPrefix(path, "/v1/media"):
 		module = "media"
 		description = "媒体"
+	case strings.HasPrefix(path, "/v1/inject-contents"):
+		module = "inject"
+		description = "注入内容"
+	case strings.HasPrefix(path, "/v1/inject-tasks"):
+		module = "inject"
+		description = "注入任务"
+	case strings.HasPrefix(path, "/v1/inject-logs"):
+		module = "inject"
+		description = "注入日志"
 	default:
 		return "", "", ""
+	}
+
+	if strings.HasSuffix(path, "/retry") {
+		return module, "retry", "重试" + description
 	}
 
 	switch strings.ToUpper(method) {

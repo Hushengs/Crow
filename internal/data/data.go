@@ -25,6 +25,7 @@ var ProviderSet = wire.NewSet(
 	NewCpRepo,
 	NewSpRepo,
 	NewCpSpRepo,
+	NewInjectRepo,
 	NewVodRepo,
 )
 

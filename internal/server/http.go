@@ -3,6 +3,7 @@ package server
 import (
 	adminv1 "crow/api/admin/v1"
 	cdnv1 "crow/api/cdn/v1"
+	injectv1 "crow/api/inject/v1"
 	loginv1 "crow/api/login/v1"
 	todov1 "crow/api/todo/v1"
 	vodv1 "crow/api/vod/v1"
@@ -19,7 +20,7 @@ import (
 )
 
 // NewHTTPServer new an HTTP server.
-func NewHTTPServer(c *conf.Server, auth *conf.Auth, operationLogUC *biz.AdminOperationLogUsecase, todo *service.TodoService, login *service.LoginService, admin *service.AdminService, cp *service.CpService, sp *service.SpService, cpSp *service.CpSpService, vod *service.VodService) *http.Server {
+func NewHTTPServer(c *conf.Server, auth *conf.Auth, operationLogUC *biz.AdminOperationLogUsecase, todo *service.TodoService, login *service.LoginService, admin *service.AdminService, cp *service.CpService, sp *service.SpService, cpSp *service.CpSpService, vod *service.VodService, inject *service.InjectService) *http.Server {
 	var opts = []http.ServerOption{
 		http.Middleware(
 			recovery.Recovery(),
@@ -52,6 +53,7 @@ func NewHTTPServer(c *conf.Server, auth *conf.Auth, operationLogUC *biz.AdminOpe
 	cdnv1.RegisterSpServiceHTTPServer(srv, sp)
 	cdnv1.RegisterCpSpServiceHTTPServer(srv, cpSp)
 	vodv1.RegisterVodServiceHTTPServer(srv, vod)
+	injectv1.RegisterInjectServiceHTTPServer(srv, inject)
 	registerPosterRoutes(srv)
 	return srv
 }

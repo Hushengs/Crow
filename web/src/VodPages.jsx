@@ -46,6 +46,7 @@ function normalizeVideo(item) {
   return {
     id: Number(pick(item, ['id'], 0)),
     categoryId: Number(pick(item, ['categoryId', 'category_id'], 0)),
+    cpId: Number(pick(item, ['cpId', 'cp_id'], 0)),
     videoCode: pick(item, ['videoCode', 'video_code']),
     title: pick(item, ['title']),
     subtitle: pick(item, ['subtitle']),
@@ -57,6 +58,16 @@ function normalizeVideo(item) {
     year: Number(pick(item, ['year'], 0)),
     duration: Number(pick(item, ['duration'], 0)),
     status: Number(pick(item, ['status'], 1)),
+  }
+}
+
+function normalizeCpOption(item) {
+  if (!item) return null
+  return {
+    id: Number(pick(item, ['id'], 0)),
+    cpCode: pick(item, ['cpCode', 'cp_code']),
+    cpName: pick(item, ['cpName', 'cp_name']),
+    status: Number(pick(item, ['status'], 0)),
   }
 }
 
@@ -94,6 +105,7 @@ function createVideoForm(video = null) {
   return {
     id: String(video?.id || ''),
     categoryId: String(video?.categoryId || ''),
+    cpId: String(video?.cpId || ''),
     videoCode: video?.videoCode || '',
     title: video?.title || '',
     subtitle: video?.subtitle || '',
@@ -112,6 +124,7 @@ function buildVideoPayload(form) {
   return {
     id: Number(form.id) || 0,
     category_id: Number(form.categoryId),
+    cp_id: Number(form.cpId),
     video_code: form.videoCode.trim(),
     title: form.title.trim(),
     subtitle: form.subtitle.trim(),
@@ -124,6 +137,16 @@ function buildVideoPayload(form) {
     duration: Number(form.duration) || 0,
     status: Number(form.status),
   }
+}
+
+function cpChoices(cps) {
+  return [
+    { value: '', label: '请选择内容提供商' },
+    ...cps.map((cp) => ({
+      value: cp.id,
+      label: `${cp.cpName || cp.cpCode}${cp.status === 1 ? '' : '（不可用）'}`,
+    })),
+  ]
 }
 
 async function uploadImageAsset(file) {
@@ -348,12 +371,16 @@ export function VideoLibraryPage() {
 export function VideoCreatePage() {
   const navigate = useNavigate()
   const [categories, setCategories] = useState([])
+  const [cps, setCps] = useState([])
   const [error, setError] = useState('')
   const [form, setForm] = useState(createVideoForm())
 
   useEffect(() => {
-    api('/api/v1/video-categories')
-      .then((data) => setCategories(buildTree((data.categories || []).map(normalizeCategory).filter(Boolean))))
+    Promise.all([api('/api/v1/video-categories'), api('/api/v1/cps?page_size=100')])
+      .then(([categoryData, cpData]) => {
+        setCategories(buildTree((categoryData.categories || []).map(normalizeCategory).filter(Boolean)))
+        setCps((cpData.cps || []).map(normalizeCpOption).filter((cp) => cp && cp.status === 1))
+      })
       .catch((err) => setError(err.message))
   }, [])
 
@@ -378,7 +405,7 @@ export function VideoCreatePage() {
       <div className="panel__header">
         <div className="card__header">
           <h2>添加影片</h2>
-          <p className="subtitle">录入标题级元数据，保存后继续添加节目。</p>
+          <p className="subtitle">录入标题级元数据，保存后继续添加节目。内容提供商决定后续 CDN 注入路由。</p>
         </div>
         <Link className="ghost-button action-link" to="/videos">
           返回影片库
@@ -390,6 +417,7 @@ export function VideoCreatePage() {
           {field('categoryId', '所属分类', form.categoryId, change, {
             choices: [{ value: '', label: '请选择分类' }, ...categories.map((c) => ({ value: c.id, label: `${'　'.repeat(c.depth)}${c.name}` }))],
           })}
+          {field('cpId', '内容提供商', form.cpId, change, { choices: cpChoices(cps) })}
           {field('videoType', '影片类型', form.videoType, change, {
             choices: [
               { value: '1', label: '电影' },
@@ -432,7 +460,11 @@ export function VideoCreatePage() {
           {field('description', '影片简介', form.description, change, { type: 'textarea', full: true })}
         </div>
         <div className="button-row">
-          <button className="submit submit--compact" disabled={!form.categoryId || !form.videoCode.trim() || !form.title.trim()} type="submit">
+          <button
+            className="submit submit--compact"
+            disabled={!form.categoryId || !form.cpId || !form.videoCode.trim() || !form.title.trim()}
+            type="submit"
+          >
             保存并添加节目
           </button>
         </div>
@@ -555,6 +587,7 @@ export function VideoDetailPage() {
   const { id } = useParams()
   const [video, setVideo] = useState(null)
   const [categories, setCategories] = useState([])
+  const [cps, setCps] = useState([])
   const [episodes, setEpisodes] = useState([])
   const [error, setError] = useState('')
   const [videoForm, setVideoForm] = useState(createVideoForm())
@@ -564,13 +597,16 @@ export function VideoDetailPage() {
   const [form, setForm] = useState({ episodeNo: '1', title: '', duration: '', description: '', status: '1' })
 
   const load = useCallback(async () => {
-    const [categoryData, videoData, episodeData] = await Promise.all([
+    const [categoryData, cpData, videoData, episodeData] = await Promise.all([
       api('/api/v1/video-categories'),
+      api('/api/v1/cps?page_size=100'),
       api(`/api/v1/videos/${id}`),
       api(`/api/v1/episodes?video_id=${id}`),
     ])
     const nextVideo = normalizeVideo(videoData)
+    const nextCps = (cpData.cps || []).map(normalizeCpOption).filter(Boolean)
     setCategories(buildTree((categoryData.categories || []).map(normalizeCategory).filter(Boolean)))
+    setCps(nextCps.filter((cp) => cp.status === 1 || cp.id === nextVideo?.cpId))
     setVideo(nextVideo)
     setVideoForm(createVideoForm(nextVideo))
     setEpisodes((episodeData.episodes || []).map(normalizeEpisode).filter(Boolean))
@@ -590,6 +626,8 @@ export function VideoDetailPage() {
     setVideoForm((current) => ({ ...current, [name]: value }))
   }
 
+  const selectedCp = cps.find((cp) => cp.id === Number(videoForm.cpId || video?.cpId))
+
   async function submitVideo(event) {
     event.preventDefault()
     setVideoSubmitting(true)
@@ -605,6 +643,7 @@ export function VideoDetailPage() {
       setVideo(saved)
       setVideoForm(createVideoForm(saved))
       setVideoFormSuccess('影片基础信息已更新。')
+      await load()
     } catch (err) {
       setVideoFormError(err.message || '影片信息更新失败')
     } finally {
@@ -660,6 +699,7 @@ export function VideoDetailPage() {
           <h1>{video.title}</h1>
           <p>{video.subtitle || video.videoCode}</p>
           <div className="vod-hero__meta">
+            <span>{selectedCp ? selectedCp.cpName || selectedCp.cpCode : `CP #${video.cpId || 0}`}</span>
             <span>{video.year || '年份未知'}</span>
             <span>{Math.round((video.duration || 0) / 60)} 分钟</span>
             <span>{episodes.length} 个节目</span>
@@ -692,6 +732,7 @@ export function VideoDetailPage() {
               {field('categoryId', '所属分类', videoForm.categoryId, changeVideo, {
                 choices: [{ value: '', label: '请选择分类' }, ...categories.map((c) => ({ value: c.id, label: `${'　'.repeat(c.depth)}${c.name}` }))],
               })}
+              {field('cpId', '内容提供商', videoForm.cpId, changeVideo, { choices: cpChoices(cps) })}
               {field('videoType', '影片类型', videoForm.videoType, changeVideo, {
                 choices: [
                   { value: '1', label: '电影' },
@@ -734,7 +775,7 @@ export function VideoDetailPage() {
               {field('description', '影片简介', videoForm.description, changeVideo, { type: 'textarea' })}
               <button
                 className="submit submit--compact"
-                disabled={!videoForm.categoryId || !videoForm.videoCode.trim() || !videoForm.title.trim() || videoSubmitting}
+                disabled={!videoForm.categoryId || !videoForm.cpId || !videoForm.videoCode.trim() || !videoForm.title.trim() || videoSubmitting}
                 type="submit"
               >
                 {videoSubmitting ? '保存中...' : '保存影片'}

@@ -35,7 +35,7 @@ func scanVideo(s rowScanner) (*biz.Video, error) {
 	var year sql.NullInt64
 	var description sql.NullString
 	var created, updated sql.NullTime
-	if err := s.Scan(&v.ID, &v.CategoryID, &v.VideoCode, &v.Title, &v.Subtitle, &v.VideoType,
+	if err := s.Scan(&v.ID, &v.CategoryID, &v.CpID, &v.VideoCode, &v.Title, &v.Subtitle, &v.VideoType,
 		&v.PosterVerticalURL, &v.PosterHorizontalURL, &v.ThumbnailURL, &description, &year,
 		&v.Duration, &v.Status, &created, &updated); err != nil {
 		return nil, err
@@ -131,11 +131,11 @@ func (r *vodRepo) CreateCategory(ctx context.Context, v *biz.VideoCategory) (*bi
 	return scanCategory(r.data.db.QueryRowContext(ctx, `SELECT id,parent_id,name,sort_order,status,create_date,update_date FROM video_category WHERE id=?`, id))
 }
 
-const videoColumns = `id,category_id,video_code,title,subtitle,video_type,poster_vertical_url,poster_horizontal_url,thumbnail_url,description,year,duration,status,create_date,update_date`
+const videoColumns = `id,category_id,cp_id,video_code,title,subtitle,video_type,poster_vertical_url,poster_horizontal_url,thumbnail_url,description,year,duration,status,create_date,update_date`
 
 func (r *vodRepo) CreateVideo(ctx context.Context, v *biz.Video) (*biz.Video, error) {
-	res, err := r.data.db.ExecContext(ctx, `INSERT INTO video(category_id,video_code,title,subtitle,video_type,poster_vertical_url,poster_horizontal_url,thumbnail_url,description,year,duration,status) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)`,
-		v.CategoryID, v.VideoCode, v.Title, v.Subtitle, v.VideoType, v.PosterVerticalURL, v.PosterHorizontalURL, v.ThumbnailURL, v.Description, nullableYear(v.Year), v.Duration, v.Status)
+	res, err := r.data.db.ExecContext(ctx, `INSERT INTO video(category_id,cp_id,video_code,title,subtitle,video_type,poster_vertical_url,poster_horizontal_url,thumbnail_url,description,year,duration,status) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+		v.CategoryID, v.CpID, v.VideoCode, v.Title, v.Subtitle, v.VideoType, v.PosterVerticalURL, v.PosterHorizontalURL, v.ThumbnailURL, v.Description, nullableYear(v.Year), v.Duration, v.Status)
 	if err != nil {
 		return nil, mapVodWriteError(err)
 	}
@@ -147,8 +147,8 @@ func (r *vodRepo) CreateVideo(ctx context.Context, v *biz.Video) (*biz.Video, er
 }
 
 func (r *vodRepo) UpdateVideo(ctx context.Context, v *biz.Video) (*biz.Video, error) {
-	res, err := r.data.db.ExecContext(ctx, `UPDATE video SET category_id=?,video_code=?,title=?,subtitle=?,video_type=?,poster_vertical_url=?,poster_horizontal_url=?,thumbnail_url=?,description=?,year=?,duration=?,status=? WHERE id=?`,
-		v.CategoryID, v.VideoCode, v.Title, v.Subtitle, v.VideoType, v.PosterVerticalURL, v.PosterHorizontalURL, v.ThumbnailURL, v.Description, nullableYear(v.Year), v.Duration, v.Status, v.ID)
+	res, err := r.data.db.ExecContext(ctx, `UPDATE video SET category_id=?,cp_id=?,video_code=?,title=?,subtitle=?,video_type=?,poster_vertical_url=?,poster_horizontal_url=?,thumbnail_url=?,description=?,year=?,duration=?,status=? WHERE id=?`,
+		v.CategoryID, v.CpID, v.VideoCode, v.Title, v.Subtitle, v.VideoType, v.PosterVerticalURL, v.PosterHorizontalURL, v.ThumbnailURL, v.Description, nullableYear(v.Year), v.Duration, v.Status, v.ID)
 	if err != nil {
 		return nil, mapVodWriteError(err)
 	}
@@ -247,6 +247,14 @@ func (r *vodRepo) ListEpisodes(ctx context.Context, videoID int64) ([]*biz.Episo
 	return result, rows.Err()
 }
 
+func (r *vodRepo) FindEpisode(ctx context.Context, id int64) (*biz.Episode, error) {
+	v, err := scanEpisode(r.data.db.QueryRowContext(ctx, `SELECT id,video_id,episode_no,title,duration,description,status,create_date,update_date FROM episode WHERE id=?`, id))
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, biz.ErrVodNotFound
+	}
+	return v, err
+}
+
 func (r *vodRepo) DeleteEpisode(ctx context.Context, id int64) error {
 	var children int
 	if err := r.data.db.QueryRowContext(ctx, `SELECT COUNT(*) FROM media WHERE episode_id=?`, id).Scan(&children); err != nil {
@@ -296,6 +304,14 @@ func (r *vodRepo) ListMedia(ctx context.Context, episodeID int64) ([]*biz.Media,
 		result = append(result, v)
 	}
 	return result, rows.Err()
+}
+
+func (r *vodRepo) FindMedia(ctx context.Context, id int64) (*biz.Media, error) {
+	v, err := scanMedia(r.data.db.QueryRowContext(ctx, `SELECT id,video_id,episode_id,media_id,media_url,file_format,bitrate,resolution,file_size,duration,status,create_date,update_date FROM media WHERE id=?`, id))
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, biz.ErrVodNotFound
+	}
+	return v, err
 }
 
 func (r *vodRepo) DeleteMedia(ctx context.Context, id int64) error {

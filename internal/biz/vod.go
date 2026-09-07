@@ -24,7 +24,7 @@ type VideoCategory struct {
 }
 
 type Video struct {
-	ID, CategoryID                                                    int64
+	ID, CategoryID, CpID                                              int64
 	VideoCode, Title, Subtitle                                        string
 	VideoType                                                         uint32
 	PosterVerticalURL, PosterHorizontalURL, ThumbnailURL, Description string
@@ -62,15 +62,22 @@ type VodRepo interface {
 	DeleteVideo(context.Context, int64) error
 	CreateEpisode(context.Context, *Episode) (*Episode, error)
 	ListEpisodes(context.Context, int64) ([]*Episode, error)
+	FindEpisode(context.Context, int64) (*Episode, error)
 	DeleteEpisode(context.Context, int64) error
 	CreateMedia(context.Context, *Media) (*Media, error)
+	FindMedia(context.Context, int64) (*Media, error)
 	ListMedia(context.Context, int64) ([]*Media, error)
 	DeleteMedia(context.Context, int64) error
 }
 
-type VodUsecase struct{ repo VodRepo }
+type VodUsecase struct {
+	repo   VodRepo
+	inject *InjectUsecase
+}
 
-func NewVodUsecase(repo VodRepo) *VodUsecase { return &VodUsecase{repo: repo} }
+func NewVodUsecase(repo VodRepo, inject *InjectUsecase) *VodUsecase {
+	return &VodUsecase{repo: repo, inject: inject}
+}
 
 func (uc *VodUsecase) ListCategories(ctx context.Context) ([]*VideoCategory, error) {
 	return uc.repo.ListCategories(ctx)
@@ -86,18 +93,32 @@ func (uc *VodUsecase) CreateCategory(ctx context.Context, v *VideoCategory) (*Vi
 	return uc.repo.CreateCategory(ctx, v)
 }
 func (uc *VodUsecase) CreateVideo(ctx context.Context, v *Video) (*Video, error) {
-	if v == nil || v.CategoryID <= 0 || strings.TrimSpace(v.VideoCode) == "" || strings.TrimSpace(v.Title) == "" || v.VideoType < 1 || v.VideoType > 4 || v.Status > 1 {
+	if v == nil || v.CategoryID <= 0 || v.CpID <= 0 || strings.TrimSpace(v.VideoCode) == "" || strings.TrimSpace(v.Title) == "" || v.VideoType < 1 || v.VideoType > 4 || v.Status > 1 {
 		return nil, ErrVodInvalid
 	}
 	normalizeVideo(v)
-	return uc.repo.CreateVideo(ctx, v)
+	item, err := uc.repo.CreateVideo(ctx, v)
+	if err != nil {
+		return nil, err
+	}
+	if err := uc.enqueueInject(ctx, InjectResourceVideo, item.ID, item.ID, 0, 0, InjectActionCreate); err != nil {
+		return nil, err
+	}
+	return item, nil
 }
 func (uc *VodUsecase) UpdateVideo(ctx context.Context, v *Video) (*Video, error) {
-	if v == nil || v.ID <= 0 || v.CategoryID <= 0 || strings.TrimSpace(v.VideoCode) == "" || strings.TrimSpace(v.Title) == "" || v.VideoType < 1 || v.VideoType > 4 || v.Status > 1 {
+	if v == nil || v.ID <= 0 || v.CategoryID <= 0 || v.CpID <= 0 || strings.TrimSpace(v.VideoCode) == "" || strings.TrimSpace(v.Title) == "" || v.VideoType < 1 || v.VideoType > 4 || v.Status > 1 {
 		return nil, ErrVodInvalid
 	}
 	normalizeVideo(v)
-	return uc.repo.UpdateVideo(ctx, v)
+	item, err := uc.repo.UpdateVideo(ctx, v)
+	if err != nil {
+		return nil, err
+	}
+	if err := uc.enqueueInject(ctx, InjectResourceVideo, item.ID, item.ID, 0, 0, InjectActionUpdate); err != nil {
+		return nil, err
+	}
+	return item, nil
 }
 func (uc *VodUsecase) GetVideo(ctx context.Context, id int64) (*Video, error) {
 	if id <= 0 {
@@ -115,6 +136,13 @@ func (uc *VodUsecase) DeleteVideo(ctx context.Context, id int64) error {
 	if id <= 0 {
 		return ErrVodInvalid
 	}
+	video, err := uc.repo.FindVideo(ctx, id)
+	if err != nil {
+		return err
+	}
+	if err := uc.enqueueInject(ctx, InjectResourceVideo, video.ID, video.ID, 0, 0, InjectActionDelete); err != nil {
+		return err
+	}
 	return uc.repo.DeleteVideo(ctx, id)
 }
 func (uc *VodUsecase) CreateEpisode(ctx context.Context, v *Episode) (*Episode, error) {
@@ -122,7 +150,14 @@ func (uc *VodUsecase) CreateEpisode(ctx context.Context, v *Episode) (*Episode, 
 		return nil, ErrVodInvalid
 	}
 	v.Title = strings.TrimSpace(v.Title)
-	return uc.repo.CreateEpisode(ctx, v)
+	item, err := uc.repo.CreateEpisode(ctx, v)
+	if err != nil {
+		return nil, err
+	}
+	if err := uc.enqueueInject(ctx, InjectResourceEpisode, item.ID, item.VideoID, item.ID, 0, InjectActionCreate); err != nil {
+		return nil, err
+	}
+	return item, nil
 }
 func (uc *VodUsecase) ListEpisodes(ctx context.Context, videoID int64) ([]*Episode, error) {
 	if videoID <= 0 {
@@ -134,6 +169,13 @@ func (uc *VodUsecase) DeleteEpisode(ctx context.Context, id int64) error {
 	if id <= 0 {
 		return ErrVodInvalid
 	}
+	episode, err := uc.repo.FindEpisode(ctx, id)
+	if err != nil {
+		return err
+	}
+	if err := uc.enqueueInject(ctx, InjectResourceEpisode, episode.ID, episode.VideoID, episode.ID, 0, InjectActionDelete); err != nil {
+		return err
+	}
 	return uc.repo.DeleteEpisode(ctx, id)
 }
 func (uc *VodUsecase) CreateMedia(ctx context.Context, v *Media) (*Media, error) {
@@ -141,7 +183,14 @@ func (uc *VodUsecase) CreateMedia(ctx context.Context, v *Media) (*Media, error)
 		return nil, ErrVodInvalid
 	}
 	v.MediaID, v.MediaURL = strings.TrimSpace(v.MediaID), strings.TrimSpace(v.MediaURL)
-	return uc.repo.CreateMedia(ctx, v)
+	item, err := uc.repo.CreateMedia(ctx, v)
+	if err != nil {
+		return nil, err
+	}
+	if err := uc.enqueueInject(ctx, InjectResourceMedia, item.ID, item.VideoID, item.EpisodeID, item.ID, InjectActionCreate); err != nil {
+		return nil, err
+	}
+	return item, nil
 }
 func (uc *VodUsecase) ListMedia(ctx context.Context, episodeID int64) ([]*Media, error) {
 	if episodeID <= 0 {
@@ -153,7 +202,29 @@ func (uc *VodUsecase) DeleteMedia(ctx context.Context, id int64) error {
 	if id <= 0 {
 		return ErrVodInvalid
 	}
+	media, err := uc.repo.FindMedia(ctx, id)
+	if err != nil {
+		return err
+	}
+	if err := uc.enqueueInject(ctx, InjectResourceMedia, media.ID, media.VideoID, media.EpisodeID, media.ID, InjectActionDelete); err != nil {
+		return err
+	}
 	return uc.repo.DeleteMedia(ctx, id)
+}
+
+func (uc *VodUsecase) enqueueInject(ctx context.Context, resourceType uint32, resourceID, videoID, episodeID, mediaID int64, action uint32) error {
+	if uc.inject == nil {
+		return nil
+	}
+	_, err := uc.inject.Enqueue(ctx, &InjectEnqueue{
+		ResourceType: resourceType,
+		ResourceID:   resourceID,
+		VideoID:      videoID,
+		EpisodeID:    episodeID,
+		MediaID:      mediaID,
+		Action:       action,
+	})
+	return err
 }
 
 func normalizeVideo(v *Video) {

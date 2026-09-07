@@ -118,6 +118,13 @@ var programPermissionSpecs = []programPermissionSpec{
 	{Key: "media:list", ParentKey: "videos", Title: "媒体列表", Handle: "/v1/media", Weight: 100},
 	{Key: "media:create", ParentKey: "videos", Title: "媒体新增", Handle: "/v1/media/create", Weight: 110},
 	{Key: "media:delete", ParentKey: "videos", Title: "媒体删除", Handle: "DELETE:/v1/media/{id}", Weight: 120},
+	{Key: "inject", ParentKey: "cdn", Title: "CDN 注入", Handle: "module://cdn/inject", Weight: 40},
+	{Key: "inject_contents:list", ParentKey: "inject", Title: "注入内容列表", Handle: "/v1/inject-contents", Weight: 10},
+	{Key: "inject_contents:get", ParentKey: "inject", Title: "注入内容详情", Handle: "/v1/inject-contents/{id}", Weight: 20},
+	{Key: "inject_contents:retry", ParentKey: "inject", Title: "注入重试", Handle: "POST:/v1/inject-contents/{id}/retry", Weight: 30},
+	{Key: "inject_tasks:list", ParentKey: "inject", Title: "注入任务列表", Handle: "/v1/inject-tasks", Weight: 40},
+	{Key: "inject_tasks:get", ParentKey: "inject", Title: "注入任务详情", Handle: "/v1/inject-tasks/{id}", Weight: 50},
+	{Key: "inject_logs:list", ParentKey: "inject", Title: "注入日志列表", Handle: "/v1/inject-logs", Weight: 60},
 }
 
 func NewPermissionUsecase(repo PermissionRepo) *PermissionUsecase {

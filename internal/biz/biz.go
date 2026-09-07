@@ -17,5 +17,6 @@ var ProviderSet = wire.NewSet(
 	NewCpUsecase,
 	NewSpUsecase,
 	NewCpSpUsecase,
+	NewInjectUsecase,
 	NewVodUsecase,
 )

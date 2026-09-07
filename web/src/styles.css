@@ -765,6 +765,26 @@ button:hover:not(:disabled),
   background: #fef3c7;
 }
 
+.status-chip--wait {
+  color: #334155;
+  background: #e2e8f0;
+}
+
+.status-chip--run {
+  color: #1d4ed8;
+  background: #dbeafe;
+}
+
+.status-chip--ok {
+  color: #15803d;
+  background: #dcfce7;
+}
+
+.status-chip--fail {
+  color: #b91c1c;
+  background: #fee2e2;
+}
+
 .empty-state {
   margin: 0;
   padding: 24px 20px;

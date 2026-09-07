@@ -141,10 +141,10 @@ func videoBiz(in *pb.Video) *biz.Video {
 	if in == nil {
 		return nil
 	}
-	return &biz.Video{ID: in.Id, CategoryID: in.CategoryId, VideoCode: in.VideoCode, Title: in.Title, Subtitle: in.Subtitle, VideoType: in.VideoType, PosterVerticalURL: in.PosterVerticalUrl, PosterHorizontalURL: in.PosterHorizontalUrl, ThumbnailURL: in.ThumbnailUrl, Description: in.Description, Year: in.Year, Duration: in.Duration, Status: in.Status}
+	return &biz.Video{ID: in.Id, CategoryID: in.CategoryId, CpID: in.CpId, VideoCode: in.VideoCode, Title: in.Title, Subtitle: in.Subtitle, VideoType: in.VideoType, PosterVerticalURL: in.PosterVerticalUrl, PosterHorizontalURL: in.PosterHorizontalUrl, ThumbnailURL: in.ThumbnailUrl, Description: in.Description, Year: in.Year, Duration: in.Duration, Status: in.Status}
 }
 func videoReply(in *biz.Video) *pb.Video {
-	return &pb.Video{Id: in.ID, CategoryId: in.CategoryID, VideoCode: in.VideoCode, Title: in.Title, Subtitle: in.Subtitle, VideoType: in.VideoType, PosterVerticalUrl: in.PosterVerticalURL, PosterHorizontalUrl: in.PosterHorizontalURL, ThumbnailUrl: in.ThumbnailURL, Description: in.Description, Year: in.Year, Duration: in.Duration, Status: in.Status, CreateTime: timestamppb.New(in.CreateTime), UpdateTime: timestamppb.New(in.UpdateTime)}
+	return &pb.Video{Id: in.ID, CategoryId: in.CategoryID, CpId: in.CpID, VideoCode: in.VideoCode, Title: in.Title, Subtitle: in.Subtitle, VideoType: in.VideoType, PosterVerticalUrl: in.PosterVerticalURL, PosterHorizontalUrl: in.PosterHorizontalURL, ThumbnailUrl: in.ThumbnailURL, Description: in.Description, Year: in.Year, Duration: in.Duration, Status: in.Status, CreateTime: timestamppb.New(in.CreateTime), UpdateTime: timestamppb.New(in.UpdateTime)}
 }
 func episodeReply(in *biz.Episode) *pb.Episode {
 	return &pb.Episode{Id: in.ID, VideoId: in.VideoID, EpisodeNo: in.EpisodeNo, Title: in.Title, Duration: in.Duration, Description: in.Description, Status: in.Status, CreateTime: timestamppb.New(in.CreateTime), UpdateTime: timestamppb.New(in.UpdateTime)}

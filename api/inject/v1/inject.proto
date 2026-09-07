@@ -1,0 +1,121 @@
+syntax = "proto3";
+
+package inject.v1;
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "crow/api/inject/v1;v1";
+
+service InjectService {
+  rpc ListInjectContents (ListInjectContentsRequest) returns (InjectContentSet) {
+    option (google.api.http) = { get: "/v1/inject-contents" };
+  }
+  rpc GetInjectContent (GetInjectContentRequest) returns (InjectContent) {
+    option (google.api.http) = { get: "/v1/inject-contents/{id}" };
+  }
+  rpc RetryInjectContent (RetryInjectContentRequest) returns (InjectContent) {
+    option (google.api.http) = { post: "/v1/inject-contents/{id}/retry" };
+  }
+  rpc ListInjectTasks (ListInjectTasksRequest) returns (InjectTaskSet) {
+    option (google.api.http) = { get: "/v1/inject-tasks" };
+  }
+  rpc GetInjectTask (GetInjectTaskRequest) returns (InjectTask) {
+    option (google.api.http) = { get: "/v1/inject-tasks/{id}" };
+  }
+  rpc ListInjectLogs (ListInjectLogsRequest) returns (InjectLogSet) {
+    option (google.api.http) = { get: "/v1/inject-logs" };
+  }
+}
+
+message InjectContent {
+  int64 id = 1;
+  uint32 resource_type = 2;
+  int64 resource_id = 3;
+  int64 video_id = 4;
+  int64 episode_id = 5;
+  int64 media_id = 6;
+  uint32 action = 7;
+  int64 last_task_id = 8;
+  uint32 status = 9;
+  string fail_reason = 10;
+  google.protobuf.Timestamp create_time = 11;
+  google.protobuf.Timestamp update_time = 12;
+}
+
+message InjectContentSet {
+  repeated InjectContent contents = 1;
+  string next_page_token = 2;
+}
+
+message ListInjectContentsRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+}
+
+message GetInjectContentRequest {
+  int64 id = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+message RetryInjectContentRequest {
+  int64 id = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+message InjectTask {
+  int64 id = 1;
+  int64 content_id = 2;
+  uint32 resource_type = 3;
+  int64 resource_id = 4;
+  int64 video_id = 5;
+  int64 episode_id = 6;
+  int64 media_id = 7;
+  uint32 action = 8;
+  uint32 status = 9;
+  google.protobuf.Timestamp create_time = 10;
+  google.protobuf.Timestamp update_time = 11;
+}
+
+message InjectTaskSet {
+  repeated InjectTask tasks = 1;
+  string next_page_token = 2;
+}
+
+message ListInjectTasksRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+}
+
+message GetInjectTaskRequest {
+  int64 id = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+message InjectLog {
+  int64 id = 1;
+  int64 task_id = 2;
+  int64 content_id = 3;
+  int64 sp_id = 4;
+  uint32 resource_type = 5;
+  int64 resource_id = 6;
+  int64 video_id = 7;
+  int64 episode_id = 8;
+  int64 media_id = 9;
+  uint32 action = 10;
+  string correlate_id = 11;
+  uint32 sync_status = 12;
+  uint32 async_status = 13;
+  string sync_message = 14;
+  string async_message = 15;
+  google.protobuf.Timestamp create_time = 16;
+  google.protobuf.Timestamp update_time = 17;
+}
+
+message InjectLogSet {
+  repeated InjectLog logs = 1;
+  string next_page_token = 2;
+}
+
+message ListInjectLogsRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+}

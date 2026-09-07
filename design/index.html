@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crow 播控管理中心 · 设计文档</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=IBM+Plex+Mono:wght@400;500&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #100e0b;
+      --ink-2: #1a1712;
+      --panel: #221e18;
+      --line: rgba(212, 176, 108, 0.22);
+      --brass: #d4b06c;
+      --brass-2: #f0d9a0;
+      --ember: #c45c32;
+      --paper: #efe6d6;
+      --muted: #a39886;
+      --ok: #7ea37a;
+      --film: rgba(255, 255, 255, 0.03);
+      --shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--paper);
+      background: var(--ink);
+      font-family: "Source Sans 3", sans-serif;
+      font-size: 17px;
+      line-height: 1.65;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 8;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+      opacity: 0.09;
+      mix-blend-mode: overlay;
+    }
+
+    .shell {
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr);
+      min-height: 100vh;
+    }
+
+    .rail {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      padding: 28px 20px;
+      border-right: 1px solid var(--line);
+      background:
+        linear-gradient(180deg, rgba(212, 176, 108, 0.06), transparent 28%),
+        var(--ink-2);
+      overflow: auto;
+    }
+
+    .mark {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 28px;
+    }
+
+    .glyph {
+      width: 42px;
+      height: 42px;
+      border: 1px solid var(--brass);
+      display: grid;
+      place-items: center;
+      color: var(--brass);
+      font-family: "Cormorant Garamond", serif;
+      font-size: 26px;
+      font-weight: 700;
+    }
+
+    .mark small {
+      display: block;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--brass);
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 10px;
+    }
+
+    .mark strong {
+      font-family: "Cormorant Garamond", serif;
+      font-size: 22px;
+      font-weight: 600;
+    }
+
+    .toc a {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 8px 0;
+      color: var(--muted);
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      font-size: 14px;
+    }
+
+    .toc a span:first-child {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 11px;
+      color: var(--brass);
+    }
+
+    .toc a.active,
+    .toc a:hover {
+      color: var(--paper);
+    }
+
+    .hint {
+      margin-top: 32px;
+      padding-top: 16px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 12px;
+      font-family: "IBM Plex Mono", monospace;
+    }
+
+    .stage { min-width: 0; }
+
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      padding: 72px 8vw 80px;
+      overflow: hidden;
+      background:
+        radial-gradient(ellipse at 80% 10%, rgba(196, 92, 50, 0.18), transparent 42%),
+        radial-gradient(ellipse at 10% 90%, rgba(212, 176, 108, 0.12), transparent 40%),
+        linear-gradient(180deg, #16130f, var(--ink));
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 36px;
+      border: 1px solid var(--line);
+      pointer-events: none;
+    }
+
+    .tc {
+      font-family: "IBM Plex Mono", monospace;
+      letter-spacing: 0.18em;
+      color: var(--brass);
+      font-size: 12px;
+    }
+
+    h1, h2, h3 {
+      font-family: "Cormorant Garamond", serif;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      line-height: 1.12;
+    }
+
+    .hero h1 {
+      max-width: 14ch;
+      margin: 18px 0 18px;
+      font-size: clamp(56px, 8vw, 108px);
+    }
+
+    .lede {
+      max-width: 38em;
+      font-size: 20px;
+      color: #d7cbb6;
+    }
+
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 28px;
+      margin-top: 48px;
+    }
+
+    .meta-row dt {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--brass);
+    }
+
+    .meta-row dd { margin: 6px 0 0; }
+
+    section.chapter {
+      padding: 88px 8vw;
+      border-top: 1px solid var(--line);
+    }
+
+    .kicker {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 12px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--brass);
+    }
+
+    h2 {
+      margin: 10px 0 22px;
+      font-size: clamp(36px, 5vw, 56px);
+    }
+
+    h3 { font-size: 28px; margin: 0 0 12px; }
+
+    p { color: #d9cebd; }
+    .muted { color: var(--muted); }
+
+    .grid-3, .grid-2, .grid-4 {
+      display: grid;
+      gap: 18px;
+    }
+    .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.03), transparent), var(--panel);
+      border: 1px solid var(--line);
+      padding: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    .card b { color: var(--brass-2); }
+
+    .pill {
+      display: inline-block;
+      border: 1px solid var(--line);
+      padding: 3px 8px;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 11px;
+      color: var(--brass);
+    }
+
+    .arch {
+      display: grid;
+      grid-template-columns: 1fr 18px 1fr 18px 1fr;
+      align-items: stretch;
+      gap: 0;
+      margin: 36px 0;
+    }
+
+    .arch .col {
+      border: 1px solid var(--line);
+      padding: 20px;
+      background: var(--panel);
+    }
+
+    .arch .arrow {
+      display: grid;
+      place-items: center;
+      color: var(--brass);
+      font-size: 20px;
+    }
+
+    .layers {
+      display: grid;
+      gap: 10px;
+      margin-top: 28px;
+    }
+
+    .layer {
+      display: grid;
+      grid-template-columns: 140px 1fr 180px;
+      gap: 16px;
+      align-items: center;
+      border: 1px solid var(--line);
+      padding: 14px 18px;
+      background: rgba(34, 30, 24, 0.7);
+    }
+
+    .layer em {
+      font-style: normal;
+      font-family: "IBM Plex Mono", monospace;
+      color: var(--brass);
+      font-size: 13px;
+    }
+
+    .flow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 13px;
+      margin: 24px 0;
+    }
+
+    .flow i {
+      font-style: normal;
+      border: 1px solid var(--line);
+      padding: 8px 12px;
+      background: var(--panel);
+    }
+
+    .flow span { color: var(--brass); }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 15px;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+
+    th {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--brass);
+      font-weight: 500;
+    }
+
+    code, .mono {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.92em;
+    }
+
+    .seq {
+      display: grid;
+      gap: 0;
+      margin: 20px 0 8px;
+    }
+
+    .seq-row {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 16px;
+      padding: 12px 0;
+      border-bottom: 1px dashed var(--line);
+    }
+
+    .seq-row strong {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 12px;
+      color: var(--brass);
+      font-weight: 500;
+    }
+
+    .tree {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 13px;
+      line-height: 1.8;
+      padding: 20px;
+      background: #14110d;
+      border: 1px solid var(--line);
+      color: #d8ccb8;
+      overflow: auto;
+    }
+
+    .footer {
+      padding: 36px 8vw 64px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 13px;
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 980px) {
+      .shell { grid-template-columns: 1fr; }
+      .rail { display: none; }
+      .grid-2, .grid-3, .grid-4, .arch, .layer {
+        grid-template-columns: 1fr;
+      }
+      .arch .arrow { display: none; }
+    }
+
+    @media print {
+      .rail, body::before { display: none; }
+      .shell { display: block; }
+      .hero, .chapter { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside class="rail">
+      <div class="mark">
+        <div class="glyph">Crow</div>
+        <div>
+          <small>Design Spec</small>
+          <strong>播控设计</strong>
+        </div>
+      </div>
+      <nav class="toc" id="toc"></nav>
+      <p class="hint">演示：↑↓ / J K 切换章节<br />P 打印 · 点击标题跳转</p>
+    </aside>
+
+    <div class="stage">
+      <header class="hero" id="cover">
+        <p class="tc" id="clock">CROW · 00:00:00:00</p>
+        <h1>Crow 播控管理中心</h1>
+        <p class="lede">面向 IPTV / OTT 内容分发的后台系统：用 Protobuf 定义契约，用 Go / Kratos 承载领域，用 React 控制台完成媒资、合作方与权限的日常运营。</p>
+        <dl class="meta-row">
+          <div>
+            <dt>文档类型</dt>
+            <dd>系统设计 / 演示稿</dd>
+          </div>
+          <div>
+            <dt>读者</dt>
+            <dd>产品、研发、运维、评审会</dd>
+          </div>
+          <div>
+            <dt>栈</dt>
+            <dd>Go · Kratos · MySQL · React</dd>
+          </div>
+          <div>
+            <dt>状态</dt>
+            <dd>当前仓库实现快照</dd>
+          </div>
+        </dl>
+      </header>
+
+      <section class="chapter" id="why">
+        <p class="kicker">01 · 定位</p>
+        <h2>为什么做 Crow</h2>
+        <p>Crow 不是通用 CMS。它服务的是<strong>内容注入与播控运营</strong>：版权方把节目交给平台，平台再按服务商路由分发。后台要同时管「片库从哪来、发给谁、谁能改」。</p>
+        <div class="grid-3" style="margin-top:28px">
+          <article class="card">
+            <p class="pill">内容</p>
+            <h3>媒资编目</h3>
+            <p>分类、影片、剧集、媒体文件、海报。电影 / 剧集 / 综艺共用一套节目树，而不是散落的文件列表。</p>
+          </article>
+          <article class="card">
+            <p class="pill">分发</p>
+            <h3>CP / SP 路由</h3>
+            <p>内容提供商（CP）注入，内容服务商（SP）拉流。编码对应协议侧 CPID / SPID，多对多绑定决定注入路径。</p>
+          </article>
+          <article class="card">
+            <p class="pill">治理</p>
+            <h3>账号与审计</h3>
+            <p>管理员、角色、权限、操作日志、系统日志。JWT 保护管理 API，变更可追溯。</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="chapter" id="scope">
+        <p class="kicker">02 · 范围</p>
+        <h2>做什么，先不做什么</h2>
+        <div class="grid-2">
+          <article class="card">
+            <h3>本期范围</h3>
+            <p>后台登录；管理员 / 角色 / 权限 CRUD；CP、SP 及绑定；影片库编目与海报上传；操作日志与运行日志查询；HTTP JSON API（Protobuf 生成）。</p>
+          </article>
+          <article class="card">
+            <h3>刻意延后</h3>
+            <p>终端播放器、CDN 调度引擎、转码流水线、计费结算、gRPC 对外暴露（入口已预留，当前 <code>cmd/crow</code> 只挂 HTTP）。Todo 示例仅作模板残留。</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="chapter" id="users">
+        <p class="kicker">03 · 使用方</p>
+        <h2>谁在用控制台</h2>
+        <table>
+          <thead>
+            <tr><th>角色</th><th>目标</th><th>主要界面</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>内容运营</td>
+              <td>上架影片、维护分类与剧集、补海报与码率信息</td>
+              <td>影片库 / 详情</td>
+            </tr>
+            <tr>
+              <td>商务 / 对接</td>
+              <td>维护 CP、SP 编码与绑定，保证协议侧身份正确</td>
+              <td>内容提供商、内容服务商</td>
+            </tr>
+            <tr>
+              <td>系统管理员</td>
+              <td>开账号、配角色、查谁改了什么</td>
+              <td>管理员、角色、权限、日志</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="chapter" id="context">
+        <p class="kicker">04 · 系统上下文</p>
+        <h2>运行时怎么拼在一起</h2>
+        <div class="arch">
+          <div class="col">
+            <p class="pill">Web</p>
+            <h3>crow-web</h3>
+            <p>Vite + React 19，端口 <code>5173</code>。会话放在 <code>sessionStorage</code>。开发时把 <code>/api</code> 与 <code>/uploads</code> 反代到后端。</p>
+          </div>
+          <div class="arrow">→</div>
+          <div class="col">
+            <p class="pill">HTTP</p>
+            <h3>cmd/crow</h3>
+            <p>Kratos HTTP <code>0.0.0.0:8000</code>。中间件：恢复、必填校验、JWT、操作日志。OpenAPI 由 proto 生成。</p>
+          </div>
+          <div class="arrow">→</div>
+          <div class="col">
+            <p class="pill">Store</p>
+            <h3>MySQL</h3>
+            <p>驱动 <code>mysql</code>，业务表由 data 层访问。Redis 配置已声明，当前主路径未作为会话存储。</p>
+          </div>
+        </div>
+        <p class="muted">本地启动：<code>go run ./cmd/crow -conf ./configs</code>，另开 <code>cd web && npm run dev</code>。</p>
+      </section>
+
+      <section class="chapter" id="layers">
+        <p class="kicker">05 · 分层</p>
+        <h2>DTO · DO · PO 单向流动</h2>
+        <p>Crow 沿用 Kratos 模板契约：边界转换，领域不碰传输，持久化不碰 proto。</p>
+        <div class="flow">
+          <i>Client</i><span>→</span>
+          <i>DTO proto</i><span>→</span>
+          <i>service</i><span>→</span>
+          <i>DO biz</i><span>→</span>
+          <i>data</i><span>→</span>
+          <i>PO / SQL</i>
+        </div>
+        <div class="layers">
+          <div class="layer">
+            <em>service</em>
+            <span>解析请求、FieldMask、列表过滤，调用 usecase。嵌入 Unimplemented Server。</span>
+            <span class="muted">只说 DTO ↔ DO</span>
+          </div>
+          <div class="layer">
+            <em>biz</em>
+            <span>领域对象、用例、Repo 接口、错误原因。权限目录等业务规则住在这里。</span>
+            <span class="muted">不 import data / service</span>
+          </div>
+          <div class="layer">
+            <em>data</em>
+            <span>实现 Repo，<code>*Data</code> 持有 <code>*sql.DB</code>。构造函数返回接口而非具体类型。</span>
+            <span class="muted">不 import DTO</span>
+          </div>
+          <div class="layer">
+            <em>server</em>
+            <span>组装 HTTP、注册服务、海报上传与静态 <code>/uploads/</code>。</span>
+            <span class="muted">无业务规则</span>
+          </div>
+          <div class="layer">
+            <em>cmd</em>
+            <span>Wire 注入唯一交汇点。</span>
+            <span class="muted">wire_gen.go 不手改</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="chapter" id="domain">
+        <p class="kicker">06 · 领域</p>
+        <h2>三块核心模型</h2>
+        <div class="grid-3">
+          <article class="card">
+            <p class="pill">VOD</p>
+            <h3>节目树</h3>
+            <p><b>Category</b> 可有父级。<b>Video</b> 挂分类，带编码、类型、海报、年份时长。<b>Episode</b> 属于影片。<b>Media</b> 挂影片或剧集，记录 URL、码率、分辨率、体积。</p>
+            <p class="muted">类型：1 电影 · 2 剧集 · 3 综艺 · 4 其他</p>
+          </article>
+          <article class="card">
+            <p class="pill">CDN 合作</p>
+            <h3>CP ↔ SP</h3>
+            <p><b>Cp</b>：注入侧身份，<code>cp_code</code> 全局唯一。<b>Sp</b>：分发侧身份，可选 JSON 配置。<b>CpSp</b>：多对多绑定与状态（正常 / 禁用 / 冻结）。</p>
+          </article>
+          <article class="card">
+            <p class="pill">IAM</p>
+            <h3>RBAC</h3>
+            <p><b>Admin</b> 多角色；<b>Role</b> 经 <b>GroupPermission</b> 挂权限。<b>Permission</b> 树：模块 handle 与 HTTP 路径 / 方法对齐，程序内预置目录。</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="chapter" id="auth">
+        <p class="kicker">07 · 安全</p>
+        <h2>登录之后才是后台</h2>
+        <div class="seq">
+          <div class="seq-row">
+            <strong>POST /v1/login</strong>
+            <span>账号密码换 access / refresh。前端存 <code>crow.auth</code>，后续请求带 <code>Authorization: Bearer</code>。</span>
+          </div>
+          <div class="seq-row">
+            <strong>JWT</strong>
+            <span>HMAC，claim 含 <code>sub</code>（管理员 ID）、<code>account</code>、<code>use=access</code>。过期由配置 <code>auth.jwt.expires_in</code>（默认 7200s）。</span>
+          </div>
+          <div class="seq-row">
+            <strong>中间件</strong>
+            <span>除登录外，<code>/v1/admins|roles|permissions|cps|sps|videos|…</code> 均校验 Bearer。失败 401。主体写入 context。</span>
+          </div>
+          <div class="seq-row">
+            <strong>审计</strong>
+            <span>管理写操作记 AdminOperationLog。进程日志可经系统日志查询。</span>
+          </div>
+        </div>
+        <p class="muted">密钥在 <code>configs/config.yaml</code>，演示环境勿把真实密钥提交仓库。</p>
+      </section>
+
+      <section class="chapter" id="api">
+        <p class="kicker">08 · 契约</p>
+        <h2>Protobuf 即 API</h2>
+        <p>资源风格：create / get / list / update / delete。List 带 <code>page_size</code>、<code>page_token</code>、<code>filter</code>、<code>order_by</code>；更新带 FieldMask。源文件在 <code>api/*/v1/*.proto</code>，用 <code>protoc</code> 生成 Go 与 OpenAPI，禁止手改 <code>*.pb.go</code>。</p>
+        <table>
+          <thead>
+            <tr><th>服务</th><th>前缀</th><th>职责</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>LoginService</td><td><code>/v1/login</code></td><td>签发令牌</td></tr>
+            <tr><td>AdminService</td><td><code>/v1/admins</code> 等</td><td>账号、角色、权限、两类日志</td></tr>
+            <tr><td>Cp / Sp / CpSp</td><td><code>/v1/cps|sps|cp-sps</code></td><td>合作方与绑定</td></tr>
+            <tr><td>VodService</td><td><code>/v1/videos</code> 等</td><td>分类、影片、剧集、媒资</td></tr>
+            <tr><td>Upload</td><td><code>POST /v1/videos/posters/upload</code></td><td>海报，≤10MB，落到 <code>uploads/posters</code></td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="chapter" id="frontend">
+        <p class="kicker">09 · 控制台</p>
+        <h2>播控管理中心信息架构</h2>
+        <p>登录后默认进入影片库。侧栏分三组；关联表（管理员-角色、CP-SP）可在表单里勾选，列表入口隐藏以免干扰运营。</p>
+        <div class="grid-3" style="margin-top:24px">
+          <article class="card">
+            <h3>内容管理</h3>
+            <p>影片库（自定义页：分类筛选、新建、详情编目）<br />内容提供商<br />内容服务商</p>
+          </article>
+          <article class="card">
+            <h3>系统管理</h3>
+            <p>管理员 · 角色 · 权限<br />操作日志 · 系统日志（只读）</p>
+          </article>
+          <article class="card">
+            <h3>交互模式</h3>
+            <p>通用资源：列表 → <code>/new</code> → <code>/:id/edit</code>。影片：海报上传、剧集与 Media 嵌在详情页。</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="chapter" id="flows">
+        <p class="kicker">10 · 关键路径</p>
+        <h2>两条必须讲清的链路</h2>
+        <div class="grid-2">
+          <article class="card">
+            <h3>上架一部剧</h3>
+            <p>1. 分类就绪<br />2. 创建 Video（类型=剧集，编码唯一）<br />3. 上传竖/横海报<br />4. 按集号建 Episode<br />5. 为每集登记 Media（地址、码率、分辨率）</p>
+          </article>
+          <article class="card">
+            <h3>开通一条注入路由</h3>
+            <p>1. 建 SP（编码 = 协议 SPID）<br />2. 建 CP（编码 = 协议 CPID）<br />3. 在 CP 表单勾选 SP，写入 CpSp<br />4. 状态保持「正常」，禁用/冻结切断路由</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="chapter" id="layout">
+        <p class="kicker">11 · 仓库地图</p>
+        <h2>代码落在哪</h2>
+        <pre class="tree">api/                 契约与生成桩
+cmd/crow/            入口与 Wire
+configs/             运行配置（无密钥进 Git）
+internal/service     DTO ↔ DO
+internal/biz         领域与 Repo 接口
+internal/data        MySQL 实现
+internal/server      HTTP、上传
+internal/middleware  JWT、操作日志
+web/                 React 控制台
+design/              本设计文档</pre>
+      </section>
+
+      <section class="chapter" id="nfr">
+        <p class="kicker">12 · 约束</p>
+        <h2>质量与演进边界</h2>
+        <div class="grid-2">
+          <article class="card">
+            <h3>必须遵守</h3>
+            <p>后端 Go，前端 React。分层方向不可逆。新增资源走 checklist：proto → 生成 → biz → data → wire → server。测试按层假依赖，不跨层打穿。</p>
+          </article>
+          <article class="card">
+            <h3>已知缺口</h3>
+            <p>权限目录已建模，控制台路由尚未按 handle 细粒度裁剪。海报为本地盘，生产需对象存储。刷新令牌接口尚未作为一等公民暴露。</p>
+          </article>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <span>Crow Design · 与仓库实现同步的演示文档</span>
+        <span class="mono">design/index.html</span>
+      </footer>
+    </div>
+  </div>
+
+  <script>
+    const chapters = [
+      ["cover", "封面"],
+      ["why", "定位"],
+      ["scope", "范围"],
+      ["users", "使用方"],
+      ["context", "上下文"],
+      ["layers", "分层"],
+      ["domain", "领域"],
+      ["auth", "安全"],
+      ["api", "契约"],
+      ["frontend", "控制台"],
+      ["flows", "路径"],
+      ["layout", "地图"],
+      ["nfr", "约束"],
+    ];
+
+    const toc = document.getElementById("toc");
+    chapters.forEach(([id, label], i) => {
+      const a = document.createElement("a");
+      a.href = "#" + id;
+      a.dataset.id = id;
+      a.innerHTML = `<span>${String(i).padStart(2, "0")}</span><span>${label}</span>`;
+      toc.appendChild(a);
+    });
+
+    const ids = chapters.map(([id]) => id);
+    const links = [...toc.querySelectorAll("a")];
+
+    const io = new IntersectionObserver((entries) => {
+      const visible = entries.filter((e) => e.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+      if (!visible) return;
+      links.forEach((a) => a.classList.toggle("active", a.dataset.id === visible.target.id));
+    }, { rootMargin: "-20% 0px -60% 0px", threshold: [0.2, 0.6] });
+
+    ids.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) io.observe(el);
+    });
+
+    function goto(delta) {
+      const current = links.findIndex((a) => a.classList.contains("active"));
+      const next = Math.min(ids.length - 1, Math.max(0, (current < 0 ? 0 : current) + delta));
+      document.getElementById(ids[next]).scrollIntoView({ behavior: "smooth" });
+    }
+
+    window.addEventListener("keydown", (e) => {
+      if (["ArrowDown", "PageDown", "j", "J", "n", "N"].includes(e.key)) {
+        e.preventDefault();
+        goto(1);
+      }
+      if (["ArrowUp", "PageUp", "k", "K", "p", "P"].includes(e.key) && e.key !== "p" && e.key !== "P") {
+        e.preventDefault();
+        goto(-1);
+      }
+      if (e.key === "p" || e.key === "P") {
+        if (!e.metaKey && !e.ctrlKey) {
+          e.preventDefault();
+          window.print();
+        }
+      }
+    });
+
+    const clock = document.getElementById("clock");
+    function tick() {
+      const d = new Date();
+      const pad = (n) => String(n).padStart(2, "0");
+      const f = Math.floor(d.getMilliseconds() / 40);
+      clock.textContent = `CROW · ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}:${pad(f)}`;
+    }
+    tick();
+    setInterval(tick, 80);
+  </script>
+</body>
+</html>
